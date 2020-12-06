@@ -1,0 +1,66 @@
+package main
+
+import (
+	"encoding/csv"
+	"io"
+	"os"
+	"strconv"
+	"time"
+)
+
+func LoadObjectList() (*ObjectList, error) {
+	f, err := os.Open("./data/objects.csv")
+	if err != nil {
+		return nil, err
+	}
+
+	defer f.Close()
+
+	r := csv.NewReader(f)
+	r.Comma = ';'
+
+	var objects []*Object = nil
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		i, err := strconv.ParseInt(record[1], 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		ownedSince := time.Unix(i, 0)
+		objects = append(objects, &Object{Name: record[0], OwnedSince: ownedSince})
+	}
+	return &ObjectList{Objects: objects}, nil
+}
+
+func (ol *ObjectList) AddObject(o *Object) {
+	ol.Objects = append(ol.Objects, o)
+}
+
+func (ol *ObjectList) Save() error {
+	f, err := os.OpenFile("./data/objects.csv", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	w := csv.NewWriter(f)
+	w.Comma = ';'
+	defer w.Flush()
+
+	var data []string
+	for _, o := range ol.Objects {
+		data = []string{o.Name, strconv.FormatInt(o.OwnedSince.Unix(), 10)}
+		err := w.Write(data)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
