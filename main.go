@@ -3,6 +3,7 @@ package main
 import (
 	"html/template"
 	"log"
+	"math/rand"
 	"net/http"
 	"time"
 )
@@ -10,6 +11,8 @@ import (
 var o *ObjectList
 
 func main() {
+	rand.Seed(time.Now().UTC().UnixNano())
+
 	objectList, err := LoadObjectList()
 	if err != nil {
 		log.Fatal(err)
