@@ -35,12 +35,16 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	o.AddObject(&Object{
-		Id: randSeq(16),
-		Name: r.PostForm.Get("name"),
-		Added: time.Now().Truncate(time.Second),
-	})
-	o.Save()
+	name := r.PostForm.Get("name")
+	if len(name) > 0 {
+		o.AddObject(&Object{
+			Id: randSeq(16),
+			Name: name,
+			Added: time.Now().Truncate(time.Second),
+		})
+		o.Save()
+	}
+
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
