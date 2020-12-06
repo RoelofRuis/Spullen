@@ -38,9 +38,9 @@ func LoadObjectList() (*ObjectList, error) {
 		}
 		added := time.Unix(i, 0)
 		object := &Object{
-			Name: record[0],
+			Name:  record[0],
 			Added: added,
-			Tags: strings.Split(record[2], ","),
+			Tags:  strings.Split(record[2], ","),
 		}
 
 		objects = append(objects, object)
@@ -68,7 +68,7 @@ func (ol *ObjectList) Save() error {
 		data = []string{
 			o.Name,
 			strconv.FormatInt(o.Added.Unix(), 10),
-			strings.Join(o.Tags,","),
+			strings.Join(o.Tags, ","),
 		}
 		err := w.Write(data)
 		if err != nil {
