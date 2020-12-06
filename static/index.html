@@ -24,6 +24,7 @@
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Added</th>
+                <th scope="col">Tags</th>
             </tr>
         </thead>
         <tbody>
@@ -31,6 +32,11 @@
             <tr>
                 <td>{{.Name}}</td>
                 <td>{{.Added}}</td>
+                <td>
+                    {{ range .Tags }}
+                        <span class="badge badge-pill badge-secondary">{{ . }}</span>
+                    {{ end }}
+                </td>
             </tr>
         {{ end }}
         </tbody>

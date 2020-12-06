@@ -9,4 +9,5 @@ type ObjectList struct {
 type Object struct {
 	Name  string
 	Added time.Time
+	Tags  []string
 }

@@ -5,11 +5,15 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
 func LoadObjectList() (*ObjectList, error) {
 	f, err := os.Open("./data/objects.csv")
+	if os.IsNotExist(err) {
+		return &ObjectList{Objects: nil}, nil
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -32,8 +36,14 @@ func LoadObjectList() (*ObjectList, error) {
 		if err != nil {
 			return nil, err
 		}
-		ownedSince := time.Unix(i, 0)
-		objects = append(objects, &Object{Name: record[0], Added: ownedSince})
+		added := time.Unix(i, 0)
+		object := &Object{
+			Name: record[0],
+			Added: added,
+			Tags: strings.Split(record[2], ","),
+		}
+
+		objects = append(objects, object)
 	}
 	return &ObjectList{Objects: objects}, nil
 }
@@ -55,7 +65,11 @@ func (ol *ObjectList) Save() error {
 
 	var data []string
 	for _, o := range ol.Objects {
-		data = []string{o.Name, strconv.FormatInt(o.Added.Unix(), 10)}
+		data = []string{
+			o.Name,
+			strconv.FormatInt(o.Added.Unix(), 10),
+			strings.Join(o.Tags,","),
+		}
 		err := w.Write(data)
 		if err != nil {
 			return err
