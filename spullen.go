@@ -3,7 +3,7 @@ package main
 import "time"
 
 type ObjectList struct {
-	Objects []*Object
+	Objects map[string]*Object
 }
 
 type Object struct {

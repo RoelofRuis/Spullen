@@ -18,6 +18,7 @@ func main() {
 
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/create", createHandler)
+	http.HandleFunc("/delete", deleteHandler)
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -39,6 +40,18 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 		Name: r.PostForm.Get("name"),
 		Added: time.Now().Truncate(time.Second),
 	})
+	o.Save()
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func deleteHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "unable to parse form", http.StatusBadRequest)
+		return
+	}
+	o.RemoveObject(r.Form.Get("id"))
 	o.Save()
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)

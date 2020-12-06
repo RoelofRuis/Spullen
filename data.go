@@ -23,7 +23,7 @@ func LoadObjectList() (*ObjectList, error) {
 	r := csv.NewReader(f)
 	r.Comma = ';'
 
-	var objects []*Object = nil
+	var objects = make(map[string]*Object)
 	for {
 		record, err := r.Read()
 		if err == io.EOF {
@@ -37,20 +37,25 @@ func LoadObjectList() (*ObjectList, error) {
 			return nil, err
 		}
 		added := time.Unix(i, 0)
+		id := record[0]
 		object := &Object{
-			Id:    record[0],
+			Id:    id,
 			Name:  record[1],
 			Added: added,
 			Tags:  strings.Split(record[3], ","),
 		}
 
-		objects = append(objects, object)
+		objects[id] = object
 	}
 	return &ObjectList{Objects: objects}, nil
 }
 
 func (ol *ObjectList) AddObject(o *Object) {
-	ol.Objects = append(ol.Objects, o)
+	ol.Objects[o.Id] = o
+}
+
+func (ol *ObjectList) RemoveObject(id string) {
+	delete(ol.Objects, id)
 }
 
 func (ol *ObjectList) Save() error {
