@@ -7,6 +7,6 @@ type ObjectList struct {
 }
 
 type Object struct {
-	Name string
-	OwnedSince time.Time
+	Name  string
+	Added time.Time
 }

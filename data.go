@@ -33,7 +33,7 @@ func LoadObjectList() (*ObjectList, error) {
 			return nil, err
 		}
 		ownedSince := time.Unix(i, 0)
-		objects = append(objects, &Object{Name: record[0], OwnedSince: ownedSince})
+		objects = append(objects, &Object{Name: record[0], Added: ownedSince})
 	}
 	return &ObjectList{Objects: objects}, nil
 }
@@ -55,7 +55,7 @@ func (ol *ObjectList) Save() error {
 
 	var data []string
 	for _, o := range ol.Objects {
-		data = []string{o.Name, strconv.FormatInt(o.OwnedSince.Unix(), 10)}
+		data = []string{o.Name, strconv.FormatInt(o.Added.Unix(), 10)}
 		err := w.Write(data)
 		if err != nil {
 			return err
