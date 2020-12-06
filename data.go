@@ -32,15 +32,16 @@ func LoadObjectList() (*ObjectList, error) {
 		if err != nil {
 			return nil, err
 		}
-		i, err := strconv.ParseInt(record[1], 10, 64)
+		i, err := strconv.ParseInt(record[2], 10, 64)
 		if err != nil {
 			return nil, err
 		}
 		added := time.Unix(i, 0)
 		object := &Object{
-			Name:  record[0],
+			Id:    record[0],
+			Name:  record[1],
 			Added: added,
-			Tags:  strings.Split(record[2], ","),
+			Tags:  strings.Split(record[3], ","),
 		}
 
 		objects = append(objects, object)
@@ -66,6 +67,7 @@ func (ol *ObjectList) Save() error {
 	var data []string
 	for _, o := range ol.Objects {
 		data = []string{
+			o.Id,
 			o.Name,
 			strconv.FormatInt(o.Added.Unix(), 10),
 			strings.Join(o.Tags, ","),

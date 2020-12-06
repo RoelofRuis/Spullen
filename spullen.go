@@ -7,6 +7,7 @@ type ObjectList struct {
 }
 
 type Object struct {
+	Id    string
 	Name  string
 	Added time.Time
 	Tags  []string
