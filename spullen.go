@@ -10,5 +10,13 @@ type Object struct {
 	Id    string
 	Name  string
 	Added time.Time
-	Tags  []string
+	Categories []string
+	Tags []string
+	Properties []*Property
+	Private bool
+}
+
+type Property struct {
+	Key string
+	Value string
 }

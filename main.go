@@ -45,6 +45,10 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 			Id: randSeq(16),
 			Name: strings.ToLower(name),
 			Added: time.Now().Truncate(time.Second),
+			Categories: nil,
+			Tags: nil,
+			Properties: nil,
+			Private: false,
 		})
 		o.Save()
 	}
