@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -42,7 +43,7 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 	if len(name) > 0 {
 		o.AddObject(&Object{
 			Id: randSeq(16),
-			Name: name,
+			Name: strings.ToLower(name),
 			Added: time.Now().Truncate(time.Second),
 		})
 		o.Save()
