@@ -8,43 +8,48 @@
 <body>
 <div class="container">
     <nav class="navbar navbar-light bg-light">
-        <span class="navbar-brand mb-0 h1">Spullen</span>
+        <span class="navbar-brand mb-1 h1">Spullen</span>
+        <span class="navbar-text">
+            Aantal: <b>{{ len .Objects }}</b>
+      </span>
     </nav>
-</div>
-<div class="container mt-3">
-    <form action="/create" method="post">
-        <div class="form-group">
-            <input name="name" type="text" class="form-control form-control-sm" placeholder="Object name" autocomplete="off" autofocus>
+    <div class="row mt-2">
+        <div class="col">
+            <form action="/create" method="post">
+                <div class="form-group">
+                    <input name="name" type="text" class="form-control form-control-sm" placeholder="Objectnaam" autocomplete="off" autofocus>
+                </div>
+            </form>
         </div>
-    </form>
-</div>
-<div class="container">
-    <table class="table table-sm">
-        <thead>
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Added</th>
-                <th scope="col">Tags</th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody>
-        {{ range .Objects }}
-            <tr>
-                <td>{{.Name}}</td>
-                <td>{{.Added}}</td>
-                <td>
-                    {{ range .Tags }}
-                        <span class="badge badge-pill badge-secondary">{{ . }}</span>
-                    {{ end }}
-                </td>
-                <td>
-                    <a href="/delete?id={{.Id}}"><span class="fa fa-trash-o"></span></a>
-                </td>
-            </tr>
-        {{ end }}
-        </tbody>
-    </table>
+        <div class="col">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">Naam</th>
+                        <th scope="col">Sinds</th>
+                        <th scope="col">Tags</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {{ range .Objects }}
+                    <tr>
+                        <td>{{ .Name }}</td>
+                        <td>{{ .Added.Format "02-01-2006" }}</td>
+                        <td>
+                            {{ range .Tags }}
+                                <span class="badge badge-pill badge-secondary">{{ . }}</span>
+                            {{ end }}
+                        </td>
+                        <td>
+                            <a href="/delete?id={{.Id}}"><span class="fa fa-trash-o"></span></a>
+                        </td>
+                    </tr>
+                {{ end }}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 </body>
 </html>
