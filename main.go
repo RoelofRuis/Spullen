@@ -44,6 +44,7 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 		o.AddObject(&Object{
 			Id: randSeq(16),
 			Name: strings.ToLower(name),
+			Quantity: 1,
 			Added: time.Now().Truncate(time.Second),
 			Categories: nil,
 			Tags: nil,

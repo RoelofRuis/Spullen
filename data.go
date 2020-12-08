@@ -33,30 +33,43 @@ func LoadObjectList() (*ObjectList, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		id := record[0]
+		name := record[1]
 		i, err := strconv.ParseInt(record[2], 10, 64)
 		if err != nil {
 			return nil, err
 		}
-		private, err := strconv.ParseBool(record[6])
+		added := time.Unix(i, 0)
+		quantity, err := strconv.ParseInt(record[3], 10, 32)
 		if err != nil {
 			return nil, err
 		}
-		id := record[0]
+		categories := strings.Split(record[4], ",")
+		tags := strings.Split(record[5], ",")
 		var properties []*Property
-		for _, p := range strings.Split(record[5], ",") {
+		for _, p := range strings.Split(record[6], ",") {
+			if len(p) == 0 {
+				continue
+			}
 			keyValue := strings.Split(p, "=")
 			if len(keyValue) != 2 {
-				return nil, fmt.Errorf("encountered invalid property value [%s]", record[5])
+				return nil, fmt.Errorf("encountered invalid property value [%s]", record[6])
 			}
 			properties = append(properties, &Property{keyValue[0], keyValue[1]})
 		}
-		added := time.Unix(i, 0)
+		private, err := strconv.ParseBool(record[7])
+		if err != nil {
+			return nil, err
+		}
+
 		object := &Object{
 			Id:    id,
-			Name:  record[1],
+			Name:  name,
 			Added: added,
-			Categories: strings.Split(record[3], ","),
-			Tags: strings.Split(record[4], ","),
+			Quantity: int(quantity),
+			Categories: categories,
+			Tags: tags,
 			Properties: properties,
 			Private: private,
 		}
@@ -94,6 +107,7 @@ func (ol *ObjectList) Save() error {
 		data = []string{
 			o.Id,
 			o.Name,
+			fmt.Sprintf("%d", o.Quantity),
 			strconv.FormatInt(o.Added.Unix(), 10),
 			strings.Join(o.Categories, ","),
 			strings.Join(o.Tags, ","),

@@ -33,6 +33,11 @@
                 </thead>
                 <tbody>
                 {{ range .Objects }}
+                    {{ if .Private }}
+                    <tr>
+                        <td colspan="4"><span class="text-muted"><i>redacted</i></span></td>
+                    </tr>
+                    {{ else }}
                     <tr>
                         <td>{{ .Name }}</td>
                         <td>{{ .Added.Format "02-01-2006" }}</td>
@@ -45,6 +50,7 @@
                             <a href="/delete?id={{.Id}}"><span class="fa fa-trash-o"></span></a>
                         </td>
                     </tr>
+                    {{ end }}
                 {{ end }}
                 </tbody>
             </table>

@@ -9,6 +9,7 @@ type ObjectList struct {
 type Object struct {
 	Id    string
 	Name  string
+	Quantity int
 	Added time.Time
 	Categories []string
 	Tags []string
