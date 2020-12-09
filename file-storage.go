@@ -21,7 +21,7 @@ type FileStorage struct {
 }
 
 func NewFileStorage() (*FileStorage, error) {
-	f, err := os.Open("./data/objects.csv")
+	f, err := os.Open("./db/objects.csv")
 	if os.IsNotExist(err) {
 		return &FileStorage{Objects: make(map[string]*Object)}, nil
 	}
@@ -106,7 +106,7 @@ func (ol *FileStorage) RemoveObject(id string) error {
 }
 
 func (ol *FileStorage) writeToFile() error {
-	f, err := os.OpenFile("./data/objects.csv", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
+	f, err := os.OpenFile("./db/objects.csv", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return err
 	}
