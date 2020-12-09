@@ -22,7 +22,6 @@ func main() {
 	o = storage
 
 	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/create", createHandler)
 	http.HandleFunc("/delete", deleteHandler)
 
 	fmt.Print("started server on localhost:8080")
@@ -31,37 +30,36 @@ func main() {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("./static/index.html")
-
-	t.Execute(w, o.GetAll())
-}
-
-func createHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		http.Error(w, "unable to parse form", http.StatusBadRequest)
-		return
-	}
-
-	name := r.PostForm.Get("name")
-	if len(name) > 0 {
-		err := o.AddObject(&Object{
-			Id:         randSeq(16),
-			Name:       strings.ToLower(name),
-			Quantity:   1,
-			Added:      time.Now().Truncate(time.Second),
-			Categories: nil,
-			Tags:       nil,
-			Properties: nil,
-			Private:    false,
-		})
+	if r.Method == http.MethodPost {
+		err := r.ParseForm()
 		if err != nil {
-			http.Error(w, "unable to add object", http.StatusInternalServerError)
+			http.Error(w, "unable to parse form", http.StatusBadRequest)
 			return
+		}
+
+		name := r.PostForm.Get("name")
+		if len(name) > 0 {
+			err := o.AddObject(&Object{
+				Id:         randSeq(16),
+				Name:       strings.ToLower(name),
+				Quantity:   1,
+				Added:      time.Now().Truncate(time.Second),
+				Categories: nil,
+				Tags:       nil,
+				Properties: nil,
+				Private:    false,
+			})
+			if err != nil {
+				print(err.Error())
+				http.Error(w, "unable to add object", http.StatusInternalServerError)
+				return
+			}
 		}
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	t, _ := template.ParseFiles("./static/index.html")
+
+	t.Execute(w, o.GetAll())
 }
 
 func deleteHandler(w http.ResponseWriter, r *http.Request) {
