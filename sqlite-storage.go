@@ -1,0 +1,37 @@
+package main
+
+import (
+	"database/sql"
+
+	_ "github.com/mattn/go-sqlite3"
+)
+
+type SqliteStorage struct {
+	db *sql.DB
+}
+
+func NewSqliteStorage() (*SqliteStorage, error) {
+	db, err := sql.Open("sqlite3", ":memory:")
+	if err != nil {
+		return nil, err
+	}
+	return &SqliteStorage{db}, nil
+}
+
+func (ol *SqliteStorage) GetAll() *ObjectSet {
+	// TODO: implement
+
+	return nil
+}
+
+func (ol *SqliteStorage) AddObject(o *Object) error {
+	// TODO: implement
+
+	return nil
+}
+
+func (ol *SqliteStorage) RemoveObject(id string) error {
+	// TODO: implement
+
+	return nil
+}

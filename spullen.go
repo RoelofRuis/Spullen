@@ -2,6 +2,10 @@ package main
 
 import "time"
 
+type ObjectSet struct {
+	Objects map[string]*Object
+}
+
 type Object struct {
 	Id    string
 	Name  string

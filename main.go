@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"math/rand"
@@ -14,22 +15,25 @@ var o Storage
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	objectList, err := NewFileStorage()
+	storage, err := NewFileStorage()
 	if err != nil {
 		log.Fatal(err)
 	}
-	o = objectList
+	o = storage
 
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/create", createHandler)
 	http.HandleFunc("/delete", deleteHandler)
+
+	fmt.Print("started server on localhost:8080")
+
 	http.ListenAndServe(":8080", nil)
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("./static/index.html")
 
-	t.Execute(w, o)
+	t.Execute(w, o.GetAll())
 }
 
 func createHandler(w http.ResponseWriter, r *http.Request) {
