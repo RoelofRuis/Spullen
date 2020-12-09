@@ -7,7 +7,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type Storage interface {
@@ -44,47 +43,21 @@ func NewFileStorage() (*FileStorage, error) {
 			return nil, err
 		}
 
-		id := record[0]
-		name := record[1]
-		i, err := strconv.ParseInt(record[2], 10, 64)
-		if err != nil {
-			return nil, err
-		}
-		added := time.Unix(i, 0)
-		quantity, err := strconv.ParseInt(record[3], 10, 32)
-		if err != nil {
-			return nil, err
-		}
-		categories := strings.Split(record[4], ",")
-		tags := strings.Split(record[5], ",")
-		var properties []*Property
-		for _, p := range strings.Split(record[6], ",") {
-			if len(p) == 0 {
-				continue
-			}
-			keyValue := strings.Split(p, "=")
-			if len(keyValue) != 2 {
-				return nil, fmt.Errorf("encountered invalid property value [%s]", record[6])
-			}
-			properties = append(properties, &Property{keyValue[0], keyValue[1]})
-		}
-		private, err := strconv.ParseBool(record[7])
+		object, err := ParseObjectForm(&ObjectForm{
+			Id:         record[0],
+			TimeAdded:  record[1],
+			Name:       record[2],
+			Quantity:   record[3],
+			Categories: record[4],
+			Tags:       record[5],
+			Properties: record[6],
+			Private:    record[7],
+		})
 		if err != nil {
 			return nil, err
 		}
 
-		object := &Object{
-			Id:         id,
-			Name:       name,
-			Added:      added,
-			Quantity:   int(quantity),
-			Categories: categories,
-			Tags:       tags,
-			Properties: properties,
-			Private:    private,
-		}
-
-		objects[id] = object
+		objects[object.Id] = object
 	}
 	return &FileStorage{Objects: objects}, nil
 }
@@ -124,9 +97,9 @@ func (ol *FileStorage) writeToFile() error {
 		}
 		data = []string{
 			o.Id,
+			strconv.FormatInt(o.Added.Unix(), 10),
 			o.Name,
 			fmt.Sprintf("%d", o.Quantity),
-			strconv.FormatInt(o.Added.Unix(), 10),
 			strings.Join(o.Categories, ","),
 			strings.Join(o.Tags, ","),
 			strings.Join(properties, ","),

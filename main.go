@@ -6,7 +6,6 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -37,20 +36,22 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		name := r.PostForm.Get("name")
-		if len(name) > 0 {
-			err := o.AddObject(&Object{
-				Id:         randSeq(16),
-				Name:       strings.ToLower(name),
-				Quantity:   1,
-				Added:      time.Now().Truncate(time.Second),
-				Categories: nil,
-				Tags:       nil,
-				Properties: nil,
-				Private:    false,
+		if len(r.PostForm.Get("name")) > 0 {
+			object, err := ParseObjectForm(&ObjectForm{
+				Name: r.PostForm.Get("name"),
+				Quantity: r.PostForm.Get("quantity"),
+				Categories: r.PostForm.Get("categories"),
+				Tags: r.PostForm.Get("tags"),
+				Properties: r.PostForm.Get("properties"),
+				Private: r.PostForm.Get("private"),
 			})
 			if err != nil {
-				print(err.Error())
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			err = o.AddObject(object)
+			if err != nil {
 				http.Error(w, "unable to add object", http.StatusInternalServerError)
 				return
 			}
