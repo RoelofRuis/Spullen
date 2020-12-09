@@ -10,10 +10,19 @@ import (
 	"time"
 )
 
-func LoadObjectList() (*ObjectList, error) {
+type Storage interface {
+	AddObject(*Object) error
+	RemoveObject(id string) error
+}
+
+type FileStorage struct {
+	Objects map[string]*Object
+}
+
+func NewFileStorage() (*FileStorage, error) {
 	f, err := os.Open("./data/objects.csv")
 	if os.IsNotExist(err) {
-		return &ObjectList{Objects: make(map[string]*Object)}, nil
+		return &FileStorage{Objects: make(map[string]*Object)}, nil
 	}
 	if err != nil {
 		return nil, err
@@ -76,18 +85,22 @@ func LoadObjectList() (*ObjectList, error) {
 
 		objects[id] = object
 	}
-	return &ObjectList{Objects: objects}, nil
+	return &FileStorage{Objects: objects}, nil
 }
 
-func (ol *ObjectList) AddObject(o *Object) {
+func (ol *FileStorage) AddObject(o *Object) error {
 	ol.Objects[o.Id] = o
+
+	return ol.writeToFile()
 }
 
-func (ol *ObjectList) RemoveObject(id string) {
+func (ol *FileStorage) RemoveObject(id string) error {
 	delete(ol.Objects, id)
+
+	return ol.writeToFile()
 }
 
-func (ol *ObjectList) Save() error {
+func (ol *FileStorage) writeToFile() error {
 	f, err := os.OpenFile("./data/objects.csv", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return err

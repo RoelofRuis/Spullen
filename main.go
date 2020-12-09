@@ -9,12 +9,12 @@ import (
 	"time"
 )
 
-var o *ObjectList
+var o Storage
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	objectList, err := LoadObjectList()
+	objectList, err := NewFileStorage()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,7 +41,7 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 
 	name := r.PostForm.Get("name")
 	if len(name) > 0 {
-		o.AddObject(&Object{
+		err := o.AddObject(&Object{
 			Id: randSeq(16),
 			Name: strings.ToLower(name),
 			Quantity: 1,
@@ -51,7 +51,10 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 			Properties: nil,
 			Private: false,
 		})
-		o.Save()
+		if err != nil {
+			http.Error(w, "unable to add object", http.StatusInternalServerError)
+			return
+		}
 	}
 
 
@@ -64,8 +67,11 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "unable to parse form", http.StatusBadRequest)
 		return
 	}
-	o.RemoveObject(r.Form.Get("id"))
-	o.Save()
+	err = o.RemoveObject(r.Form.Get("id"))
+	if err != nil {
+		http.Error(w, "unable to remove object", http.StatusInternalServerError)
+		return
+	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
