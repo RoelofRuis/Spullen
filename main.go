@@ -28,6 +28,11 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 }
 
+type IndexModel struct {
+	Objects     *ObjectSet
+	PrivateMode bool
+}
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		err := r.ParseForm()
@@ -60,7 +65,10 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	t, _ := template.ParseFiles("./static/index.html")
 
-	t.Execute(w, o.GetAll())
+	t.Execute(w, IndexModel{
+		Objects:     o.GetAll(),
+		PrivateMode: true,
+	})
 }
 
 func deleteHandler(w http.ResponseWriter, r *http.Request) {
