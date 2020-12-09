@@ -74,14 +74,14 @@ func NewFileStorage() (*FileStorage, error) {
 		}
 
 		object := &Object{
-			Id:    id,
-			Name:  name,
-			Added: added,
-			Quantity: int(quantity),
+			Id:         id,
+			Name:       name,
+			Added:      added,
+			Quantity:   int(quantity),
 			Categories: categories,
-			Tags: tags,
+			Tags:       tags,
 			Properties: properties,
-			Private: private,
+			Private:    private,
 		}
 
 		objects[id] = object
@@ -120,7 +120,7 @@ func (ol *FileStorage) writeToFile() error {
 	for _, o := range ol.Objects {
 		var properties []string
 		for _, p := range o.Properties {
-			properties = append(properties,  fmt.Sprintf("%s=%s", p.Key, p.Value))
+			properties = append(properties, fmt.Sprintf("%s=%s", p.Key, p.Value))
 		}
 		data = []string{
 			o.Id,

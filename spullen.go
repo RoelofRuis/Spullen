@@ -7,17 +7,17 @@ type ObjectSet struct {
 }
 
 type Object struct {
-	Id    string
-	Name  string
-	Quantity int
-	Added time.Time
+	Id         string
+	Name       string
+	Quantity   int
+	Added      time.Time
 	Categories []string
-	Tags []string
+	Tags       []string
 	Properties []*Property
-	Private bool
+	Private    bool
 }
 
 type Property struct {
-	Key string
+	Key   string
 	Value string
 }

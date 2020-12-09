@@ -46,21 +46,20 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.PostForm.Get("name")
 	if len(name) > 0 {
 		err := o.AddObject(&Object{
-			Id: randSeq(16),
-			Name: strings.ToLower(name),
-			Quantity: 1,
-			Added: time.Now().Truncate(time.Second),
+			Id:         randSeq(16),
+			Name:       strings.ToLower(name),
+			Quantity:   1,
+			Added:      time.Now().Truncate(time.Second),
 			Categories: nil,
-			Tags: nil,
+			Tags:       nil,
 			Properties: nil,
-			Private: false,
+			Private:    false,
 		})
 		if err != nil {
 			http.Error(w, "unable to add object", http.StatusInternalServerError)
 			return
 		}
 	}
-
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
