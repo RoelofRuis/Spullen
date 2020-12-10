@@ -53,6 +53,7 @@
                         <th scope="col">Naam</th>
                         <th scope="col">Sinds</th>
                         <th scope="col">Tags</th>
+                        <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -71,6 +72,9 @@
                             {{ range .Tags }}
                                 <span class="badge badge-pill badge-secondary">{{ . }}</span>
                             {{ end }}
+                        </td>
+                        <td>
+                            <a href="/edit?id={{ .Id }}"><i class="fa fa-pencil"></i></a>
                         </td>
                     </tr>
                     {{ end }}

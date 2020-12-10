@@ -11,6 +11,8 @@ import (
 
 var o Storage
 
+var privateMode = true
+
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
@@ -63,11 +65,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	t, _ := template.ParseFiles("./static/index.html")
+	t, _ := template.ParseFiles("./static/index.gohtml")
 
 	t.Execute(w, IndexModel{
 		Objects:     o.GetAll(),
-		PrivateMode: true,
+		PrivateMode: privateMode,
 	})
 }
 
