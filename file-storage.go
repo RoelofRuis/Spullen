@@ -10,7 +10,8 @@ import (
 )
 
 type Storage interface {
-	GetAll() *ObjectSet
+	GetAll() *map[string]*Object
+	Get(id string) *Object
 	AddObject(*Object) error
 	RemoveObject(id string) error
 }
@@ -62,8 +63,16 @@ func NewFileStorage() (*FileStorage, error) {
 	return &FileStorage{Objects: objects}, nil
 }
 
-func (ol *FileStorage) GetAll() *ObjectSet {
-	return &ObjectSet{ol.Objects}
+func (ol *FileStorage) Get(id string) *Object {
+	if object, found := ol.Objects[id]; found {
+		return object
+	}
+
+	return nil
+}
+
+func (ol *FileStorage) GetAll() *map[string]*Object {
+	return &ol.Objects
 }
 
 func (ol *FileStorage) AddObject(o *Object) error {

@@ -11,7 +11,7 @@
     <nav class="navbar navbar-light bg-light">
         <span class="navbar-brand mb-1 h1">Spullen</span>
         <span class="navbar-text">
-            Aantal: <b>{{ len .Objects.Objects }}</b>
+            Aantal: <b>{{ len .Objects }}</b>
       </span>
     </nav>
     <div class="row mt-2">
@@ -53,14 +53,13 @@
                         <th scope="col">Naam</th>
                         <th scope="col">Sinds</th>
                         <th scope="col">Tags</th>
-                        <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
-                {{ range .Objects.Objects }}
+                {{ range .Objects }}
                     {{ if and $private_mode .Private }}
                     <tr>
-                        <td colspan="4"><span class="text-muted"><i>privé</i></span></td>
+                        <td colspan="3"><span class="text-muted"><i>privé</i></span></td>
                     </tr>
                     {{ else }}
                     <tr>
@@ -72,9 +71,6 @@
                             {{ range .Tags }}
                                 <span class="badge badge-pill badge-secondary">{{ . }}</span>
                             {{ end }}
-                        </td>
-                        <td>
-                            <a href="/delete?id={{.Id}}"><i class="fa fa-trash-o"></i></a>
                         </td>
                     </tr>
                     {{ end }}

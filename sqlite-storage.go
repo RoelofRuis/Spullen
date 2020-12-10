@@ -18,7 +18,13 @@ func NewSqliteStorage() (*SqliteStorage, error) {
 	return &SqliteStorage{db}, nil
 }
 
-func (ol *SqliteStorage) GetAll() *ObjectSet {
+func (ol *SqliteStorage) Get(id string) *Object {
+	// TODO: implement
+
+	return nil
+}
+
+func (ol *SqliteStorage) GetAll() *map[string]*Object {
 	// TODO: implement
 
 	return nil
