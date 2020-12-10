@@ -40,29 +40,14 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		err := r.ParseForm()
 		if err != nil {
-			http.Error(w, "unable to parse form", http.StatusBadRequest)
-			return
+			println(err.Error())
+			http.Error(w, "bad request", http.StatusBadRequest)
 		}
 
-		if len(r.PostForm.Get("name")) > 0 {
-			object, err := ParseObjectForm(&ObjectForm{
-				Name: r.PostForm.Get("name"),
-				Quantity: r.PostForm.Get("quantity"),
-				Categories: r.PostForm.Get("categories"),
-				Tags: r.PostForm.Get("tags"),
-				Properties: r.PostForm.Get("properties"),
-				Private: r.PostForm.Get("private"),
-			})
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
-				return
-			}
-
-			err = o.AddObject(object)
-			if err != nil {
-				http.Error(w, "unable to add object", http.StatusInternalServerError)
-				return
-			}
+		err = saveObject(r)
+		if err != nil {
+			println(err.Error())
+			http.Error(w, "error", http.StatusInternalServerError)
 		}
 	}
 
@@ -81,21 +66,57 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func saveObject(r *http.Request) error {
+	if len(r.PostForm.Get("name")) > 0 {
+		object, err := ParseObjectForm(&ObjectForm{
+			Id: r.Form.Get("id"),
+			Name: r.PostForm.Get("name"),
+			Quantity: r.PostForm.Get("quantity"),
+			Categories: r.PostForm.Get("categories"),
+			Tags: r.PostForm.Get("tags"),
+			Properties: r.PostForm.Get("properties"),
+			Private: r.PostForm.Get("private"),
+		})
+		if err != nil {
+			return err
+		}
+
+		err = o.PutObject(object)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func editHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		http.Error(w, "unable to parse form", http.StatusBadRequest)
-		return
+		println(err.Error())
+		http.Error(w, "bad request", http.StatusBadRequest)
 	}
+
 	id := r.Form.Get("id")
 	object := o.Get(id)
 	if object == nil {
 		http.Error(w, "object does not exist", http.StatusNotFound)
 		return
 	}
+
 	if privateMode && object.Private {
 		http.Error(w, "object can not be edited", http.StatusForbidden)
 		return
+	}
+
+	if r.Method == http.MethodPost {
+		err := saveObject(r)
+		if err != nil {
+			println(err.Error())
+			http.Error(w, "error", http.StatusInternalServerError)
+		}
+
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 
 	t, err := template.ParseFiles("./static/layout.gohtml", "./static/edit.gohtml")

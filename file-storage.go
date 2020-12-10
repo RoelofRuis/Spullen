@@ -12,7 +12,7 @@ import (
 type Storage interface {
 	GetAll() *map[string]*Object
 	Get(id string) *Object
-	AddObject(*Object) error
+	PutObject(*Object) error
 	RemoveObject(id string) error
 }
 
@@ -75,7 +75,7 @@ func (ol *FileStorage) GetAll() *map[string]*Object {
 	return &ol.Objects
 }
 
-func (ol *FileStorage) AddObject(o *Object) error {
+func (ol *FileStorage) PutObject(o *Object) error {
 	ol.Objects[o.Id] = o
 
 	return ol.writeToFile()

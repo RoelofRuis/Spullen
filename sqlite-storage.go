@@ -30,7 +30,7 @@ func (ol *SqliteStorage) GetAll() *map[string]*Object {
 	return nil
 }
 
-func (ol *SqliteStorage) AddObject(o *Object) error {
+func (ol *SqliteStorage) PutObject(o *Object) error {
 	// TODO: implement
 
 	return nil
