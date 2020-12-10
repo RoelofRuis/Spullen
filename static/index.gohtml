@@ -1,3 +1,7 @@
+{{ define "navbar-text" }}
+Aantal: <b>{{ len .Objects }}</b>
+{{ end }}
+
 {{ define "content" }}
 {{ $private_mode := .PrivateMode }}
 <div class="row mt-2">
