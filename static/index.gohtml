@@ -1,88 +1,72 @@
-<!DOCTYPE html>
+{{ define "content" }}
 {{ $private_mode := .PrivateMode }}
-<html lang="en">
-<head>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" >
-    <title>Spullen</title>
-</head>
-<body>
-<div class="container">
-    <nav class="navbar navbar-light bg-light">
-        <span class="navbar-brand mb-1 h1">Spullen</span>
-        <span class="navbar-text">
-            Totaal aantal: <b>{{ len .Objects }}</b>
-      </span>
-    </nav>
-    <div class="row mt-2">
-        <div class="col">
-            <form action="/" method="post">
-                <div class="form-row">
-                    <div class="form-group col">
-                        <label for="name-field">Objectnaam</label>
-                        <input id="name-field" name="name" type="text" class="form-control form-control-sm" placeholder="tafel" autocomplete="off" autofocus>
-                    </div>
-                    <div class="form-group col">
-                        <label for="quantity-field">Aantal</label>
-                        <input id="quantity-field" name="quantity" type="number" class="form-control form-control-sm" value="1" autocomplete="off" autofocus>
-                    </div>
+<div class="row mt-2">
+    <div class="col">
+        <form action="/" method="post">
+            <div class="form-row">
+                <div class="form-group col">
+                    <label for="name-field">Objectnaam</label>
+                    <input id="name-field" name="name" type="text" class="form-control form-control-sm" placeholder="tafel" autocomplete="off" autofocus>
                 </div>
-                <div class="form-group">
-                    <label for="category-field">Categorieën</label>
-                    <input id="category-field" name="categories" type="text" class="form-control form-control-sm" placeholder="meubel,groot" autocomplete="off">
+                <div class="form-group col">
+                    <label for="quantity-field">Aantal</label>
+                    <input id="quantity-field" name="quantity" type="number" class="form-control form-control-sm" value="1" autocomplete="off" autofocus>
                 </div>
-                <div class="form-group">
-                    <label for="tags-field">Tags</label>
-                    <input id="tags-field" name="tags" type="text" class="form-control form-control-sm" placeholder="woonkamer,opruimen" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label for="properties-field">Eigenschappen</label>
-                    <input id="properties-field" name="properties" type="text" class="form-control form-control-sm" placeholder="kleur=bruin,materiaal=hout" autocomplete="off">
-                </div>
-                <div class="form-check">
-                    <input name="private" class="form-control-sm form-check-input" type="checkbox" id="check-private">
-                    <label class="form-check-label" for="check-private">Privé</label>
-                </div>
-                <button type="submit" class="btn btn-primary">Opslaan</button>
-            </form>
-        </div>
-        <div class="col">
-            <table class="table table-sm">
-                <thead>
-                    <tr>
-                        <th scope="col">Naam</th>
-                        <th scope="col">Sinds</th>
-                        <th scope="col">Tags</th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                {{ range .Objects }}
-                    {{ if and $private_mode .Private }}
-                    <tr>
-                        <td colspan="3"><span class="text-muted"><i>privé</i></span></td>
-                    </tr>
-                    {{ else }}
-                    <tr>
-                        <td>
-                            {{ if .Private }}<i class="fa fa-exclamation"></i>{{ end }} {{ .Name }}
-                        </td>
-                        <td>{{ .Added.Format "02-01-2006" }}</td>
-                        <td>
-                            {{ range .Tags }}
-                                <span class="badge badge-pill badge-secondary">{{ . }}</span>
-                            {{ end }}
-                        </td>
-                        <td>
-                            <a href="/edit?id={{ .Id }}"><i class="fa fa-pencil"></i></a>
-                        </td>
-                    </tr>
-                    {{ end }}
+            </div>
+            <div class="form-group">
+                <label for="category-field">Categorieën</label>
+                <input id="category-field" name="categories" type="text" class="form-control form-control-sm" placeholder="meubel,groot" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="tags-field">Tags</label>
+                <input id="tags-field" name="tags" type="text" class="form-control form-control-sm" placeholder="woonkamer,opruimen" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="properties-field">Eigenschappen</label>
+                <input id="properties-field" name="properties" type="text" class="form-control form-control-sm" placeholder="kleur=bruin,materiaal=hout" autocomplete="off">
+            </div>
+            <div class="form-check">
+                <input name="private" class="form-control-sm form-check-input" type="checkbox" id="check-private">
+                <label class="form-check-label" for="check-private">Privé</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Opslaan</button>
+        </form>
+    </div>
+    <div class="col">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Naam</th>
+                    <th scope="col">Sinds</th>
+                    <th scope="col">Tags</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+            {{ range .Objects }}
+                {{ if and $private_mode .Private }}
+                <tr>
+                    <td colspan="3"><span class="text-muted"><i>privé</i></span></td>
+                </tr>
+                {{ else }}
+                <tr>
+                    <td>
+                        {{ if .Private }}<i class="fa fa-exclamation"></i>{{ end }} {{ .Name }}
+                    </td>
+                    <td>{{ .Added.Format "02-01-2006" }}</td>
+                    <td>
+                        {{ range .Tags }}
+                            <span class="badge badge-pill badge-secondary">{{ . }}</span>
+                        {{ end }}
+                    </td>
+                    <td>
+                        <a href="/edit?id={{ .Id }}"><i class="fa fa-pencil"></i></a>
+                    </td>
+                </tr>
                 {{ end }}
-                </tbody>
-            </table>
-        </div>
+            {{ end }}
+            </tbody>
+        </table>
     </div>
 </div>
-</body>
-</html>
+{{ end }}

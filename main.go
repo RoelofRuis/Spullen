@@ -23,6 +23,7 @@ func main() {
 	o = storage
 
 	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/edit", editHandler)
 	http.HandleFunc("/delete", deleteHandler)
 
 	fmt.Print("started server on localhost:8080")
@@ -65,12 +66,48 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	t, _ := template.ParseFiles("./static/index.gohtml")
+	t, err := template.ParseFiles("./static/layout.gohtml", "./static/index.gohtml")
+	if err != nil {
+		http.Error(w, "unable to parse templates", http.StatusInternalServerError)
+		return
+	}
 
-	t.Execute(w, IndexModel{
+	err = t.ExecuteTemplate(w, "layout", IndexModel{
 		Objects:     o.GetAll(),
 		PrivateMode: privateMode,
 	})
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+}
+
+func editHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "unable to parse form", http.StatusBadRequest)
+		return
+	}
+	id := r.Form.Get("id")
+	object := o.Get(id)
+	if object == nil {
+		http.Error(w, "object does not exist", http.StatusNotFound)
+		return
+	}
+	if privateMode && object.Private {
+		http.Error(w, "object can not be edited", http.StatusForbidden)
+		return
+	}
+
+	t, err := template.ParseFiles("./static/layout.gohtml", "./static/edit.gohtml")
+	if err != nil {
+		http.Error(w, "unable to parse templates", http.StatusInternalServerError)
+		return
+	}
+
+	err = t.ExecuteTemplate(w, "layout", MakeForm(object))
+	if err != nil {
+		fmt.Print(err.Error())
+	}
 }
 
 func deleteHandler(w http.ResponseWriter, r *http.Request) {

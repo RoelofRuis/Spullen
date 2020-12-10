@@ -19,6 +19,28 @@ type ObjectForm struct {
 	Private string
 }
 
+func MakeForm(o *Object) *ObjectForm {
+	var propertyStrings []string = nil
+	for _, p := range o.Properties {
+		propertyStrings = append(propertyStrings, p.Key + "=" + p.Value)
+	}
+
+	var private = ""
+	if o.Private {
+		private = "on"
+	}
+	return &ObjectForm{
+		Id:         o.Id,
+		TimeAdded:  strconv.FormatInt(o.Added.Unix(), 10),
+		Name:       o.Name,
+		Quantity:   strconv.FormatInt(int64(o.Quantity), 10),
+		Categories: strings.Join(o.Categories, ","),
+		Tags:       strings.Join(o.Tags, ","),
+		Properties: strings.Join(propertyStrings, ","),
+		Private:    private,
+	}
+}
+
 func ParseObjectForm(r *ObjectForm) (*Object, error) {
 	id := r.Id
 	if id == "" {

@@ -1,0 +1,35 @@
+{{ define "content" }}
+<div class="row mt-2">
+    <div class="col">
+        <form action="/edit?id={{ .Id }}" method="post">
+            <div class="form-row">
+                <div class="form-group col">
+                    <label for="name-field">Objectnaam</label>
+                    <input id="name-field" name="name" type="text" class="form-control form-control-sm" autocomplete="off" autofocus value="{{ .Name }}">
+                </div>
+                <div class="form-group col">
+                    <label for="quantity-field">Aantal</label>
+                    <input id="quantity-field" name="quantity" type="number" class="form-control form-control-sm" value="{{ .Quantity }}" autocomplete="off" autofocus>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="category-field">Categorieën</label>
+                <input id="category-field" name="categories" type="text" class="form-control form-control-sm" autocomplete="off" value="{{ .Categories }}">
+            </div>
+            <div class="form-group">
+                <label for="tags-field">Tags</label>
+                <input id="tags-field" name="tags" type="text" class="form-control form-control-sm" autocomplete="off" value="{{ .Tags }}">
+            </div>
+            <div class="form-group">
+                <label for="properties-field">Eigenschappen</label>
+                <input id="properties-field" name="properties" type="text" class="form-control form-control-sm" autocomplete="off" value="{{ .Properties }}">
+            </div>
+            <div class="form-check">
+                <input name="private" class="form-control-sm form-check-input" type="checkbox" id="check-private" value="{{ .Private }}">
+                <label class="form-check-label" for="check-private">Privé</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Opslaan</button>
+        </form>
+    </div>
+</div>
+{{ end }}
