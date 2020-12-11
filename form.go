@@ -88,14 +88,9 @@ func ParseObjectForm(r *ObjectForm) (*Object, error) {
 		})
 	}
 
-	var hidden bool
-	switch r.Hidden {
-	case "true":
-		hidden = true
-	case "false":
-		hidden = false
-	default:
-		return nil, fmt.Errorf("invalid hidden value %s", r.Hidden)
+	hidden, err := strconv.ParseBool(r.Hidden)
+	if err != nil {
+		return nil, fmt.Errorf("unable to parse hidden value %s", r.Hidden)
 	}
 
 	return &Object{
