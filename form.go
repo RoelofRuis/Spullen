@@ -11,12 +11,12 @@ type ObjectForm struct {
 	Id string
 	TimeAdded string
 
-	Name string
-	Quantity string
+	Name       string
+	Quantity   string
 	Categories string
-	Tags string
+	Tags       string
 	Properties string
-	Private string
+	Hidden     string
 }
 
 func MakeForm(o *Object) *ObjectForm {
@@ -25,9 +25,9 @@ func MakeForm(o *Object) *ObjectForm {
 		propertyStrings = append(propertyStrings, p.Key + "=" + p.Value)
 	}
 
-	var private = ""
-	if o.Private {
-		private = "on"
+	var hidden = ""
+	if o.Hidden {
+		hidden = "true"
 	}
 	return &ObjectForm{
 		Id:         o.Id,
@@ -37,7 +37,7 @@ func MakeForm(o *Object) *ObjectForm {
 		Categories: strings.Join(o.Categories, ","),
 		Tags:       strings.Join(o.Tags, ","),
 		Properties: strings.Join(propertyStrings, ","),
-		Private:    private,
+		Hidden:     hidden,
 	}
 }
 
@@ -88,24 +88,24 @@ func ParseObjectForm(r *ObjectForm) (*Object, error) {
 		})
 	}
 
-	var private bool
-	switch r.Private {
-	case "on", "true":
-		private = true
-	case "", "false":
-		private = false
+	var hidden bool
+	switch r.Hidden {
+	case "true":
+		hidden = true
+	case "false":
+		hidden = false
 	default:
-		return nil, fmt.Errorf("invalid private value %s", r.Private)
+		return nil, fmt.Errorf("invalid hidden value %s", r.Hidden)
 	}
 
 	return &Object{
-		Id: id,
-		Name: strings.ToLower(r.Name),
-		Quantity: int(quantity),
-		Added: timeAdded,
+		Id:         id,
+		Name:       strings.ToLower(r.Name),
+		Quantity:   int(quantity),
+		Added:      timeAdded,
 		Categories: categories,
-		Tags: tags,
+		Tags:       tags,
 		Properties: properties,
-		Private: private,
+		Hidden:     hidden,
 	}, nil
 }

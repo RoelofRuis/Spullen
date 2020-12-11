@@ -11,7 +11,7 @@ import (
 
 var o Storage
 
-var privateMode = true
+var privateMode = false
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -67,15 +67,16 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func saveObject(r *http.Request) error {
+	fmt.Printf("%+v", r.PostForm.Get("hidden"))
 	if len(r.PostForm.Get("name")) > 0 {
 		object, err := ParseObjectForm(&ObjectForm{
-			Id: r.Form.Get("id"),
-			Name: r.PostForm.Get("name"),
-			Quantity: r.PostForm.Get("quantity"),
+			Id:         r.Form.Get("id"),
+			Name:       r.PostForm.Get("name"),
+			Quantity:   r.PostForm.Get("quantity"),
 			Categories: r.PostForm.Get("categories"),
-			Tags: r.PostForm.Get("tags"),
+			Tags:       r.PostForm.Get("tags"),
 			Properties: r.PostForm.Get("properties"),
-			Private: r.PostForm.Get("private"),
+			Hidden:     r.PostForm.Get("hidden"),
 		})
 		if err != nil {
 			return err
@@ -104,7 +105,7 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if privateMode && object.Private {
+	if privateMode && object.Hidden {
 		http.Error(w, "object can not be edited", http.StatusForbidden)
 		return
 	}

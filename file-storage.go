@@ -52,7 +52,7 @@ func NewFileStorage() (*FileStorage, error) {
 			Categories: record[4],
 			Tags:       record[5],
 			Properties: record[6],
-			Private:    record[7],
+			Hidden:     record[7],
 		})
 		if err != nil {
 			return nil, err
@@ -112,7 +112,7 @@ func (ol *FileStorage) writeToFile() error {
 			strings.Join(o.Categories, ","),
 			strings.Join(o.Tags, ","),
 			strings.Join(properties, ","),
-			strconv.FormatBool(o.Private),
+			strconv.FormatBool(o.Hidden),
 		}
 		err := w.Write(data)
 		if err != nil {

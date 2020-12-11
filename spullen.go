@@ -10,7 +10,7 @@ type Object struct {
 	Categories []string
 	Tags       []string
 	Properties []*Property
-	Private    bool
+	Hidden     bool
 }
 
 type Property struct {

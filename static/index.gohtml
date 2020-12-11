@@ -30,8 +30,9 @@ Aantal: <b>{{ len .Objects }}</b>
                 <input id="properties-field" name="properties" type="text" class="form-control form-control-sm" placeholder="kleur=bruin,materiaal=hout" autocomplete="off">
             </div>
             <div class="form-check">
-                <input name="private" class="form-control-sm form-check-input" type="checkbox" id="check-private">
-                <label class="form-check-label" for="check-private">Privé</label>
+                <input type="checkbox" name="hidden" class="form-control-sm form-check-input" id="check-hidden" value="true">
+                <input type="hidden" name="hidden" value="false">
+                <label class="form-check-label" for="check-hidden">Verborgen</label>
             </div>
             <button type="submit" class="btn btn-primary">Opslaan</button>
         </form>
@@ -48,14 +49,14 @@ Aantal: <b>{{ len .Objects }}</b>
             </thead>
             <tbody>
             {{ range .Objects }}
-                {{ if and $private_mode .Private }}
+                {{ if and $private_mode .Hidden }}
                 <tr>
-                    <td colspan="3"><span class="text-muted"><i>privé</i></span></td>
+                    <td colspan="3"><span class="text-muted"><i>verborgen</i></span></td>
                 </tr>
                 {{ else }}
                 <tr>
                     <td>
-                        {{ if .Private }}<i class="fa fa-exclamation"></i>{{ end }} {{ .Name }}
+                        {{ if .Hidden }}<i class="fa fa-exclamation"></i>{{ end }} {{ .Name }}
                     </td>
                     <td>{{ .Added.Format "02-01-2006" }}</td>
                     <td>
