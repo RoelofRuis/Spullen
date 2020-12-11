@@ -67,7 +67,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func saveObject(r *http.Request) error {
-	fmt.Printf("%+v", r.PostForm.Get("hidden"))
 	if len(r.PostForm.Get("name")) > 0 {
 		object, err := ParseObjectForm(&ObjectForm{
 			Id:         r.Form.Get("id"),
