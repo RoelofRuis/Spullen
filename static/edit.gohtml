@@ -17,12 +17,14 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="category-field">Categorieën</label>
-                <input id="category-field" name="categories" type="text" class="form-control form-control-sm" autocomplete="off" value="{{ .Categories }}">
+                <label for="tags-field">Tags</label>
+                <i class="fa fa-question-circle-o text-primary pull-right" title="veranderlijke groeperingen"></i>
+                <input id="tags-field" name="tags" type="text" class="form-control form-control-sm" autocomplete="off" value="{{ .Tags }}">
             </div>
             <div class="form-group">
-                <label for="tags-field">Tags</label>
-                <input id="tags-field" name="tags" type="text" class="form-control form-control-sm" autocomplete="off" value="{{ .Tags }}">
+                <label for="category-field">Categorieën</label>
+                <i class="fa fa-question-circle-o text-primary pull-right" title="onveranderlijke groeperingen"></i>
+                <input id="category-field" name="categories" type="text" class="form-control form-control-sm" autocomplete="off" value="{{ .Categories }}">
             </div>
             <div class="form-group">
                 <label for="properties-field">Eigenschappen</label>
