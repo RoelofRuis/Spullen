@@ -32,7 +32,7 @@ func main() {
 }
 
 type IndexModel struct {
-	Objects     *map[string]*Object
+	Objects     []*Object
 	PrivateMode bool
 }
 

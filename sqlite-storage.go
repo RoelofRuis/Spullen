@@ -24,7 +24,7 @@ func (ol *SqliteStorage) Get(id string) *Object {
 	return nil
 }
 
-func (ol *SqliteStorage) GetAll() *map[string]*Object {
+func (ol *SqliteStorage) GetAll() []*Object {
 	// TODO: implement
 
 	return nil

@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
 
 type Storage interface {
-	GetAll() *map[string]*Object
+	GetAll() []*Object
 	Get(id string) *Object
 	PutObject(*Object) error
 	RemoveObject(id string) error
@@ -63,31 +64,53 @@ func NewFileStorage() (*FileStorage, error) {
 	return &FileStorage{Objects: objects}, nil
 }
 
-func (ol *FileStorage) Get(id string) *Object {
-	if object, found := ol.Objects[id]; found {
+func (s *FileStorage) Get(id string) *Object {
+	if object, found := s.Objects[id]; found {
 		return object
 	}
 
 	return nil
 }
 
-func (ol *FileStorage) GetAll() *map[string]*Object {
-	return &ol.Objects
+type objectName struct {
+	id string
+	name string
 }
 
-func (ol *FileStorage) PutObject(o *Object) error {
-	ol.Objects[o.Id] = o
+type objectNames []objectName
 
-	return ol.writeToFile()
+func (o objectNames) Len() int { return len(o) }
+func (o objectNames) Less(i, j int) bool { return o[i].name < o[j].name }
+func (o objectNames) Swap(i, j int) { o[i], o[j] = o[j], o[i] }
+
+func (s *FileStorage) GetAll() []*Object {
+	var identifiers objectNames = nil
+	for _, o := range s.Objects {
+		identifiers = append(identifiers, objectName{id: o.Id, name: o.Name})
+	}
+	sort.Sort(identifiers)
+
+	var objectList []*Object = nil
+	for _, i := range identifiers {
+		objectList = append(objectList, s.Objects[i.id])
+	}
+
+	return objectList
 }
 
-func (ol *FileStorage) RemoveObject(id string) error {
-	delete(ol.Objects, id)
+func (s *FileStorage) PutObject(o *Object) error {
+	s.Objects[o.Id] = o
 
-	return ol.writeToFile()
+	return s.writeToFile()
 }
 
-func (ol *FileStorage) writeToFile() error {
+func (s *FileStorage) RemoveObject(id string) error {
+	delete(s.Objects, id)
+
+	return s.writeToFile()
+}
+
+func (s *FileStorage) writeToFile() error {
 	f, err := os.OpenFile("./db/objects.csv", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return err
@@ -99,7 +122,7 @@ func (ol *FileStorage) writeToFile() error {
 	defer w.Flush()
 
 	var data []string
-	for _, o := range ol.Objects {
+	for _, o := range s.Objects {
 		var properties []string
 		for _, p := range o.Properties {
 			properties = append(properties, fmt.Sprintf("%s=%s", p.Key, p.Value))
