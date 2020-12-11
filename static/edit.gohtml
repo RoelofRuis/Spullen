@@ -28,12 +28,13 @@
                 <label for="properties-field">Eigenschappen</label>
                 <input id="properties-field" name="properties" type="text" class="form-control form-control-sm" autocomplete="off" value="{{ .Properties }}">
             </div>
-            <div class="form-check">
+            <div class="form-check mb-3">
                 <input type="checkbox" name="hidden" class="form-control-sm form-check-input" id="check-hidden" value="true" {{ if .Hidden }}checked="checked"{{ end }}>
                 <input type="hidden" name="hidden" value="false">
                 <label class="form-check-label" for="check-hidden">Verborgen</label>
             </div>
-            <button type="submit" class="btn btn-primary">Opslaan</button>
+            <button type="submit" class="btn btn-outline-primary">Opslaan</button>
+            <a href="/delete?id={{ .Id }}" class="btn btn-outline-danger pull-right" role="button">Verwijderen</a>
         </form>
     </div>
 </div>
