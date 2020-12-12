@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	err := migration.Create("init")
+	err := migration.Create("items")
 	if err != nil {
 		log.Fatal(err)
 	}

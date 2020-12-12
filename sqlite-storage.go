@@ -11,7 +11,7 @@ type SqliteStorage struct {
 }
 
 func NewSqliteStorage() (*SqliteStorage, error) {
-	db, err := sql.Open("sqlite3", ":memory:")
+	db, err := sql.Open("sqlite3", "./db/spullen.sqlite")
 	if err != nil {
 		return nil, err
 	}
