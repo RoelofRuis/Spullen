@@ -7,8 +7,6 @@ import (
 	"math/rand"
 	"net/http"
 	"time"
-
-	"github.com/roelofruis/spullen/internal/migration"
 )
 
 var o Storage
@@ -18,21 +16,10 @@ var privateMode = false
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	err := migration.Up()
-	storage, err := NewSqliteStorage()
+	storage, err := NewFileStorage()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	migrator, err := migration.Init(storage.db)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = migrator.Up()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	o = storage
 
 	http.HandleFunc("/", indexHandler)
