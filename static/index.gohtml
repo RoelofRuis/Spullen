@@ -48,8 +48,8 @@ Aantal: <b>{{ .TotalCount }}</b>
             <thead>
                 <tr>
                     <th scope="col">Naam</th>
+                    <th scope="col"></th>
                     <th scope="col">Sinds</th>
-                    <th scope="col">Categorieën</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -65,12 +65,15 @@ Aantal: <b>{{ .TotalCount }}</b>
                         {{ if .Hidden }}<i class="fa fa-exclamation"></i>{{ end }} {{ .Name }}
                         {{ if gt .Quantity 1 }}<span class="text-muted">×{{ .Quantity }}</span>{{ end }}
                     </td>
-                    <td>{{ .Added.Format "02-01-2006" }}</td>
                     <td>
                         {{ range .Categories }}
                             <span class="badge badge-pill badge-secondary">{{ . }}</span>
                         {{ end }}
+                        {{ range .Tags }}
+                            <span class="badge badge-pill badge-info">{{ . }}</span>
+                        {{ end }}
                     </td>
+                    <td>{{ .Added.Format "02-01-2006" }}</td>
                     <td>
                         <a class="text-secondary" href="/edit?id={{ .Id }}"><i class="fa fa-pencil"></i></a>
                     </td>
