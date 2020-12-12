@@ -32,6 +32,7 @@ func main() {
 }
 
 type IndexModel struct {
+	TotalCount  int
 	Objects     []*Object
 	PrivateMode bool
 }
@@ -57,7 +58,13 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	totalCount := 0
+	for _, o := range o.GetAll() {
+		totalCount += o.Quantity
+	}
+
 	err = t.ExecuteTemplate(w, "layout", IndexModel{
+		TotalCount:  totalCount,
 		Objects:     o.GetAll(),
 		PrivateMode: privateMode,
 	})
