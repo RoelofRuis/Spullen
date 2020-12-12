@@ -8,6 +8,7 @@ import (
 
 type IndexModel struct {
 	TotalCount  int
+	Categories  []string
 	Objects     []*Object
 	PrivateMode bool
 }
@@ -34,12 +35,22 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	totalCount := 0
+	var categorySet = map[string]bool{}
 	for _, o := range o.GetAll() {
 		totalCount += o.Quantity
+		for _, c := range o.Categories {
+			categorySet[c] = true
+		}
+	}
+
+	var categories []string
+	for k := range categorySet {
+		categories = append(categories, k)
 	}
 
 	err = t.ExecuteTemplate(w, "layout", IndexModel{
 		TotalCount:  totalCount,
+		Categories:  categories,
 		Objects:     o.GetAll(),
 		PrivateMode: privateMode,
 	})

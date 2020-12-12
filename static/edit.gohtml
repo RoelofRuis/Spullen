@@ -32,7 +32,7 @@
             </div>
             <div class="form-group">
                 <label for="properties-field">Aantekeningen</label>
-                <textarea id="properties-field" name="notes" rows="3" class="form-control form-control-sm" placeholder="gekregen van oma" autocomplete="off">{{ .Notes }}</textarea>
+                <textarea id="properties-field" name="notes" rows="3" class="form-control form-control-sm" autocomplete="off">{{ .Notes }}</textarea>
             </div>
             <div class="form-check mb-3">
                 <input type="checkbox" name="hidden" class="form-control-sm form-check-input" id="check-hidden" value="true" {{ if .Hidden }}checked="checked"{{ end }}>

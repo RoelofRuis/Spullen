@@ -42,6 +42,11 @@ Aantal: <b>{{ .TotalCount }}</b>
             </div>
             <button type="submit" class="btn btn-outline-primary">Opslaan</button>
         </form>
+        <hr>
+        <h6>Gedefinieerde categorieën</h6>
+        {{ range .Categories }}
+            <span class="badge badge-pill badge-secondary">{{ . }}</span>
+        {{ end }}
     </div>
     <div class="col">
         <table class="table table-sm">
@@ -49,7 +54,7 @@ Aantal: <b>{{ .TotalCount }}</b>
                 <tr>
                     <th scope="col">Naam</th>
                     <th scope="col">Sinds</th>
-                    <th scope="col">Tags</th>
+                    <th scope="col">Categorieën</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -67,7 +72,7 @@ Aantal: <b>{{ .TotalCount }}</b>
                     </td>
                     <td>{{ .Added.Format "02-01-2006" }}</td>
                     <td>
-                        {{ range .Tags }}
+                        {{ range .Categories }}
                             <span class="badge badge-pill badge-secondary">{{ . }}</span>
                         {{ end }}
                     </td>
