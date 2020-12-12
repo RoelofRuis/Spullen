@@ -17,7 +17,7 @@ type ObjectForm struct {
 	Tags       string
 	Properties string
 	Hidden     string
-	Description string
+	Notes      string
 }
 
 func MakeForm(o *Object) *ObjectForm {
@@ -39,7 +39,7 @@ func MakeForm(o *Object) *ObjectForm {
 		Tags:       strings.Join(o.Tags, ","),
 		Properties: strings.Join(propertyStrings, ","),
 		Hidden:     hidden,
-		Description: o.Description,
+		Notes:      o.Notes,
 	}
 }
 
@@ -104,6 +104,6 @@ func ParseObjectForm(r *ObjectForm) (*Object, error) {
 		Tags:       tags,
 		Properties: properties,
 		Hidden:     hidden,
-		Description: r.Description,
+		Notes:      r.Notes,
 	}, nil
 }

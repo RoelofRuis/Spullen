@@ -14,11 +14,11 @@ type Object struct {
 	Added      time.Time
 	Name       string
 	Quantity   int
-	Description string
 	Categories []string
 	Tags       []string
 	Properties []*Property
 	Hidden     bool
+	Notes      string
 }
 
 type Property struct {
