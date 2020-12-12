@@ -114,6 +114,7 @@ func saveObject(r *http.Request) error {
 			Tags:       r.PostForm.Get("tags"),
 			Properties: r.PostForm.Get("properties"),
 			Hidden:     r.PostForm.Get("hidden"),
+			Description: r.PostForm.Get("description"),
 		})
 		if err != nil {
 			return err

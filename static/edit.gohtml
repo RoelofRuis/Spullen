@@ -30,6 +30,10 @@
                 <label for="properties-field">Eigenschappen</label>
                 <input id="properties-field" name="properties" type="text" class="form-control form-control-sm" autocomplete="off" value="{{ .Properties }}">
             </div>
+            <div class="form-group">
+                <label for="properties-field">Omschrijving</label>
+                <textarea id="properties-field" name="description" rows="3" class="form-control form-control-sm" placeholder="gekregen van oma" autocomplete="off">{{ .Description }}</textarea>
+            </div>
             <div class="form-check mb-3">
                 <input type="checkbox" name="hidden" class="form-control-sm form-check-input" id="check-hidden" value="true" {{ if .Hidden }}checked="checked"{{ end }}>
                 <input type="hidden" name="hidden" value="false">

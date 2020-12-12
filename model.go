@@ -11,9 +11,10 @@ type Storage interface {
 
 type Object struct {
 	Id         string
+	Added      time.Time
 	Name       string
 	Quantity   int
-	Added      time.Time
+	Description string
 	Categories []string
 	Tags       []string
 	Properties []*Property
