@@ -69,15 +69,15 @@ func (s *FileStorage) Get(id string) *Object {
 }
 
 type objectName struct {
-	id string
+	id   string
 	name string
 }
 
 type objectNames []objectName
 
-func (o objectNames) Len() int { return len(o) }
+func (o objectNames) Len() int           { return len(o) }
 func (o objectNames) Less(i, j int) bool { return o[i].name < o[j].name }
-func (o objectNames) Swap(i, j int) { o[i], o[j] = o[j], o[i] }
+func (o objectNames) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
 
 func (s *FileStorage) GetAll() []*Object {
 	var identifiers objectNames = nil

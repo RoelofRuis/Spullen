@@ -8,7 +8,7 @@ import (
 )
 
 type ObjectForm struct {
-	Id string
+	Id        string
 	TimeAdded string
 
 	Name       string
@@ -23,7 +23,7 @@ type ObjectForm struct {
 func MakeForm(o *Object) *ObjectForm {
 	var propertyStrings []string = nil
 	for _, p := range o.Properties {
-		propertyStrings = append(propertyStrings, p.Key + "=" + p.Value)
+		propertyStrings = append(propertyStrings, p.Key+"="+p.Value)
 	}
 
 	var hidden = ""
