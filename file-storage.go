@@ -10,12 +10,14 @@ import (
 	"strings"
 )
 
+const DBPATH string = "./db/objects.csv"
+
 type FileStorage struct {
 	Objects map[string]*Object
 }
 
 func NewFileStorage() (*FileStorage, error) {
-	f, err := os.Open("./db/objects.csv")
+	f, err := os.Open(DBPATH)
 	if os.IsNotExist(err) {
 		return &FileStorage{Objects: make(map[string]*Object)}, nil
 	}
@@ -104,7 +106,7 @@ func (s *FileStorage) RemoveObject(id string) error {
 }
 
 func (s *FileStorage) writeToFile() error {
-	f, err := os.OpenFile("./db/objects.csv", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
+	f, err := os.OpenFile(DBPATH, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return err
 	}
