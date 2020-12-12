@@ -1,4 +1,4 @@
-module roelofruis.nl/spullen
+module github.com/roelofruis/spullen
 
 go 1.15
 

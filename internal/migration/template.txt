@@ -6,7 +6,7 @@ func init() {
     migrator.AddMigration(&Migration{
         Version: "{{.Version}}",
         Up:      mig_{{.Version}}_{{.Name}}_up,
-    }
+    })
 }
 
 func mig_{{.Version}}_{{.Name}}_up(tx *sql.Tx) error {

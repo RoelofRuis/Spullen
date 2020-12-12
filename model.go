@@ -2,6 +2,13 @@ package main
 
 import "time"
 
+type Storage interface {
+	GetAll() []*Object
+	Get(id string) *Object
+	PutObject(*Object) error
+	RemoveObject(id string) error
+}
+
 type Object struct {
 	Id         string
 	Name       string

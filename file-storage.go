@@ -10,13 +10,6 @@ import (
 	"strings"
 )
 
-type Storage interface {
-	GetAll() []*Object
-	Get(id string) *Object
-	PutObject(*Object) error
-	RemoveObject(id string) error
-}
-
 type FileStorage struct {
 	Objects map[string]*Object
 }

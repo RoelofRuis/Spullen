@@ -118,13 +118,13 @@ func Create(name string) error {
 
 	var out bytes.Buffer
 
-	t := template.Must(template.ParseFiles("./migration/template.txt"))
+	t := template.Must(template.ParseFiles("./internal/migration/template.txt"))
 	err := t.Execute(&out, in)
 	if err != nil {
 		return errors.New("unable to execute template: " + err.Error())
 	}
 
-	f, err := os.Create(fmt.Sprintf("./migrations/%s_%s.go", version, name))
+	f, err := os.Create(fmt.Sprintf("./internal/migration/%s_%s.go", version, name))
 	if err != nil {
 		return errors.New("unable to create migration file: " + err.Error())
 	}
