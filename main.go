@@ -26,7 +26,7 @@ func main() {
 	http.HandleFunc("/edit", editHandler)
 	http.HandleFunc("/delete", deleteHandler)
 
-	fmt.Print("started server on localhost:8080")
+	log.Print("started server on localhost:8080")
 
 	http.ListenAndServe(":8080", nil)
 }
