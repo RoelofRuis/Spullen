@@ -63,7 +63,7 @@ Aantal: <b>{{ .TotalCount }}</b>
                 <tr>
                     <td>
                         {{ if .Hidden }}<i class="fa fa-exclamation"></i>{{ end }} {{ .Name }}
-                        {{ if gt .Quantity 1 }}<span class="text-muted">{{ .Quantity }}×</span>{{ end }}
+                        {{ if gt .Quantity 1 }}<span class="text-muted">×{{ .Quantity }}</span>{{ end }}
                     </td>
                     <td>{{ .Added.Format "02-01-2006" }}</td>
                     <td>
