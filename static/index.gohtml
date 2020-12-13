@@ -49,20 +49,20 @@ Aantal spullen: <b>{{ .TotalCount }}</b>
             <thead>
                 <tr>
                     <th colspan="4">
-                        Overzicht <span id="table-filter" class="fa fa-filter text-muted" style="display: none;"></span>
+                        Overzicht
+                        {{ if $private_mode }}
+                        <span class="fa fa-exclamation text-muted" title="privemodus"></span>
+                        {{ end }}
+                        <span id="table-filter" class="fa fa-filter text-muted" title="filter toegepast" style="display: none;"></span>
                     </th>
                 </tr>
             </thead>
             <tbody id="table-results">
             {{ range .Objects }}
-                {{ if and $private_mode .Hidden }}
-                <tr>
-                    <td colspan="4"><span class="text-muted"><i>verborgen</i></span></td>
-                </tr>
-                {{ else }}
+                {{ if or $private_mode (not .Hidden) }}
                 <tr>
                     <td>
-                        {{ if .Hidden }}<i class="fa fa-exclamation"></i>{{ end }}<span class="name">{{ .Name }}</span>
+                        {{ if .Hidden }}<i class="fa fa-exclamation text-muted"></i> {{ end }}<span class="name">{{ .Name }}</span>
                         {{ if gt .Quantity 1 }}<span class="text-muted">×{{ .Quantity }}</span>{{ end }}
                     </td>
                     <td>

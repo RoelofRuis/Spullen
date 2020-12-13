@@ -9,7 +9,7 @@ import (
 
 var o Storage
 
-var privateMode = false
+var privateMode = true
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())

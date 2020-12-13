@@ -62,7 +62,7 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if privateMode && object.Hidden {
+	if ! privateMode && object.Hidden {
 		http.Error(w, "object can not be edited", http.StatusForbidden)
 		return
 	}
