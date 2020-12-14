@@ -48,7 +48,7 @@ Aantal spullen: <b>{{ .TotalCount }}</b>
         <table class="table table-sm table-hover">
             <thead>
                 <tr>
-                    <th colspan="4">
+                    <th colspan="3">
                         Overzicht
                         {{ if $private_mode }}
                         <span class="fa fa-exclamation text-muted" title="privemodus"></span>
@@ -60,20 +60,22 @@ Aantal spullen: <b>{{ .TotalCount }}</b>
             <tbody id="table-results">
             {{ range .Objects }}
                 {{ if or $private_mode (not .Hidden) }}
-                <tr>
+                <tr title="{{ .Name }} ({{ .Added.Format "02-01-2006" }})">
                     <td>
                         {{ if .Hidden }}<i class="fa fa-exclamation text-muted"></i> {{ end }}<span class="name">{{ .Name }}</span>
                         {{ if gt .Quantity 1 }}<span class="text-muted">×{{ .Quantity }}</span>{{ end }}
                     </td>
                     <td>
                         {{ range .Categories }}
-                            <span class="badge badge-pill badge-secondary">{{ . }}</span>
+                            <span class="badge badge-pill badge-dark">{{ . }}</span>
                         {{ end }}
                         {{ range .Tags }}
                             <span class="badge badge-pill badge-info">{{ . }}</span>
                         {{ end }}
+                        {{ range .Properties }}
+                            <span class="badge badge-pill badge-secondary">{{ .Key }}={{ .Value }}</span>
+                        {{ end }}
                     </td>
-                    <td>{{ .Added.Format "02-01-2006" }}</td>
                     <td>
                         <a class="text-secondary" href="/edit?id={{ .Id }}"><i class="fa fa-pencil"></i></a>
                     </td>
