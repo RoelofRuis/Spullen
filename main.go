@@ -22,7 +22,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Print(plain)
+	fmt.Print(string(plain))
 
 	rand.Seed(time.Now().UTC().UnixNano())
 

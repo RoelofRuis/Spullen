@@ -4,6 +4,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"golang.org/x/crypto/scrypt"
 )
 
 func Encrypt(key []byte, data []byte) ([]byte, error) {
@@ -69,7 +70,7 @@ func DeriveKey(password, salt []byte) ([]byte, []byte, error) {
 		}
 	}
 
-	key, err := crypto.scrypt.Key(password, salt, 1048576, 8, 1, 32)
+	key, err := scrypt.Key(password, salt, 1048576, 8, 1, 32)
 	if err != nil {
 		return nil, nil, err
 	}
