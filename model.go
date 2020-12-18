@@ -2,6 +2,11 @@ package main
 
 import "time"
 
+type App struct {
+	Storage *Storage
+	PrivateMode bool
+}
+
 type Storage interface {
 	GetAll() []*Object
 	Get(id string) *Object

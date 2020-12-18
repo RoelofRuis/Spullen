@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -13,17 +12,6 @@ var o Storage
 var privateMode = true
 
 func main() {
-	data := "iedereen is liefde"
-	cipher, err := Encrypt([]byte("je moedr"), []byte(data))
-	if err != nil {
-		log.Fatal(err)
-	}
-	plain, err := Decrypt([]byte("je moedr"), cipher)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Print(string(plain))
-
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	storage, err := NewFileStorage()
@@ -33,6 +21,7 @@ func main() {
 	o = storage
 
 	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/view", viewHandler)
 	http.HandleFunc("/edit", editHandler)
 	http.HandleFunc("/delete", deleteHandler)
 

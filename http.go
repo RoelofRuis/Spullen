@@ -13,6 +13,19 @@ type IndexModel struct {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("./static/layout.gohtml", "./static/index.gohtml")
+	if err != nil {
+		http.Error(w, "unable to parse templates", http.StatusInternalServerError)
+		return
+	}
+
+	err = t.ExecuteTemplate(w, "layout", nil)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+}
+
+func viewHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		err := r.ParseForm()
 		if err != nil {
@@ -27,7 +40,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	t, err := template.ParseFiles("./static/layout.gohtml", "./static/index.gohtml")
+	t, err := template.ParseFiles("./static/layout.gohtml", "./static/view.gohtml")
 	if err != nil {
 		http.Error(w, "unable to parse templates", http.StatusInternalServerError)
 		return

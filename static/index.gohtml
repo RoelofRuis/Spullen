@@ -1,118 +1,21 @@
-{{ define "navbar-text" }}
-Aantal spullen: <b>{{ .TotalCount }}</b>
-{{ end }}
+{{ define "navbar-text" }}{{ end }}
 
 {{ define "content" }}
-{{ $private_mode := .PrivateMode }}
 <div class="row mt-2">
     <div class="col">
-        <form action="/" method="post">
+        <h4>Nieuwe database</h4>
+        <form action="/new" method="post">
             <div class="form-row">
                 <div class="form-group col">
-                    <label for="name-field">Objectnaam</label>
-                    <input onkeyup="filterTable()" id="name-field" name="name" type="text" class="form-control form-control-sm" autocomplete="off" autofocus>
+                    <label for="name-field">Databasenaam</label>
+                    <input id="name-field" name="name" type="text" class="form-control form-control-sm">
                 </div>
                 <div class="form-group col">
-                    <label for="quantity-field">Aantal</label>
-                    <input id="quantity-field" name="quantity" type="number" class="form-control form-control-sm" value="1" autocomplete="off" autofocus>
+                    <label for="password-field">Wachtwoord</label>
+                    <input id="password-field" name="password" type="password" class="form-control form-control-sm">
                 </div>
             </div>
-            <div class="form-group">
-                <label for="tags-field">Tags</label>
-                <i class="fa fa-question-circle-o text-primary pull-right" title="veranderlijke groeperingen: 'woonkamer,opruimen'"></i>
-                <input id="tags-field" name="tags" type="text" class="form-control form-control-sm" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label for="category-field">Categorieën</label>
-                <i class="fa fa-question-circle-o text-primary pull-right" title="onveranderlijke groeperingen: 'meubel,groot'"></i>
-                <input id="category-field" name="categories" type="text" class="form-control form-control-sm" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label for="properties-field">Eigenschappen</label>
-                <i class="fa fa-question-circle-o text-primary pull-right" title="eigenschappen: 'kleur=bruin,materiaal=hout'"></i>
-                <input id="properties-field" name="properties" type="text" class="form-control form-control-sm" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label for="properties-field">Aantekeningen</label>
-                <textarea id="properties-field" name="notes" rows="3" class="form-control form-control-sm" autocomplete="off"></textarea>
-            </div>
-            <div class="form-check mb-3">
-                <input type="checkbox" name="hidden" class="form-control-sm form-check-input" id="check-hidden" value="true">
-                <input type="hidden" name="hidden" value="false">
-                <label class="form-check-label" for="check-hidden">Verborgen</label>
-            </div>
-            <button type="submit" class="btn btn-outline-primary">Opslaan</button>
         </form>
     </div>
-    <div class="col overflow-auto" style="overflow-y: scroll; height: 800px">
-        <table class="table table-sm table-hover">
-            <thead>
-                <tr>
-                    <th colspan="3">
-                        Overzicht
-                        {{ if $private_mode }}
-                        <span class="fa fa-exclamation text-muted" title="privemodus"></span>
-                        {{ end }}
-                        <span id="table-filter" class="fa fa-filter text-muted" title="filter toegepast" style="display: none;"></span>
-                    </th>
-                </tr>
-            </thead>
-            <tbody id="table-results">
-            {{ range .Objects }}
-                {{ if or $private_mode (not .Hidden) }}
-                <tr title="{{ .Name }} ({{ .Added.Format "02-01-2006" }})">
-                    <td>
-                        {{ if .Hidden }}<i class="fa fa-exclamation text-muted"></i> {{ end }}<span class="name">{{ .Name }}</span>
-                        {{ if gt .Quantity 1 }}<span class="text-muted">×{{ .Quantity }}</span>{{ end }}
-                    </td>
-                    <td>
-                        {{ range .Categories }}
-                            <span class="badge badge-pill badge-dark">{{ . }}</span>
-                        {{ end }}
-                        {{ range .Tags }}
-                            <span class="badge badge-pill badge-info">{{ . }}</span>
-                        {{ end }}
-                        {{ range .Properties }}
-                            <span class="badge badge-pill badge-secondary">{{ .Key }}={{ .Value }}</span>
-                        {{ end }}
-                    </td>
-                    <td>
-                        <a class="text-secondary" href="/edit?id={{ .Id }}"><i class="fa fa-pencil"></i></a>
-                    </td>
-                </tr>
-                {{ end }}
-            {{ end }}
-            </tbody>
-        </table>
-    </div>
 </div>
-<script>
-function filterTable() {
-    let input, filter, table, tr, filterIcon, rowsFiltered, name, i, textValue;
-    input = document.getElementById("name-field");
-    filter = input.value.toLowerCase();
-    table = document.getElementById("table-results");
-    tr = table.getElementsByTagName("tr");
-    filterIcon = document.getElementById("table-filter")
-
-    rowsFiltered = 0;
-    for (i = 0; i < tr.length; i ++) {
-        name = tr[i].getElementsByClassName("name")[0];
-        if (name) {
-            textValue = name.textContent || name.innerText;
-            if (name.textContent.toLowerCase().indexOf(filter) > -1) {
-                tr[i].style.display = "";
-            } else {
-                tr[i].style.display = "none";
-                rowsFiltered += 1;
-            }
-        }
-    }
-    if (rowsFiltered > 0) {
-        filterIcon.style.display = "";
-    } else {
-        filterIcon.style.display = "none";
-    }
-}
-</script>
 {{ end }}
