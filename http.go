@@ -25,6 +25,24 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func newHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "unable to parse form", http.StatusBadRequest)
+		return
+	}
+
+	name := r.Form.Get("name")
+	pass := r.Form.Get("password")
+
+	db := &Storage{
+		name: name,
+		pass: []byte(pass),
+	}
+
+	w.Write([]byte(fmt.Sprintf("%+v", db)))
+}
+
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		err := r.ParseForm()

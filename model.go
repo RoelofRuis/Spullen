@@ -2,12 +2,12 @@ package main
 
 import "time"
 
-type App struct {
-	Storage *Storage
-	PrivateMode bool
+type Storage struct {
+	name string
+	pass []byte
 }
 
-type Storage interface {
+type ObjectRepository interface {
 	GetAll() []*Object
 	Get(id string) *Object
 	PutObject(*Object) error

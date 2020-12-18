@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var o Storage
+var o ObjectRepository
 
 var privateMode = true
 
@@ -21,6 +21,7 @@ func main() {
 	o = storage
 
 	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/new", newHandler)
 	http.HandleFunc("/view", viewHandler)
 	http.HandleFunc("/edit", editHandler)
 	http.HandleFunc("/delete", deleteHandler)
