@@ -4,7 +4,12 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"path/filepath"
 )
+
+type IndexModel struct {
+	Databases []string
+}
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
@@ -37,7 +42,15 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = t.ExecuteTemplate(w, "layout", nil)
+	files, err := filepath.Glob("*.db")
+	if err != nil {
+		http.Error(w, "unable to detect databases", http.StatusInternalServerError)
+		return
+	}
+
+	err = t.ExecuteTemplate(w, "layout", &IndexModel{
+		Databases: files,
+	})
 	if err != nil {
 		fmt.Print(err.Error())
 	}

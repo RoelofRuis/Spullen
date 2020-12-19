@@ -17,6 +17,11 @@
             </div>
             <button type="submit" class="btn btn-outline-success">Aanmaken</button>
         </form>
+        <hr>
+        <h4>Database openen</h4>
+        {{ range .Databases }}
+            <a href="/load?id={{ . }}">{{ . }}</a>
+        {{ end }}
     </div>
 </div>
 {{ end }}
