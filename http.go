@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+	"strings"
 )
 
 type IndexModel struct {
@@ -26,7 +27,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 		var repo ObjectRepository
 		if load {
-			data, err := Read(name, []byte(pass))
+			data, err := Read(fmt.Sprintf("%s.db", name), []byte(pass))
 			if err != nil {
 				http.Error(w, "invalid database", http.StatusInternalServerError)
 				return
@@ -39,6 +40,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			repo = NewRepository()
 		}
+
 		app = &App{
 			authenticated: true,
 			dbName:        name,
@@ -63,8 +65,13 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var names []string
+	for _, f := range files {
+		names = append(names, strings.TrimSuffix(f, ".db"))
+	}
+
 	err = t.ExecuteTemplate(w, "layout", &IndexModel{
-		Databases: files,
+		Databases: names,
 	})
 	if err != nil {
 		fmt.Print(err.Error())
