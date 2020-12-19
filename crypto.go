@@ -34,7 +34,7 @@ func Encrypt(key []byte, data []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func Decrypt(key, data[]byte) ([]byte, error) {
+func Decrypt(key, data []byte) ([]byte, error) {
 	salt, data := data[len(data)-32:], data[:len(data)-32]
 
 	key, _, err := DeriveKey(key, salt)

@@ -35,12 +35,14 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.Form.Get("name")
 	pass := r.Form.Get("password")
 
-	db := &Storage{
+	_ = &Storage{
 		name: name,
 		pass: []byte(pass),
 	}
 
-	w.Write([]byte(fmt.Sprintf("%+v", db)))
+	// TODO: implement the creation logic
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
@@ -93,7 +95,7 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if ! privateMode && object.Hidden {
+	if !privateMode && object.Hidden {
 		http.Error(w, "object can not be edited", http.StatusForbidden)
 		return
 	}
