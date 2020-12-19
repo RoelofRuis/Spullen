@@ -113,6 +113,23 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/view", http.StatusSeeOther)
 }
 
+func closeHandler(w http.ResponseWriter, r *http.Request) {
+	if ! app.authenticated {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	app = &App{
+		authenticated: false,
+		dbName:        "",
+		pass:          nil,
+		privateMode:   false,
+		objects:       nil,
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 func editHandler(w http.ResponseWriter, r *http.Request) {
 	if ! app.authenticated {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
