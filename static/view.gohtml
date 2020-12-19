@@ -1,6 +1,6 @@
 {{ define "navbar" }}
-<span>{{ .DbName }}</span>
-<a href="/save" class="btn btn-outline-success">Database opslaan <i class="fa fa-save"></i></a>
+<span>Database: <b>{{ .DbName }}</b></span>
+<a href="/save" class="btn btn-outline-success">Opslaan <i class="fa fa-save"></i></a>
 {{ end }}
 
 {{ define "content" }}
