@@ -32,6 +32,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "invalid database", http.StatusInternalServerError)
 				return
 			}
+
 			repo, err = Load(data)
 			if err != nil {
 				http.Error(w, "invalid database", http.StatusInternalServerError)
@@ -233,10 +234,10 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func saveObject(r *http.Request) error {
-	if len(r.PostForm.Get("dbName")) > 0 {
+	if len(r.PostForm.Get("name")) > 0 {
 		object, err := ParseObjectForm(&ObjectForm{
 			Id:         r.Form.Get("id"),
-			Name:       r.PostForm.Get("dbName"),
+			Name:       r.PostForm.Get("name"),
 			Quantity:   r.PostForm.Get("quantity"),
 			Categories: r.PostForm.Get("categories"),
 			Tags:       r.PostForm.Get("tags"),
