@@ -14,7 +14,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "bad request", http.StatusBadRequest)
 		}
 
-		name := r.Form.Get("dbName")
+		name := r.Form.Get("dbname")
 		pass := r.Form.Get("password")
 
 		repo := NewRepository()
