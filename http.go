@@ -52,6 +52,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	if ! app.authenticated {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
 	}
 
 	if r.Method == http.MethodPost {
@@ -89,7 +90,33 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func saveHandler(w http.ResponseWriter, r *http.Request) {
+	if ! app.authenticated {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	data, err := Save(app.objects)
+	if err != nil {
+		println(err.Error())
+		http.Error(w, "error", http.StatusInternalServerError)
+	}
+
+	err = Write(app.path, app.pass, data)
+	if err != nil {
+		println(err.Error())
+		http.Error(w, "error", http.StatusInternalServerError)
+	}
+
+	http.Redirect(w, r, "/view", http.StatusSeeOther)
+}
+
 func editHandler(w http.ResponseWriter, r *http.Request) {
+	if ! app.authenticated {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	err := r.ParseForm()
 	if err != nil {
 		println(err.Error())
@@ -114,17 +141,6 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 			println(err.Error())
 			http.Error(w, "error", http.StatusInternalServerError)
 		}
-		data, err := Save(app.objects)
-		if err != nil {
-			println(err.Error())
-			http.Error(w, "error", http.StatusInternalServerError)
-		}
-
-		err = Write(app.path, app.pass, data)
-		if err != nil {
-			println(err.Error())
-			http.Error(w, "error", http.StatusInternalServerError)
-		}
 
 		http.Redirect(w, r, "/view", http.StatusSeeOther)
 		return
@@ -143,6 +159,11 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteHandler(w http.ResponseWriter, r *http.Request) {
+	if ! app.authenticated {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, "unable to parse form", http.StatusBadRequest)

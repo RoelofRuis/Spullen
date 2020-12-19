@@ -32,6 +32,7 @@ func main() {
 	http.HandleFunc("/view", viewHandler)
 	http.HandleFunc("/edit", editHandler)
 	http.HandleFunc("/delete", deleteHandler)
+	http.HandleFunc("/save", saveHandler)
 
 	log.Print("started server on localhost:8080")
 
