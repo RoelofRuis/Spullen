@@ -22,8 +22,23 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		name := r.Form.Get("dbname")
 		pass := r.Form.Get("password")
 
-		repo := NewRepository()
+		load := r.Form.Get("load") == "true"
 
+		var repo ObjectRepository
+		if load {
+			data, err := Read(name, []byte(pass))
+			if err != nil {
+				http.Error(w, "invalid database", http.StatusInternalServerError)
+				return
+			}
+			repo, err = Load(data)
+			if err != nil {
+				http.Error(w, "invalid database", http.StatusInternalServerError)
+				return
+			}
+		} else {
+			repo = NewRepository()
+		}
 		app = &App{
 			authenticated: true,
 			dbName:        name,
