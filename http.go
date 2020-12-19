@@ -103,13 +103,24 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !privateMode && object.Hidden {
+	if ! app.privateMode && object.Hidden {
 		http.Error(w, "object can not be edited", http.StatusForbidden)
 		return
 	}
 
 	if r.Method == http.MethodPost {
 		err := saveObject(r)
+		if err != nil {
+			println(err.Error())
+			http.Error(w, "error", http.StatusInternalServerError)
+		}
+		data, err := Save(app.objects)
+		if err != nil {
+			println(err.Error())
+			http.Error(w, "error", http.StatusInternalServerError)
+		}
+
+		err = Write(app.path, app.pass, data)
 		if err != nil {
 			println(err.Error())
 			http.Error(w, "error", http.StatusInternalServerError)

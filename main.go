@@ -25,8 +25,6 @@ var app = &App {
 	objects: nil,
 }
 
-var privateMode = true
-
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 

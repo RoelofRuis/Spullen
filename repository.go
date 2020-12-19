@@ -54,13 +54,13 @@ func Load(data []byte) (*ObjectRepositoryImpl, error) {
 	return &ObjectRepositoryImpl{Objects: objects}, nil
 }
 
-func Save(s *ObjectRepositoryImpl) ([]byte, error) {
+func Save(s ObjectRepository) ([]byte, error) {
 	b := &bytes.Buffer{}
 	w := csv.NewWriter(b)
 	w.Comma = ';'
 
 	var data []string
-	for _, o := range s.Objects {
+	for _, o := range s.GetAll() {
 		var properties []string
 		for _, p := range o.Properties {
 			properties = append(properties, fmt.Sprintf("%s=%s", p.Key, p.Value))
