@@ -1,5 +1,6 @@
-{{ define "navbar-text" }}
-Aantal spullen: <b>{{ .TotalCount }}</b>
+{{ define "navbar" }}
+<span>{{ .DbName }}</span>
+<a href="/save" class="btn btn-outline-success">Database opslaan <i class="fa fa-save"></i></a>
 {{ end }}
 
 {{ define "content" }}
@@ -54,6 +55,7 @@ Aantal spullen: <b>{{ .TotalCount }}</b>
                         <span class="fa fa-exclamation text-muted" title="privemodus"></span>
                         {{ end }}
                         <span id="table-filter" class="fa fa-filter text-muted" title="filter toegepast" style="display: none;"></span>
+                        <span class="pull-right">Totaal aantal: <b>{{ .TotalCount }}</b></span>
                     </th>
                 </tr>
             </thead>

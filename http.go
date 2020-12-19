@@ -6,12 +6,6 @@ import (
 	"net/http"
 )
 
-type IndexModel struct {
-	TotalCount  int
-	Objects     []*Object
-	PrivateMode bool
-}
-
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		err := r.ParseForm()
@@ -20,14 +14,14 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "bad request", http.StatusBadRequest)
 		}
 
-		name := r.Form.Get("name")
+		name := r.Form.Get("dbName")
 		pass := r.Form.Get("password")
 
 		repo := NewRepository()
 
 		app = &App{
 			authenticated: true,
-			path:          fmt.Sprintf("%s.db", name),
+			dbName:        name,
 			pass:          []byte(pass),
 			privateMode:   false,
 			objects:       repo,
@@ -47,6 +41,13 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
+}
+
+type ViewModel struct {
+	TotalCount  int
+	DbName      string
+	Objects     []*Object
+	PrivateMode bool
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
@@ -80,8 +81,9 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 		totalCount += o.Quantity
 	}
 
-	err = t.ExecuteTemplate(w, "layout", IndexModel{
+	err = t.ExecuteTemplate(w, "layout", ViewModel{
 		TotalCount:  totalCount,
+		DbName:      app.dbName,
 		Objects:     app.objects.GetAll(),
 		PrivateMode: app.privateMode,
 	})
@@ -102,7 +104,7 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "error", http.StatusInternalServerError)
 	}
 
-	err = Write(app.path, app.pass, data)
+	err = Write(fmt.Sprintf("%s.db", app.dbName), app.pass, data)
 	if err != nil {
 		println(err.Error())
 		http.Error(w, "error", http.StatusInternalServerError)
@@ -179,10 +181,10 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func saveObject(r *http.Request) error {
-	if len(r.PostForm.Get("name")) > 0 {
+	if len(r.PostForm.Get("dbName")) > 0 {
 		object, err := ParseObjectForm(&ObjectForm{
 			Id:         r.Form.Get("id"),
-			Name:       r.PostForm.Get("name"),
+			Name:       r.PostForm.Get("dbName"),
 			Quantity:   r.PostForm.Get("quantity"),
 			Categories: r.PostForm.Get("categories"),
 			Tags:       r.PostForm.Get("tags"),

@@ -9,18 +9,18 @@ import (
 
 type App struct {
 	authenticated bool
-	path string
-	pass []byte
-	privateMode bool
+	dbName        string
+	pass          []byte
+	privateMode   bool
 
 	objects ObjectRepository
 }
 
 var app = &App {
 	authenticated: false,
-	path: "",
-	pass: nil,
-	privateMode: false,
+	dbName:        "",
+	pass:          nil,
+	privateMode:   false,
 
 	objects: nil,
 }
