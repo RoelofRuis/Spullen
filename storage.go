@@ -5,10 +5,58 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"golang.org/x/crypto/scrypt"
+	"io/ioutil"
+	"os"
 )
 
-func Encrypt(key []byte, data []byte) ([]byte, error) {
-	key, salt, err := DeriveKey(key, nil)
+type Storage struct {
+	path string
+	pass []byte
+}
+
+func NewStorage(path string, pass string) *Storage {
+	return &Storage{
+		path: path,
+		pass: []byte(pass),
+	}
+}
+
+func (s *Storage) Read() ([]byte, error) {
+	data, err := ioutil.ReadFile(s.path)
+	if err != nil {
+		return nil, err
+	}
+
+	plain, err := decrypt(s.pass, data)
+	if err != nil {
+		return nil, err
+	}
+
+	return plain, err
+}
+
+func (s *Storage) Write(data []byte) error {
+	encrypted, err := encrypt(s.pass, data)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.OpenFile(s.path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	_, err = f.Write(encrypted)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func encrypt(pass, data []byte) ([]byte, error) {
+	key, salt, err := deriveKey(pass, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -34,10 +82,10 @@ func Encrypt(key []byte, data []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func Decrypt(key, data []byte) ([]byte, error) {
+func decrypt(pass, data []byte) ([]byte, error) {
 	salt, data := data[len(data)-32:], data[:len(data)-32]
 
-	key, _, err := DeriveKey(key, salt)
+	key, _, err := deriveKey(pass, salt)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +110,7 @@ func Decrypt(key, data []byte) ([]byte, error) {
 	return plaintext, nil
 }
 
-func DeriveKey(password, salt []byte) ([]byte, []byte, error) {
+func deriveKey(password, salt []byte) ([]byte, []byte, error) {
 	if salt == nil {
 		salt = make([]byte, 32)
 		if _, err := rand.Read(salt); err != nil {

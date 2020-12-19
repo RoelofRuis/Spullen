@@ -2,11 +2,6 @@ package main
 
 import "time"
 
-type Storage struct {
-	name string
-	pass []byte
-}
-
 type ObjectRepository interface {
 	GetAll() []*Object
 	Get(id string) *Object

@@ -32,13 +32,8 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	name := r.Form.Get("name")
-	pass := r.Form.Get("password")
-
-	_ = &Storage{
-		name: name,
-		pass: []byte(pass),
-	}
+	_ = r.Form.Get("name")
+	_ = r.Form.Get("password")
 
 	// TODO: implement the creation logic
 
