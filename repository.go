@@ -1,33 +1,27 @@
 package main
 
 import (
+	"bytes"
 	"encoding/csv"
 	"fmt"
 	"io"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
 )
 
-const DBPATH string = "./db/objects.csv"
-
-type FileStorage struct {
+type ObjectRepositoryImpl struct {
 	Objects map[string]*Object
 }
 
-func NewFileStorage() (*FileStorage, error) {
-	f, err := os.Open(DBPATH)
-	if os.IsNotExist(err) {
-		return &FileStorage{Objects: make(map[string]*Object)}, nil
+func NewRepository() *ObjectRepositoryImpl {
+	return &ObjectRepositoryImpl{
+		Objects: map[string]*Object{},
 	}
-	if err != nil {
-		return nil, err
-	}
+}
 
-	defer f.Close()
-
-	r := csv.NewReader(f)
+func Load(data []byte) (*ObjectRepositoryImpl, error) {
+	r := csv.NewReader(strings.NewReader(string(data)))
 	r.Comma = ';'
 
 	var objects = make(map[string]*Object)
@@ -57,65 +51,13 @@ func NewFileStorage() (*FileStorage, error) {
 
 		objects[object.Id] = object
 	}
-	return &FileStorage{Objects: objects}, nil
+	return &ObjectRepositoryImpl{Objects: objects}, nil
 }
 
-func (s *FileStorage) Get(id string) *Object {
-	if object, found := s.Objects[id]; found {
-		return object
-	}
-
-	return nil
-}
-
-type objectName struct {
-	id   string
-	name string
-}
-
-type objectNames []objectName
-
-func (o objectNames) Len() int           { return len(o) }
-func (o objectNames) Less(i, j int) bool { return o[i].name < o[j].name }
-func (o objectNames) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
-
-func (s *FileStorage) GetAll() []*Object {
-	var identifiers objectNames = nil
-	for _, o := range s.Objects {
-		identifiers = append(identifiers, objectName{id: o.Id, name: o.Name})
-	}
-	sort.Sort(identifiers)
-
-	var objectList []*Object = nil
-	for _, i := range identifiers {
-		objectList = append(objectList, s.Objects[i.id])
-	}
-
-	return objectList
-}
-
-func (s *FileStorage) PutObject(o *Object) error {
-	s.Objects[o.Id] = o
-
-	return s.writeToFile()
-}
-
-func (s *FileStorage) RemoveObject(id string) error {
-	delete(s.Objects, id)
-
-	return s.writeToFile()
-}
-
-func (s *FileStorage) writeToFile() error {
-	f, err := os.OpenFile(DBPATH, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	w := csv.NewWriter(f)
+func Save(s *ObjectRepositoryImpl) ([]byte, error) {
+	b := &bytes.Buffer{}
+	w := csv.NewWriter(b)
 	w.Comma = ';'
-	defer w.Flush()
 
 	var data []string
 	for _, o := range s.Objects {
@@ -136,9 +78,56 @@ func (s *FileStorage) writeToFile() error {
 		}
 		err := w.Write(data)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
+
+	return b.Bytes(), nil
+}
+
+
+func (s *ObjectRepositoryImpl) Get(id string) *Object {
+	if object, found := s.Objects[id]; found {
+		return object
+	}
+
+	return nil
+}
+
+type objectName struct {
+	id   string
+	name string
+}
+
+type objectNames []objectName
+
+func (o objectNames) Len() int           { return len(o) }
+func (o objectNames) Less(i, j int) bool { return o[i].name < o[j].name }
+func (o objectNames) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
+
+func (s *ObjectRepositoryImpl) GetAll() []*Object {
+	var identifiers objectNames = nil
+	for _, o := range s.Objects {
+		identifiers = append(identifiers, objectName{id: o.Id, name: o.Name})
+	}
+	sort.Sort(identifiers)
+
+	var objectList []*Object = nil
+	for _, i := range identifiers {
+		objectList = append(objectList, s.Objects[i.id])
+	}
+
+	return objectList
+}
+
+func (s *ObjectRepositoryImpl) PutObject(o *Object) error {
+	s.Objects[o.Id] = o
+
+	return nil
+}
+
+func (s *ObjectRepositoryImpl) RemoveObject(id string) error {
+	delete(s.Objects, id)
 
 	return nil
 }

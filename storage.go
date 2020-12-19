@@ -9,25 +9,13 @@ import (
 	"os"
 )
 
-type Storage struct {
-	path string
-	pass []byte
-}
-
-func NewStorage(path string, pass string) *Storage {
-	return &Storage{
-		path: path,
-		pass: []byte(pass),
-	}
-}
-
-func (s *Storage) Read() ([]byte, error) {
-	data, err := ioutil.ReadFile(s.path)
+func Read(path string, pass []byte) ([]byte, error) {
+	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	plain, err := decrypt(s.pass, data)
+	plain, err := decrypt(pass, data)
 	if err != nil {
 		return nil, err
 	}
@@ -35,13 +23,13 @@ func (s *Storage) Read() ([]byte, error) {
 	return plain, err
 }
 
-func (s *Storage) Write(data []byte) error {
-	encrypted, err := encrypt(s.pass, data)
+func Write(path string, pass []byte, data []byte) error {
+	encrypted, err := encrypt(pass, data)
 	if err != nil {
 		return err
 	}
 
-	f, err := os.OpenFile(s.path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return err
 	}

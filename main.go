@@ -7,21 +7,30 @@ import (
 	"time"
 )
 
-var o ObjectRepository
+type App struct {
+	authenticated bool
+	path string
+	pass []byte
+	privateMode bool
+
+	objects ObjectRepository
+}
+
+var app = &App {
+	authenticated: false,
+	path: "",
+	pass: nil,
+	privateMode: false,
+
+	objects: nil,
+}
 
 var privateMode = true
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	storage, err := NewFileStorage()
-	if err != nil {
-		log.Fatal(err)
-	}
-	o = storage
-
 	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/new", newHandler)
 	http.HandleFunc("/view", viewHandler)
 	http.HandleFunc("/edit", editHandler)
 	http.HandleFunc("/delete", deleteHandler)
