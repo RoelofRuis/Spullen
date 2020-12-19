@@ -82,6 +82,8 @@ func Save(s ObjectRepository) ([]byte, error) {
 		}
 	}
 
+	w.Flush()
+
 	return b.Bytes(), nil
 }
 
