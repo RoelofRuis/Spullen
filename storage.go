@@ -10,16 +10,22 @@ import (
 )
 
 type EncryptedStorage struct {
-
+	dbName string
+	path string
+	pass []byte
 }
 
-func Read(path string, pass []byte) ([]byte, error) {
-	data, err := ioutil.ReadFile(path)
+func (s *EncryptedStorage) Name() string {
+	return s.dbName
+}
+
+func (s *EncryptedStorage) Read() ([]byte, error) {
+	data, err := ioutil.ReadFile(s.path)
 	if err != nil {
 		return nil, err
 	}
 
-	plain, err := decrypt(pass, data)
+	plain, err := decrypt(s.pass, data)
 	if err != nil {
 		return nil, err
 	}
@@ -27,13 +33,13 @@ func Read(path string, pass []byte) ([]byte, error) {
 	return plain, err
 }
 
-func Write(path string, pass []byte, data []byte) error {
-	encrypted, err := encrypt(pass, data)
+func (s *EncryptedStorage) Write(data []byte) error {
+	encrypted, err := encrypt(s.pass, data)
 	if err != nil {
 		return err
 	}
 
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
+	f, err := os.OpenFile(s.path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return err
 	}

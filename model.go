@@ -3,8 +3,9 @@ package main
 import "time"
 
 type Storage interface {
-	Read(path string, pass []byte) ([]byte, error)
-	Write(path string, pass []byte, data []byte) error
+	Name() string
+	Read() ([]byte, error)
+	Write(data []byte) error
 }
 
 type ObjectRepository interface {

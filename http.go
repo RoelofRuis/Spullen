@@ -26,9 +26,15 @@ func (s *server) handleIndex() http.HandlerFunc {
 
 			load := r.Form.Get("load") == "true"
 
+			s.storage = &EncryptedStorage{
+				dbName: name,
+				path:   fmt.Sprintf("%s.db", name),
+				pass:   []byte(pass),
+			}
+
 			var repo ObjectRepository
 			if load {
-				data, err := Read(fmt.Sprintf("%s.db", name), []byte(pass))
+				data, err := s.storage.Read()
 				if err != nil {
 					http.Error(w, "invalid database", http.StatusInternalServerError)
 					return
@@ -43,8 +49,6 @@ func (s *server) handleIndex() http.HandlerFunc {
 				repo = NewRepository()
 			}
 
-			s.dbName = name
-			s.pass = []byte(pass)
 			s.privateMode = false
 			s.objects = repo
 
@@ -114,7 +118,7 @@ func (s *server) handleView() http.HandlerFunc {
 
 		err = t.ExecuteTemplate(w, "layout", viewModel{
 			TotalCount:  totalCount,
-			DbName:      s.dbName,
+			DbName:      s.storage.Name(),
 			Objects:     s.objects.GetAll(),
 			PrivateMode: s.privateMode,
 		})
@@ -132,7 +136,7 @@ func (s *server) handleSave() http.HandlerFunc {
 			http.Error(w, "error", http.StatusInternalServerError)
 		}
 
-		err = Write(fmt.Sprintf("%s.db", s.dbName), s.pass, data)
+		err = s.storage.Write(data)
 		if err != nil {
 			println(err.Error())
 			http.Error(w, "error", http.StatusInternalServerError)
@@ -144,9 +148,7 @@ func (s *server) handleSave() http.HandlerFunc {
 
 func (s *server) handleClose() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.dbName = ""
-		s.pass = nil
-		s.privateMode = false
+		s.storage = nil
 		s.objects = nil
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)

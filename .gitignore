@@ -1,3 +1,5 @@
 .idea/
 
+# Local databases
 db/
+*.db

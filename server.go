@@ -5,10 +5,9 @@ import "net/http"
 type server struct {
 	router http.ServeMux
 
-	dbName string
-	pass []byte
 	privateMode bool
 
+	storage Storage
 	objects ObjectRepository
 }
 
