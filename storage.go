@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bytes"
+	"compress/gzip"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
 	"golang.org/x/crypto/scrypt"
 	"io/ioutil"
+	"log"
 	"os"
 )
 
@@ -20,25 +23,60 @@ func (s *EncryptedStorage) Name() string {
 }
 
 func (s *EncryptedStorage) Read() ([]byte, error) {
+	// READ
 	data, err := ioutil.ReadFile(s.path)
 	if err != nil {
 		return nil, err
 	}
 
+	// DECRYPT
 	plain, err := decrypt(s.pass, data)
 	if err != nil {
 		return nil, err
 	}
 
-	return plain, err
+	// GUNZIP
+	r, err := gzip.NewReader(bytes.NewReader(plain))
+	if err != nil {
+		return nil, err
+	}
+	defer r.Close()
+
+	unzipped, err := ioutil.ReadAll(r)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	return unzipped, nil
 }
 
 func (s *EncryptedStorage) Write(data []byte) error {
-	encrypted, err := encrypt(s.pass, data)
+	// GZIP
+	buf := &bytes.Buffer{}
+
+	w := gzip.NewWriter(buf)
+
+	_, err := w.Write(data)
+	if err != nil {
+		return err
+	}
+	err = w.Flush()
+	if err != nil {
+		return err
+	}
+	err = w.Close()
 	if err != nil {
 		return err
 	}
 
+	// ENCRYPT
+	encrypted, err := encrypt(s.pass, buf.Bytes())
+	if err != nil {
+		return err
+	}
+
+	// WRITE
 	f, err := os.OpenFile(s.path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return err

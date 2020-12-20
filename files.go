@@ -16,8 +16,6 @@ func (f *Finder) FindDatabases() ([]string, error) {
 		path = fmt.Sprintf("%s/*.db", f.root)
 	}
 
-	println(path)
-
 	files, err := filepath.Glob(path)
 	if err != nil {
 		return nil, err
