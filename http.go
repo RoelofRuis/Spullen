@@ -88,11 +88,6 @@ func (s *server) handleView() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		if ! s.authenticated {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-			return
-		}
-
 		if r.Method == http.MethodPost {
 			err := r.ParseForm()
 			if err != nil {
@@ -132,11 +127,6 @@ func (s *server) handleView() http.HandlerFunc {
 
 func (s *server) handleSave() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if ! s.authenticated {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-			return
-		}
-
 		data, err := Save(s.objects)
 		if err != nil {
 			println(err.Error())
@@ -155,11 +145,6 @@ func (s *server) handleSave() http.HandlerFunc {
 
 func (s *server) handleClose() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if ! s.authenticated {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-			return
-		}
-
 		s.authenticated = false
 		s.dbName = ""
 		s.pass = nil
@@ -172,11 +157,6 @@ func (s *server) handleClose() http.HandlerFunc {
 
 func (s *server) handleEdit() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if ! s.authenticated {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-			return
-		}
-
 		err := r.ParseForm()
 		if err != nil {
 			println(err.Error())
@@ -221,11 +201,6 @@ func (s *server) handleEdit() http.HandlerFunc {
 
 func (s *server) handleDelete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r * http.Request) {
-		if !s.authenticated {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-			return
-		}
-
 		err := r.ParseForm()
 		if err != nil {
 			http.Error(w, "unable to parse form", http.StatusBadRequest)
