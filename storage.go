@@ -11,8 +11,8 @@ import (
 
 type EncryptedStorage struct {
 	dbName string
-	path string
-	pass []byte
+	path   string
+	pass   []byte
 }
 
 func (s *EncryptedStorage) Name() string {

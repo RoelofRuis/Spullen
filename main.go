@@ -14,13 +14,13 @@ func main() {
 	dbRoot := os.Getenv("DBROOT")
 
 	server := &server{
-		router:        http.ServeMux{},
+		router: http.ServeMux{},
 
-		privateMode:   false,
+		privateMode: false,
 
-		finder:        &Finder{root: dbRoot},
-		storage: 	   nil,
-		objects:       nil,
+		finder:  &Finder{root: dbRoot},
+		storage: nil,
+		objects: nil,
 	}
 
 	server.routes()

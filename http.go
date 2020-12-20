@@ -164,7 +164,7 @@ func (s *server) handleEdit() http.HandlerFunc {
 			return
 		}
 
-		if ! s.privateMode && object.Hidden {
+		if !s.privateMode && object.Hidden {
 			http.Error(w, "object can not be edited", http.StatusForbidden)
 			return
 		}
@@ -194,7 +194,7 @@ func (s *server) handleEdit() http.HandlerFunc {
 }
 
 func (s *server) handleDelete() http.HandlerFunc {
-	return func(w http.ResponseWriter, r * http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
 			http.Error(w, "unable to parse form", http.StatusBadRequest)

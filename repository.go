@@ -87,7 +87,6 @@ func Save(s ObjectRepository) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-
 func (s *ObjectRepositoryImpl) Get(id string) *Object {
 	if object, found := s.Objects[id]; found {
 		return object
