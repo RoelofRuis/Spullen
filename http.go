@@ -19,6 +19,7 @@ func (s *server) handleIndex() http.HandlerFunc {
 			if err != nil {
 				println(err.Error())
 				http.Error(w, "bad request", http.StatusBadRequest)
+				return
 			}
 
 			name := r.Form.Get("dbname")
