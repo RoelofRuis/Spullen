@@ -5,7 +5,6 @@ import "net/http"
 type server struct {
 	router http.ServeMux
 
-	authenticated bool
 	dbName string
 	pass []byte
 	privateMode bool
@@ -15,20 +14,20 @@ type server struct {
 
 func (s *server) routes() {
 	s.router.HandleFunc("/", s.handleIndex())
-	s.router.HandleFunc("/edit", s.onlyAuthenticated(s.handleEdit()))
-	s.router.HandleFunc("/view", s.onlyAuthenticated(s.handleView()))
-	s.router.HandleFunc("/delete", s.onlyAuthenticated(s.handleDelete()))
-	s.router.HandleFunc("/save", s.onlyAuthenticated(s.handleSave()))
-	s.router.HandleFunc("/close", s.onlyAuthenticated(s.handleClose()))
+	s.router.HandleFunc("/edit", s.withLoadedObjects(s.handleEdit()))
+	s.router.HandleFunc("/view", s.withLoadedObjects(s.handleView()))
+	s.router.HandleFunc("/delete", s.withLoadedObjects(s.handleDelete()))
+	s.router.HandleFunc("/save", s.withLoadedObjects(s.handleSave()))
+	s.router.HandleFunc("/close", s.withLoadedObjects(s.handleClose()))
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
-func (s *server) onlyAuthenticated(h http.HandlerFunc) http.HandlerFunc {
+func (s *server) withLoadedObjects(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if ! s.authenticated {
+		if s.objects == nil {
 			http.NotFound(w, r)
 			return
 		}

@@ -9,6 +9,10 @@ import (
 	"os"
 )
 
+type EncryptedStorage struct {
+
+}
+
 func Read(path string, pass []byte) ([]byte, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {

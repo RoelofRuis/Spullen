@@ -43,7 +43,6 @@ func (s *server) handleIndex() http.HandlerFunc {
 				repo = NewRepository()
 			}
 
-			s.authenticated = true
 			s.dbName = name
 			s.pass = []byte(pass)
 			s.privateMode = false
@@ -145,7 +144,6 @@ func (s *server) handleSave() http.HandlerFunc {
 
 func (s *server) handleClose() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.authenticated = false
 		s.dbName = ""
 		s.pass = nil
 		s.privateMode = false

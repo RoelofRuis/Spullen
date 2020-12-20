@@ -12,7 +12,6 @@ func main() {
 
 	server := &server{
 		router:        http.ServeMux{},
-		authenticated: false,
 		dbName:        "",
 		pass:          nil,
 		privateMode:   false,
