@@ -7,6 +7,7 @@ type server struct {
 
 	privateMode bool
 
+	finder *Finder
 	storage Storage
 	objects ObjectRepository
 }

@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"path/filepath"
-	"strings"
 )
 
 func (s *server) handleIndex() http.HandlerFunc {
@@ -13,7 +11,7 @@ func (s *server) handleIndex() http.HandlerFunc {
 		Databases []string
 	}
 
-	return func (w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			err := r.ParseForm()
 			if err != nil {
@@ -63,15 +61,10 @@ func (s *server) handleIndex() http.HandlerFunc {
 			return
 		}
 
-		files, err := filepath.Glob("*.db")
+		names, err := s.finder.FindDatabases()
 		if err != nil {
 			http.Error(w, "unable to detect databases", http.StatusInternalServerError)
 			return
-		}
-
-		var names []string
-		for _, f := range files {
-			names = append(names, strings.TrimSuffix(f, ".db"))
 		}
 
 		err = t.ExecuteTemplate(w, "layout", &indexModel{

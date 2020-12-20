@@ -4,16 +4,22 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"time"
 )
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
+	dbRoot := os.Getenv("DBROOT")
+
 	server := &server{
 		router:        http.ServeMux{},
-		storage: 	   nil,
+
 		privateMode:   false,
+
+		finder:        &Finder{root: dbRoot},
+		storage: 	   nil,
 		objects:       nil,
 	}
 
