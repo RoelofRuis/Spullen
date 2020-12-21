@@ -17,7 +17,12 @@
                     </div>
                     <div class="form-group col">
                         <label for="password-field">Wachtwoord</label>
-                        <input id="password-field" name="password" type="password" class="form-control form-control-sm" autocomplete="off">
+                        {{ with .Form.Errors.LoadPassword }}
+                            <input id="password-field " name="password" type="password" class="form-control form-control-sm is-invalid" autocomplete="off">
+                            <div class="invalid-feedback">{{ . }}</div>
+                        {{ else }}
+                            <input id="password-field " name="password" type="password" class="form-control form-control-sm" autocomplete="off">
+                        {{ end }}
                     </div>
                     <input type="hidden" name="load" value="true">
                 </div>
@@ -30,11 +35,21 @@
             <div class="form-row">
                 <div class="form-group col">
                     <label for="dbname-field">Databasenaam</label>
-                    <input id="dbname-field" name="dbname" type="text" class="form-control form-control-sm" autocomplete="off">
+                    {{ with .Form.Errors.NewDatabaseName }}
+                        <input id="dbname-field" name="dbname" type="text" class="form-control form-control-sm is-invalid" autocomplete="off">
+                        <div class="invalid-feedback">{{ . }}</div>
+                    {{ else }}
+                        <input id="dbname-field" name="dbname" type="text" class="form-control form-control-sm" autocomplete="off">
+                    {{ end }}
                 </div>
                 <div class="form-group col">
                     <label for="password-field">Wachtwoord</label>
-                    <input id="password-field" name="password" type="password" class="form-control form-control-sm" autocomplete="off">
+                    {{ with .Form.Errors.NewPassword }}
+                        <input id="password-field" name="password" type="password" class="form-control form-control-sm is-invalid" autocomplete="off">
+                        <div class="invalid-feedback">{{ . }}</div>
+                    {{ else }}
+                        <input id="password-field" name="password" type="password" class="form-control form-control-sm" autocomplete="off">
+                    {{ end }}
                 </div>
             </div>
             <button type="submit" class="btn btn-outline-success">Aanmaken</button>

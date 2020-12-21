@@ -9,50 +9,46 @@ import (
 func (s *server) handleIndex() http.HandlerFunc {
 	type indexModel struct {
 		Databases []string
+		Form *IndexForm
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		form := &IndexForm{}
+
 		if r.Method == http.MethodPost {
-			err := r.ParseForm()
-			if err != nil {
-				println(err.Error())
-				http.Error(w, "bad request", http.StatusBadRequest)
+			form.DatabaseName = r.PostFormValue("dbname")
+			form.Password = r.PostFormValue("password")
+			form.ShouldLoad = r.PostFormValue("load") == "true"
+
+			if form.Validate() {
+				s.storage = &EncryptedStorage{
+					dbName: form.DatabaseName,
+					path:   fmt.Sprintf("%s.db", form.DatabaseName),
+					pass:   []byte(form.Password),
+				}
+				var repo ObjectRepository
+				if form.ShouldLoad {
+					data, err := s.storage.Read()
+					if err != nil {
+						http.Error(w, "invalid database", http.StatusInternalServerError)
+						return
+					}
+
+					repo, err = Load(data)
+					if err != nil {
+						http.Error(w, "invalid database", http.StatusInternalServerError)
+						return
+					}
+				} else {
+					repo = NewRepository()
+				}
+
+				s.privateMode = false
+				s.objects = repo
+
+				http.Redirect(w, r, "/view", http.StatusSeeOther)
 				return
 			}
-
-			name := r.Form.Get("dbname")
-			pass := r.Form.Get("password")
-
-			load := r.Form.Get("load") == "true"
-
-			s.storage = &EncryptedStorage{
-				dbName: name,
-				path:   fmt.Sprintf("%s.db", name),
-				pass:   []byte(pass),
-			}
-
-			var repo ObjectRepository
-			if load {
-				data, err := s.storage.Read()
-				if err != nil {
-					http.Error(w, "invalid database", http.StatusInternalServerError)
-					return
-				}
-
-				repo, err = Load(data)
-				if err != nil {
-					http.Error(w, "invalid database", http.StatusInternalServerError)
-					return
-				}
-			} else {
-				repo = NewRepository()
-			}
-
-			s.privateMode = false
-			s.objects = repo
-
-			http.Redirect(w, r, "/view", http.StatusSeeOther)
-			return
 		}
 
 		t, err := template.ParseFiles("./static/layout.gohtml", "./static/index.gohtml")
@@ -69,6 +65,7 @@ func (s *server) handleIndex() http.HandlerFunc {
 
 		err = t.ExecuteTemplate(w, "layout", &indexModel{
 			Databases: names,
+			Form: form,
 		})
 		if err != nil {
 			fmt.Print(err.Error())
