@@ -8,6 +8,8 @@ import (
 
 func (s *server) handleIndex() http.HandlerFunc {
 	type indexModel struct {
+		Alert string
+
 		Databases []string
 		Form *IndexForm
 	}
@@ -15,39 +17,24 @@ func (s *server) handleIndex() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		form := &IndexForm{}
 
+		var loadingAlert = ""
 		if r.Method == http.MethodPost {
 			form.DatabaseName = r.PostFormValue("dbname")
 			form.Password = r.PostFormValue("password")
-			form.ShouldLoad = r.PostFormValue("load") == "true"
+			form.IsExisting = r.PostFormValue("is_existing") == "true"
 
 			if form.Validate() {
-				s.storage = &EncryptedStorage{
-					dbName: form.DatabaseName,
-					path:   fmt.Sprintf("%s.db", form.DatabaseName),
-					pass:   []byte(form.Password),
-				}
-				var repo ObjectRepository
-				if form.ShouldLoad {
-					data, err := s.storage.Read()
-					if err != nil {
-						http.Error(w, "invalid database", http.StatusInternalServerError)
-						return
-					}
+				storage, repo, err := loadStorageAndRepository(form.DatabaseName, []byte(form.Password), form.IsExisting)
+				if err == nil {
+					s.privateMode = false
+					s.storage = storage
+					s.objects = repo
 
-					repo, err = Load(data)
-					if err != nil {
-						http.Error(w, "invalid database", http.StatusInternalServerError)
-						return
-					}
-				} else {
-					repo = NewRepository()
+					http.Redirect(w, r, "/view", http.StatusSeeOther)
+					return
 				}
 
-				s.privateMode = false
-				s.objects = repo
-
-				http.Redirect(w, r, "/view", http.StatusSeeOther)
-				return
+				loadingAlert = "De database kon niet worden geopend. Het wachtwoord is fout of de database is corrupt."
 			}
 		}
 
@@ -64,6 +51,7 @@ func (s *server) handleIndex() http.HandlerFunc {
 		}
 
 		err = t.ExecuteTemplate(w, "layout", &indexModel{
+			Alert: loadingAlert,
 			Databases: names,
 			Form: form,
 		})
@@ -71,6 +59,31 @@ func (s *server) handleIndex() http.HandlerFunc {
 			fmt.Print(err.Error())
 		}
 	}
+}
+
+func loadStorageAndRepository(name string, pass []byte, isExisting bool) (Storage, ObjectRepository, error) {
+	storage := &EncryptedStorage{
+		dbName: name,
+		path:   fmt.Sprintf("%s.db", name),
+		pass:   pass,
+	}
+
+	var repo ObjectRepository
+	if isExisting {
+		data, err := storage.Read()
+		if err != nil {
+			return nil, nil, err
+		}
+
+		repo, err = Load(data)
+		if err != nil {
+			return nil, nil, err
+		}
+	} else {
+		repo = NewRepository()
+	}
+
+	return storage, repo, nil
 }
 
 func (s *server) handleView() http.HandlerFunc {
