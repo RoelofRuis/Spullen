@@ -61,6 +61,7 @@ func (s *server) handleIndex() http.HandlerFunc {
 	}
 }
 
+// TODO: extract this into separate service that handles storage state
 func loadStorageAndRepository(name string, pass []byte, isExisting bool) (Storage, ObjectRepository, error) {
 	storage := &EncryptedStorage{
 		dbName: name,

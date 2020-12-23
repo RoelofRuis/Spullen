@@ -29,7 +29,10 @@
                 </div>
                 <input type="hidden" name="is_existing" value="true">
             </div>
-            <button type="submit" class="btn btn-outline-success">Openen</button>
+            <button type="submit" class="btn btn-outline-success btn-spinner">
+                <span class="spinner-border spinner-border-sm" role="status" style="display:none" aria-hidden="true"></span>
+                Openen
+            </button>
         </form>
         <hr>
         {{ end }}
@@ -59,4 +62,15 @@
         </form>
     </div>
 </div>
+<script>
+function spinner() {
+    const buttons = document.getElementsByClassName('btn-spinner');
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener('click', () => {
+            buttons[i].querySelector('span').style.display = ''
+        })
+    }
+}
+spinner();
+</script>
 {{ end }}
