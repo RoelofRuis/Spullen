@@ -29,3 +29,18 @@ func (f *IndexForm) Validate() bool {
 
 	return len(f.Errors) == 0
 }
+
+type ObjectForm2 struct {
+	Id string
+	TimeAdded string
+
+	Name string
+	Quantity string
+	Categories string
+	Tags string
+	Properties string
+	Hidden string
+	Notes string
+
+	Errors map[string]string
+}
