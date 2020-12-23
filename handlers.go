@@ -11,7 +11,7 @@ func (s *server) handleIndex() http.HandlerFunc {
 		Alert string
 
 		Databases []string
-		Form *IndexForm
+		Form      *IndexForm
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -51,9 +51,9 @@ func (s *server) handleIndex() http.HandlerFunc {
 		}
 
 		err = t.ExecuteTemplate(w, "layout", &indexModel{
-			Alert: loadingAlert,
+			Alert:     loadingAlert,
 			Databases: names,
-			Form: form,
+			Form:      form,
 		})
 		if err != nil {
 			fmt.Print(err.Error())
