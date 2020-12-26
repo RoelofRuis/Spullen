@@ -4,12 +4,15 @@
 <form action="/" method="post">
     <div class="row mt-2">
         <div class="col">
+            <h4>Database openen</h4>
             {{ with .Alert }}
             <div class="alert alert-danger">{{ . }}</div>
             {{ end }}
+            <div class="form-row">
             {{ $numDbs := len .Databases }}
             {{ if gt $numDbs 0}}
-            <div class="form-group">
+
+            <div class="form-group col">
                 <label for="existing-db-field">Bestaande database</label>
                 <select class="form-control form-control-sm" id="existing-db-field" name="existing-db">
                     {{ range .Databases }}
@@ -17,9 +20,8 @@
                     {{ end }}
                 </select>
             </div>
-            <hr>
             {{ end }}
-            <div class="form-group">
+            <div class="form-group col">
                 <label for="new-db-field">Nieuwe database</label>
                 {{ with .Form.Errors.Database }}
                     <input id="new-db-field" name="new-db" type="text" class="form-control form-control-sm is-invalid" autocomplete="off">
@@ -28,8 +30,8 @@
                     <input id="new-db-field" name="new-db" type="text" class="form-control form-control-sm" autocomplete="off">
                 {{ end }}
             </div>
-        </div>
-        <div class="col">
+            </div>
+            <hr>
             <div class="form-group">
                 <label for="password-field">Wachtwoord</label>
                 {{ with .Form.Errors.Password }}
