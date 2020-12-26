@@ -62,7 +62,7 @@
                 <textarea id="properties-field" name="notes" rows="3" class="form-control form-control-sm" autocomplete="off">{{ .Form.Notes }}</textarea>
             </div>
             <div class="form-check mb-3">
-                <input type="checkbox" name="hidden" class="form-control-sm form-check-input" id="check-hidden" value="true" {{ if .Form.Hidden }}checked="checked"{{ end }}>
+                <input type="checkbox" name="hidden" class="form-control-sm form-check-input" id="check-hidden" value="true" {{ if eq .Form.Hidden "true" }}checked{{ end }}>
                 <input type="hidden" name="hidden" value="false">
                 <label class="form-check-label" for="check-hidden">Verborgen</label>
             </div>
