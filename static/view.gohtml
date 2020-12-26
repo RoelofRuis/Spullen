@@ -17,38 +17,66 @@
 {{ $private_mode := .PrivateMode }}
 <div class="row mt-2">
     <div class="col">
+        {{ with .Alert }}
+            <div class="alert alert-danger">{{ . }}</div>
+        {{ end }}
         <form action="/view" method="post">
             <div class="form-row">
                 <div class="form-group col">
                     <label for="name-field">Objectnaam</label>
-                    <input onkeyup="filterTable()" id="name-field" name="name" type="text" class="form-control form-control-sm" autocomplete="off" autofocus>
+                    {{ if .Form.Errors.Name }}
+                        <input onkeyup="filterTable()" id="name-field" name="name" type="text" class="form-control form-control-sm is-invalid" autocomplete="off" value="{{ .Form.Name }}" autofocus>
+                        <div class="invalid-feedback">{{ .Form.Errors.Name }}</div>
+                    {{ else }}
+                        <input onkeyup="filterTable()" id="name-field" name="name" type="text" class="form-control form-control-sm" autocomplete="off" value="{{ .Form.Name }}" autofocus>
+                    {{ end }}
                 </div>
                 <div class="form-group col">
                     <label for="quantity-field">Aantal</label>
-                    <input id="quantity-field" name="quantity" type="number" class="form-control form-control-sm" value="1" autocomplete="off" autofocus>
+                    {{ if .Form.Errors.Quantity }}
+                        <input id="quantity-field" name="quantity" type="number" class="form-control form-control-sm is-invalid" value="{{ .Form.Quantity }}" autocomplete="off" autofocus>
+                        <div class="invalid-feedback">{{ .Form.Errors.Quantity }}</div>
+                    {{ else }}
+                        <input id="quantity-field" name="quantity" type="number" class="form-control form-control-sm" value="{{ .Form.Quantity }}" autocomplete="off" autofocus>
+                    {{ end }}
                 </div>
             </div>
             <div class="form-group">
                 <label for="tags-field">Tags</label>
                 <i class="fa fa-question-circle-o text-primary pull-right" title="veranderlijke groeperingen: 'woonkamer,opruimen'"></i>
-                <input id="tags-field" name="tags" type="text" class="form-control form-control-sm" autocomplete="off">
+                {{ if .Form.Errors.Tags }}
+                    <input id="tags-field" name="tags" type="text" class="form-control form-control-sm is-invalid" value="{{ .Form.Tags }}" autocomplete="off">
+                    <div class="invalid-feedback">{{ .Form.Errors.Tags }}</div>
+                {{ else }}
+                    <input id="tags-field" name="tags" type="text" class="form-control form-control-sm" value="{{ .Form.Tags }}" autocomplete="off">
+                {{ end }}
             </div>
             <div class="form-group">
                 <label for="category-field">Categorieën</label>
                 <i class="fa fa-question-circle-o text-primary pull-right" title="onveranderlijke groeperingen: 'meubel,groot'"></i>
-                <input id="category-field" name="categories" type="text" class="form-control form-control-sm" autocomplete="off">
+                {{ if .Form.Errors.Categories }}
+                    <input id="category-field" name="categories" type="text" class="form-control form-control-sm is-invalid" value="{{ .Form.Categories }}" autocomplete="off">
+                    <div class="invalid-feedback">{{ .Form.Errors.Categories }}</div>
+                {{ else }}
+                    <input id="category-field" name="categories" type="text" class="form-control form-control-sm" value="{{ .Form.Categories }}" autocomplete="off">
+                {{ end }}
             </div>
             <div class="form-group">
                 <label for="properties-field">Eigenschappen</label>
                 <i class="fa fa-question-circle-o text-primary pull-right" title="eigenschappen: 'kleur=bruin,materiaal=hout'"></i>
-                <input id="properties-field" name="properties" type="text" class="form-control form-control-sm" autocomplete="off">
+                {{ if .Form.Errors.Properties }}
+                    <input id="properties-field" name="properties" type="text" class="form-control form-control-sm is-invalid" value="{{ .Form.Properties }}" autocomplete="off">
+                    <div class="invalid-feedback">{{ .Form.Errors.Properties }}</div>
+                {{ else }}
+                    <input id="properties-field" name="properties" type="text" class="form-control form-control-sm" value="{{ .Form.Properties }}" autocomplete="off">
+                {{ end }}
             </div>
             <div class="form-group">
                 <label for="properties-field">Aantekeningen</label>
-                <textarea id="properties-field" name="notes" rows="3" class="form-control form-control-sm" autocomplete="off"></textarea>
+                <textarea id="properties-field" name="notes" rows="3" class="form-control form-control-sm" autocomplete="off">{{ .Form.Notes }}</textarea>
             </div>
             <div class="form-check mb-3">
-                <input type="checkbox" name="hidden" class="form-control-sm form-check-input" id="check-hidden" value="true">
+                <input type="checkbox" name="hidden" class="form-control-sm form-check-input" id="check-hidden" value="true" {{ if .Form.Hidden }}checked{{ end }}>
                 <input type="hidden" name="hidden" value="false">
                 <label class="form-check-label" for="check-hidden">Verborgen</label>
             </div>
@@ -126,15 +154,5 @@ function filterTable() {
         filterIcon.style.display = "none";
     }
 }
-
-function spinner() {
-    const buttons = document.getElementsByClassName('btn-spinner');
-    for (let i = 0; i < buttons.length; i++) {
-        buttons[i].addEventListener('click', () => {
-            buttons[i].querySelector('span').style.display = ''
-        })
-    }
-}
-spinner();
 </script>
 {{ end }}

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 func (s *server) handleIndex() http.HandlerFunc {
@@ -88,24 +90,39 @@ func loadStorageAndRepository(name string, pass []byte, isExisting bool) (Storag
 
 func (s *server) handleView() http.HandlerFunc {
 	type viewModel struct {
+		Alert string
+
 		TotalCount  int
 		DbName      string
 		Objects     []*Object
 		PrivateMode bool
+
+		Form *ObjectForm
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
-			err := r.ParseForm()
-			if err != nil {
-				println(err.Error())
-				http.Error(w, "bad request", http.StatusBadRequest)
-			}
+		form := EmptyForm()
 
-			err = s.saveObject(r)
-			if err != nil {
-				println(err.Error())
-				http.Error(w, "error", http.StatusInternalServerError)
+		var alert = ""
+		if r.Method == http.MethodPost {
+			form.Id = randSeq(16)
+			form.TimeAdded = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
+			form.Name = r.PostFormValue("name")
+			form.Quantity = r.PostFormValue("quantity")
+			form.Categories = r.PostFormValue("categories")
+			form.Tags = r.PostFormValue("tags")
+			form.Properties = r.PostFormValue("properties")
+			form.Hidden = r.PostFormValue("hidden")
+			form.Notes = r.PostFormValue("notes")
+
+			if form.Validate() {
+				obj, err := form.GetObject()
+				if err != nil {
+					alert = fmt.Sprintf("Error when getting object from form\n%s", err.Error())
+				}
+
+				_ = s.objects.PutObject(obj)
+				form = EmptyForm()
 			}
 		}
 
@@ -121,10 +138,12 @@ func (s *server) handleView() http.HandlerFunc {
 		}
 
 		err = t.ExecuteTemplate(w, "layout", viewModel{
+			Alert: alert,
 			TotalCount:  totalCount,
 			DbName:      s.storage.Name(),
 			Objects:     s.objects.GetAll(),
 			PrivateMode: s.privateMode,
+			Form:        form,
 		})
 		if err != nil {
 			fmt.Print(err.Error())
@@ -160,6 +179,12 @@ func (s *server) handleClose() http.HandlerFunc {
 }
 
 func (s *server) handleEdit() http.HandlerFunc {
+	type EditModel struct {
+		Alert string
+
+		Form *ObjectForm
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
@@ -179,15 +204,29 @@ func (s *server) handleEdit() http.HandlerFunc {
 			return
 		}
 
-		if r.Method == http.MethodPost {
-			err := s.saveObject(r)
-			if err != nil {
-				println(err.Error())
-				http.Error(w, "error", http.StatusInternalServerError)
-			}
+		form := FormFromObject(object)
 
-			http.Redirect(w, r, "/view", http.StatusSeeOther)
-			return
+		var alert = ""
+		if r.Method == http.MethodPost {
+			form.Name = r.PostFormValue("name")
+			form.Quantity = r.PostFormValue("quantity")
+			form.Categories = r.PostFormValue("categories")
+			form.Tags = r.PostFormValue("tags")
+			form.Properties = r.PostFormValue("properties")
+			form.Hidden = r.PostFormValue("hidden")
+			form.Notes = r.PostFormValue("notes")
+
+			if form.Validate() {
+				obj, err := form.GetObject()
+				if err != nil {
+					alert = fmt.Sprintf("Error when getting object\n%s", err.Error())
+				} else {
+					_ = s.objects.PutObject(obj)
+
+					http.Redirect(w, r, "/view", http.StatusSeeOther)
+					return
+				}
+			}
 		}
 
 		t, err := template.ParseFiles("./static/layout.gohtml", "./static/edit.gohtml")
@@ -196,7 +235,7 @@ func (s *server) handleEdit() http.HandlerFunc {
 			return
 		}
 
-		err = t.ExecuteTemplate(w, "layout", MakeForm(object))
+		err = t.ExecuteTemplate(w, "layout", EditModel{Form: form, Alert: alert})
 		if err != nil {
 			fmt.Print(err.Error())
 		}
@@ -218,29 +257,4 @@ func (s *server) handleDelete() http.HandlerFunc {
 
 		http.Redirect(w, r, "/view", http.StatusSeeOther)
 	}
-}
-
-func (s *server) saveObject(r *http.Request) error {
-	if len(r.PostForm.Get("name")) > 0 {
-		object, err := ParseObjectForm(&ObjectForm{
-			Id:         r.Form.Get("id"),
-			Name:       r.PostForm.Get("name"),
-			Quantity:   r.PostForm.Get("quantity"),
-			Categories: r.PostForm.Get("categories"),
-			Tags:       r.PostForm.Get("tags"),
-			Properties: r.PostForm.Get("properties"),
-			Hidden:     r.PostForm.Get("hidden"),
-			Notes:      r.PostForm.Get("notes"),
-		})
-		if err != nil {
-			return err
-		}
-
-		err = s.objects.PutObject(object)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }

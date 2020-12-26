@@ -16,7 +16,7 @@ func main() {
 	server := &server{
 		router: http.ServeMux{},
 
-		privateMode: false,
+		privateMode: true,
 
 		finder:  &Finder{root: dbRoot},
 		storage: nil,

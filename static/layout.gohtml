@@ -14,5 +14,16 @@
     </nav>
     {{ template "content" . }}
 </div>
+<script>
+function spinner() {
+    const buttons = document.getElementsByClassName('btn-spinner');
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener('click', () => {
+            buttons[i].querySelector('span').style.display = ''
+        })
+    }
+}
+spinner();
+</script>
 </body>
 {{ end }}

@@ -34,7 +34,7 @@ func Load(data []byte) (*ObjectRepositoryImpl, error) {
 			return nil, err
 		}
 
-		object, err := ParseObjectForm(&ObjectForm{
+		form := &ObjectForm{
 			Id:         record[0],
 			TimeAdded:  record[1],
 			Name:       record[2],
@@ -44,7 +44,13 @@ func Load(data []byte) (*ObjectRepositoryImpl, error) {
 			Properties: record[6],
 			Hidden:     record[7],
 			Notes:      record[8],
-		})
+		}
+
+		if ! form.Validate() {
+			return nil, fmt.Errorf("invalid object [%s]", record[0])
+		}
+
+		object, err := form.GetObject()
 		if err != nil {
 			return nil, err
 		}
