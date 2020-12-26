@@ -1,31 +1,48 @@
 package main
 
+import "strconv"
+
 type IndexForm struct {
-	DatabaseName string
+	ExistingDatabaseName string
+	NewDatabaseName string
 	Password     string
-	IsExisting   bool
+	PrivateMode string
 
 	Errors map[string]string
+
+	database string
+	isNew bool
+	isPrivateMode bool
 }
 
 func (f *IndexForm) Validate() bool {
 	f.Errors = make(map[string]string)
 
-	if len(f.DatabaseName) == 0 {
-		if f.IsExisting {
-			f.Errors["LoadDatabaseName"] = "Selecteer een bestaande database"
-		} else {
-			f.Errors["NewDatabaseName"] = "Geef een database op"
-		}
+	existingSelected := len(f.ExistingDatabaseName) > 0
+	newSelected := len(f.NewDatabaseName) > 0
+
+	if ! existingSelected && ! newSelected {
+		f.Errors["Database"] = "Geef een database op"
+	}
+
+	f.isNew = newSelected
+	if f.isNew {
+		f.database = f.NewDatabaseName
+	} else {
+		f.database = f.ExistingDatabaseName
 	}
 
 	if len(f.Password) == 0 {
-		if f.IsExisting {
-			f.Errors["LoadPassword"] = "Wachtwoord mag niet leeg zijn"
-		} else {
-			f.Errors["NewPassword"] = "Wachtwoord mag niet leeg zijn"
-		}
+		f.Errors["Password"] = "Wachtwoord mag niet leeg zijn"
 	}
+
+	isPrivate, err := strconv.ParseBool(f.PrivateMode)
+	if err != nil {
+		f.Errors["PrivateMode"] = "Privémodus moet een geldige booleaanse waarde zijn"
+	} else {
+		f.isPrivateMode = isPrivate
+	}
+
 
 	return len(f.Errors) == 0
 }

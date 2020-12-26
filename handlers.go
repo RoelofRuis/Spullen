@@ -21,13 +21,15 @@ func (s *server) handleIndex() http.HandlerFunc {
 
 		var loadingAlert = ""
 		if r.Method == http.MethodPost {
-			form.DatabaseName = r.PostFormValue("dbname")
+			form.ExistingDatabaseName = r.PostFormValue("existing-db")
+			form.NewDatabaseName = r.PostFormValue("new-db")
 			form.Password = r.PostFormValue("password")
-			form.IsExisting = r.PostFormValue("is_existing") == "true"
+			form.PrivateMode = r.PostFormValue("private-mode")
 
 			if form.Validate() {
-				storage, repo, err := loadStorageAndRepository(form.DatabaseName, []byte(form.Password), form.IsExisting)
+				storage, repo, err := loadStorageAndRepository(form.database, []byte(form.Password), ! form.isNew)
 				if err == nil {
+					s.privateMode = form.isPrivateMode
 					s.storage = storage
 					s.objects = repo
 

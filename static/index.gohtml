@@ -1,67 +1,57 @@
 {{ define "navbar" }}{{ end }}
 
 {{ define "content" }}
-<div class="row mt-2">
-    <div class="col">
-        {{ with .Alert }}
-        <div class="alert alert-danger">{{ . }}</div>
-        {{ end }}
-        {{ $numDbs := len .Databases }} {{ if gt $numDbs 0}}
-        <h4>Database openen</h4>
-        <form action="/" method="post">
-            <div class="form-row">
-                <div class="form-group col">
-                    <label for="dbname-field">Databasenaam</label>
-                    <select class="form-control form-control-sm" id="dbname-field" name="dbname">
-                        {{ range .Databases }}
-                            <option>{{ . }}</option>
-                        {{ end }}
-                    </select>
-                </div>
-                <div class="form-group col">
-                    <label for="password-field">Wachtwoord</label>
-                    {{ with .Form.Errors.LoadPassword }}
-                        <input id="password-field " name="password" type="password" class="form-control form-control-sm is-invalid" autocomplete="off">
-                        <div class="invalid-feedback">{{ . }}</div>
-                    {{ else }}
-                        <input id="password-field " name="password" type="password" class="form-control form-control-sm" autocomplete="off">
+<form action="/" method="post">
+    <div class="row mt-2">
+        <div class="col">
+            {{ with .Alert }}
+            <div class="alert alert-danger">{{ . }}</div>
+            {{ end }}
+            {{ $numDbs := len .Databases }}
+            {{ if gt $numDbs 0}}
+            <div class="form-group">
+                <label for="existing-db-field">Bestaande database</label>
+                <select class="form-control form-control-sm" id="existing-db-field" name="existing-db">
+                    {{ range .Databases }}
+                        <option>{{ . }}</option>
                     {{ end }}
-                </div>
-                <input type="hidden" name="is_existing" value="true">
+                </select>
             </div>
+            <hr>
+            {{ end }}
+            <div class="form-group">
+                <label for="new-db-field">Nieuwe database</label>
+                {{ with .Form.Errors.Database }}
+                    <input id="new-db-field" name="new-db" type="text" class="form-control form-control-sm is-invalid" autocomplete="off">
+                    <div class="invalid-feedback">{{ . }}</div>
+                {{ else }}
+                    <input id="new-db-field" name="new-db" type="text" class="form-control form-control-sm" autocomplete="off">
+                {{ end }}
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="password-field">Wachtwoord</label>
+                {{ with .Form.Errors.Password }}
+                    <input id="password-field" name="password" type="password" class="form-control form-control-sm is-invalid" autocomplete="off">
+                    <div class="invalid-feedback">{{ . }}</div>
+                {{ else }}
+                    <input id="password-field" name="password" type="password" class="form-control form-control-sm" autocomplete="off">
+                {{ end }}
+            </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" name="private-mode" class="form-control-sm form-check-input" id="private-mode" value="true" {{ if eq .Form.PrivateMode "true" }}checked{{ end }}>
+                <input type="hidden" name="private-mode" value="false">
+                <label class="form-check-label" for="private-mode">Open in privémodus</label>
+            </div>
+            <input type="hidden" name="is_existing" value="true">
             <button type="submit" class="btn btn-outline-success btn-spinner">
                 <span class="spinner-border spinner-border-sm" role="status" style="display:none" aria-hidden="true"></span>
                 Openen
             </button>
-        </form>
-        <hr>
-        {{ end }}
-        <h4>Nieuwe database</h4>
-        <form action="/" method="post">
-            <div class="form-row">
-                <div class="form-group col">
-                    <label for="dbname-field">Databasenaam</label>
-                    {{ with .Form.Errors.NewDatabaseName }}
-                        <input id="dbname-field" name="dbname" type="text" class="form-control form-control-sm is-invalid" autocomplete="off">
-                        <div class="invalid-feedback">{{ . }}</div>
-                    {{ else }}
-                        <input id="dbname-field" name="dbname" type="text" class="form-control form-control-sm" autocomplete="off">
-                    {{ end }}
-                </div>
-                <div class="form-group col">
-                    <label for="password-field">Wachtwoord</label>
-                    {{ with .Form.Errors.NewPassword }}
-                        <input id="password-field" name="password" type="password" class="form-control form-control-sm is-invalid" autocomplete="off">
-                        <div class="invalid-feedback">{{ . }}</div>
-                    {{ else }}
-                        <input id="password-field" name="password" type="password" class="form-control form-control-sm" autocomplete="off">
-                    {{ end }}
-                </div>
-            </div>
-            <button type="submit" class="btn btn-outline-success">Aanmaken</button>
-        </form>
+        </div>
     </div>
-</div>
+</form>
 <script>
 function spinner() {
     const buttons = document.getElementsByClassName('btn-spinner');
