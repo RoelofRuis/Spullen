@@ -26,7 +26,6 @@ func (s *server) handleIndex() http.HandlerFunc {
 			if form.Validate() {
 				storage, repo, err := loadStorageAndRepository(form.DatabaseName, []byte(form.Password), form.IsExisting)
 				if err == nil {
-					s.privateMode = false
 					s.storage = storage
 					s.objects = repo
 
