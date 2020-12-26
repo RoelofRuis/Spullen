@@ -8,6 +8,10 @@ import (
 	"time"
 )
 
+var index = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/index.gohtml"))
+var view = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/view.gohtml"))
+var edit = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/edit.gohtml"))
+
 func (s *server) handleIndex() http.HandlerFunc {
 	type indexModel struct {
 		Alert string
@@ -41,19 +45,13 @@ func (s *server) handleIndex() http.HandlerFunc {
 			}
 		}
 
-		t, err := template.ParseFiles("./static/layout.gohtml", "./static/index.gohtml")
-		if err != nil {
-			http.Error(w, "unable to parse templates", http.StatusInternalServerError)
-			return
-		}
-
 		names, err := s.finder.FindDatabases()
 		if err != nil {
 			http.Error(w, "unable to detect databases", http.StatusInternalServerError)
 			return
 		}
 
-		err = t.ExecuteTemplate(w, "layout", &indexModel{
+		err = index.ExecuteTemplate(w, "layout", &indexModel{
 			Alert:     loadingAlert,
 			Databases: names,
 			Form:      form,
@@ -128,18 +126,12 @@ func (s *server) handleView() http.HandlerFunc {
 			}
 		}
 
-		t, err := template.ParseFiles("./static/layout.gohtml", "./static/view.gohtml")
-		if err != nil {
-			http.Error(w, "unable to parse templates", http.StatusInternalServerError)
-			return
-		}
-
 		totalCount := 0
 		for _, o := range s.objects.GetAll() {
 			totalCount += o.Quantity
 		}
 
-		err = t.ExecuteTemplate(w, "layout", viewModel{
+		err := view.ExecuteTemplate(w, "layout", viewModel{
 			Alert: alert,
 			TotalCount:  totalCount,
 			DbName:      s.storage.Name(),
@@ -231,13 +223,7 @@ func (s *server) handleEdit() http.HandlerFunc {
 			}
 		}
 
-		t, err := template.ParseFiles("./static/layout.gohtml", "./static/edit.gohtml")
-		if err != nil {
-			http.Error(w, "unable to parse templates", http.StatusInternalServerError)
-			return
-		}
-
-		err = t.ExecuteTemplate(w, "layout", EditModel{Form: form, Alert: alert})
+		err = edit.ExecuteTemplate(w, "layout", EditModel{Form: form, Alert: alert})
 		if err != nil {
 			fmt.Print(err.Error())
 		}
