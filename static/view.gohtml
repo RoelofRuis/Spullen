@@ -38,10 +38,10 @@
                 <div class="form-group col">
                     <label for="quantity-field">Aantal</label>
                     {{ if .Form.Errors.Quantity }}
-                        <input id="quantity-field" name="quantity" type="number" class="form-control form-control-sm is-invalid" value="{{ .Form.Quantity }}" autocomplete="off" autofocus>
+                        <input id="quantity-field" name="quantity" type="number" class="form-control form-control-sm is-invalid" value="{{ .Form.Quantity }}" autocomplete="off">
                         <div class="invalid-feedback">{{ .Form.Errors.Quantity }}</div>
                     {{ else }}
-                        <input id="quantity-field" name="quantity" type="number" class="form-control form-control-sm" value="{{ .Form.Quantity }}" autocomplete="off" autofocus>
+                        <input id="quantity-field" name="quantity" type="number" class="form-control form-control-sm" value="{{ .Form.Quantity }}" autocomplete="off">
                     {{ end }}
                 </div>
             </div>
