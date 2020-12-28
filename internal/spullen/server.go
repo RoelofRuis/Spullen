@@ -18,8 +18,9 @@ type Server struct {
 
 func (s *Server) Routes() {
 	s.Router.HandleFunc("/", s.handleIndex())
-	s.Router.HandleFunc("/edit", s.withDatabase(s.handleEdit()))
 	s.Router.HandleFunc("/view", s.withDatabase(s.handleView()))
+	s.Router.HandleFunc("/edit", s.withDatabase(s.handleEdit()))
+	s.Router.HandleFunc("/split", s.withDatabase(s.handleSplit()))
 	s.Router.HandleFunc("/delete", s.withDatabase(s.handleDelete()))
 	s.Router.HandleFunc("/save", s.withDatabase(s.handleSave()))
 	s.Router.HandleFunc("/close", s.withDatabase(s.handleClose()))

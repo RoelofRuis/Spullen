@@ -10,7 +10,7 @@ import (
 
 var index = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/index.gohtml"))
 var view = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/view.gohtml"))
-var edit = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/edit.gohtml"))
+
 
 func (s *Server) handleIndex() http.HandlerFunc {
 	type indexModel struct {
@@ -155,6 +155,84 @@ func (s *Server) handleClose() http.HandlerFunc {
 	}
 }
 
+func (s *Server) handleSplit() http.HandlerFunc {
+	type SplitModel struct {
+		Alert string
+
+		Original *ObjectForm
+		Form *ObjectForm
+	}
+
+	return func (w http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
+		if err != nil {
+			println(err.Error())
+			http.Error(w, "bad request", http.StatusBadRequest)
+			return
+		}
+
+		id := r.Form.Get("id")
+		objectPointer := s.Objects.Get(id)
+		if objectPointer == nil {
+			http.Error(w, "object does not exist", http.StatusNotFound)
+			return
+		}
+
+		object := *objectPointer
+
+		if object.Quantity < 2 {
+			http.Error(w, "object cannot be split", http.StatusBadRequest)
+			return
+		}
+
+		if !s.PrivateMode && object.Hidden {
+			http.Error(w, "object can not be edited", http.StatusForbidden)
+			return
+		}
+
+		form := FormFromObject(&object)
+		object.Quantity -= 1
+		original := FormFromObject(&object)
+
+		var alert = ""
+		if r.Method == http.MethodPost {
+			form.Id = randSeq(16)
+			form.TimeAdded = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
+			form.Name = r.PostFormValue("name")
+			form.Quantity = "1"
+			form.Categories = r.PostFormValue("categories")
+			form.Tags = r.PostFormValue("tags")
+			form.Properties = r.PostFormValue("properties")
+			form.Hidden = r.PostFormValue("hidden")
+			form.Notes = r.PostFormValue("notes")
+
+			if form.Validate() {
+				splitObject, err := form.GetObject()
+				if err != nil {
+					alert = fmt.Sprintf("Error when getting object \n%s", err.Error())
+				} else {
+					_ = s.Objects.PutObject(splitObject)
+					_ = s.Objects.PutObject(&object)
+
+					http.Redirect(w, r, "/view", http.StatusSeeOther)
+					return
+				}
+			}
+		}
+
+		split := template.Must(template.ParseFiles("./static/layout.gohtml", "./static/split.gohtml"))
+
+		err = split.ExecuteTemplate(w, "layout", SplitModel{
+			Original: original,
+			Form: form,
+			Alert: alert,
+		})
+		if err != nil {
+			fmt.Print(err.Error())
+		}
+	}
+}
+
 func (s *Server) handleEdit() http.HandlerFunc {
 	type EditModel struct {
 		Alert string
@@ -206,6 +284,8 @@ func (s *Server) handleEdit() http.HandlerFunc {
 				}
 			}
 		}
+
+		edit := template.Must(template.ParseFiles("./static/layout.gohtml", "./static/edit.gohtml"))
 
 		err = edit.ExecuteTemplate(w, "layout", EditModel{Form: form, Alert: alert})
 		if err != nil {

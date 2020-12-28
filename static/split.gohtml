@@ -3,11 +3,11 @@
 {{ define "content" }}
 <div class="row mt-2">
     <div class="col">
-        <h4>Aanpassen</h4>
+        <h4>Afsplitsen</h4>
         {{ with .Alert }}
             <div class="alert alert-danger">{{ . }}</div>
         {{ end }}
-        <form action="/edit?id={{ .Form.Id }}" method="post">
+        <form action="/split?id={{ .Form.Id }}" method="post">
             <div class="form-row">
                 <div class="form-group col">
                     <label for="name-field">Objectnaam</label>
@@ -20,12 +20,7 @@
                 </div>
                 <div class="form-group col">
                     <label for="quantity-field">Aantal</label>
-                    {{ if .Form.Errors.Quantity }}
-                        <input id="quantity-field" name="quantity" type="number" class="form-control form-control-sm is-invalid" value="{{ .Form.Quantity }}" autocomplete="off">
-                        <div class="invalid-feedback">{{ .Form.Errors.Quantity }}</div>
-                    {{ else }}
-                        <input id="quantity-field" name="quantity" type="number" class="form-control form-control-sm" value="{{ .Form.Quantity }}" autocomplete="off">
-                    {{ end }}
+                    <input id="quantity-field" name="quantity" type="number" class="form-control form-control-sm" value="1" autocomplete="off" disabled>
                 </div>
             </div>
             <div class="form-group">
@@ -67,11 +62,42 @@
                 <input type="hidden" name="hidden" value="false">
                 <label class="form-check-label" for="check-hidden">Verborgen</label>
             </div>
-            <button type="submit" class="btn btn-outline-success">Opslaan</button>
+            <button type="submit" class="btn btn-outline-success">Afsplitsen</button>
             <a href="/view" class="btn btn-outline-primary">Terug</a>
-            <a href="/delete?id={{ .Form.Id }}" class="btn btn-outline-danger pull-right" role="button">Verwijderen</a>
         </form>
     </div>
-    <div class="col"></div>
+    <div class="col">
+        <h4 class="text-muted">Origineel</h4>
+        <div class="form-row">
+            <div class="form-group col">
+                <label for="name-field">Objectnaam</label>
+                <input id="name-field" name="name" type="text" class="form-control form-control-sm" autocomplete="off" value="{{ .Original.Name }}" disabled>
+            </div>
+            <div class="form-group col">
+                <label for="quantity-field">Aantal</label>
+                <input id="quantity-field" name="quantity" type="number" class="form-control form-control-sm" value="{{ .Original.Quantity }}" autocomplete="off" disabled>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="tags-field">Tags</label>
+            <input id="tags-field" name="tags" type="text" class="form-control form-control-sm" value="{{ .Original.Tags }}" autocomplete="off" disabled>
+        </div>
+        <div class="form-group">
+            <label for="category-field">Categorieën</label>
+            <input id="category-field" name="categories" type="text" class="form-control form-control-sm" value="{{ .Original.Categories }}" autocomplete="off" disabled>
+        </div>
+        <div class="form-group">
+            <label for="properties-field">Eigenschappen</label>
+            <input id="properties-field" name="properties" type="text" class="form-control form-control-sm" value="{{ .Original.Properties }}" autocomplete="off" disabled>
+        </div>
+        <div class="form-group">
+            <label for="properties-field">Aantekeningen</label>
+            <textarea id="properties-field" name="notes" rows="3" class="form-control form-control-sm" autocomplete="off" disabled>{{ .Original.Notes }}</textarea>
+        </div>
+        <div class="form-check mb-3">
+            <input type="checkbox" name="hidden" class="form-control-sm form-check-input" id="check-hidden" value="true" {{ if eq .Original.Hidden "true" }}checked{{ end }} disabled>
+            <label class="form-check-label" for="check-hidden">Verborgen</label>
+        </div>
+    </div>
 </div>
 {{ end }}
