@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -12,6 +13,7 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	dbRoot := os.Getenv("DBROOT")
+	port := os.Getenv("PORT")
 
 	server := &server{
 		router: http.ServeMux{},
@@ -25,9 +27,9 @@ func main() {
 
 	server.routes()
 
-	log.Print("started server on localhost:8080")
+	log.Printf("starting server on localhost:%s", port)
 
-	err := http.ListenAndServe(":8080", server)
+	err := http.ListenAndServe(fmt.Sprintf(":%s", port), server)
 	if err != nil {
 		log.Fatal(err)
 	}
