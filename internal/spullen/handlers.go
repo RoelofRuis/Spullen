@@ -11,6 +11,7 @@ func (s *Server) handleIndex() http.HandlerFunc {
 	type indexModel struct {
 		Alert string
 
+		DevMode bool
 		Databases []string
 		Form      *IndexForm
 	}
@@ -59,6 +60,7 @@ func (s *Server) handleIndex() http.HandlerFunc {
 		}
 
 		err = s.Views.Index.ExecuteTemplate(w, "layout", &indexModel{
+			DevMode: s.DevMode,
 			Alert:     loadingAlert,
 			Databases: names,
 			Form:      form,
