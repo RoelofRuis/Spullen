@@ -1,11 +1,13 @@
 package spullen
 
 import (
+	"html/template"
 	"net/http"
 )
 
 type Server struct {
 	Router http.ServeMux
+	Views *Views
 
 	PrivateMode bool
 
@@ -14,6 +16,20 @@ type Server struct {
 	Finder  *Finder
 	Db Database
 	Objects ObjectRepository
+}
+
+type Views struct {
+	Index *template.Template
+	View *template.Template
+	Edit *template.Template
+	Split *template.Template
+}
+
+func (s *Server) Templates() {
+	s.Views.Index = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/index.gohtml"))
+	s.Views.View = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/view.gohtml"))
+	s.Views.Edit = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/edit.gohtml"))
+	s.Views.Split = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/split.gohtml"))
 }
 
 func (s *Server) Routes() {

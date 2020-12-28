@@ -2,15 +2,10 @@ package spullen
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
 	"time"
 )
-
-var index = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/index.gohtml"))
-var view = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/view.gohtml"))
-
 
 func (s *Server) handleIndex() http.HandlerFunc {
 	type indexModel struct {
@@ -59,7 +54,7 @@ func (s *Server) handleIndex() http.HandlerFunc {
 			return
 		}
 
-		err = index.ExecuteTemplate(w, "layout", &indexModel{
+		err = s.Views.Index.ExecuteTemplate(w, "layout", &indexModel{
 			Alert:     loadingAlert,
 			Databases: names,
 			Form:      form,
@@ -113,7 +108,7 @@ func (s *Server) handleView() http.HandlerFunc {
 			totalCount += o.Quantity
 		}
 
-		err := view.ExecuteTemplate(w, "layout", viewModel{
+		err := s.Views.View.ExecuteTemplate(w, "layout", viewModel{
 			Alert:       alert,
 			TotalCount:  totalCount,
 			DbName:      s.Db.Name(),
@@ -220,9 +215,7 @@ func (s *Server) handleSplit() http.HandlerFunc {
 			}
 		}
 
-		split := template.Must(template.ParseFiles("./static/layout.gohtml", "./static/split.gohtml"))
-
-		err = split.ExecuteTemplate(w, "layout", SplitModel{
+		err = s.Views.Split.ExecuteTemplate(w, "layout", SplitModel{
 			Original: original,
 			Form: form,
 			Alert: alert,
@@ -285,9 +278,7 @@ func (s *Server) handleEdit() http.HandlerFunc {
 			}
 		}
 
-		edit := template.Must(template.ParseFiles("./static/layout.gohtml", "./static/edit.gohtml"))
-
-		err = edit.ExecuteTemplate(w, "layout", EditModel{Form: form, Alert: alert})
+		err = s.Views.Edit.ExecuteTemplate(w, "layout", EditModel{Form: form, Alert: alert})
 		if err != nil {
 			fmt.Print(err.Error())
 		}

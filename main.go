@@ -30,6 +30,7 @@ func main() {
 
 	server := &spullen.Server{
 		Router: http.ServeMux{},
+		Views: &spullen.Views{},
 
 		PrivateMode: true,
 		DbMode:      dbMode,
@@ -38,6 +39,7 @@ func main() {
 		Db: database.NewDatabase(factory),
 	}
 
+	server.Templates()
 	server.Routes()
 
 	log.Printf("starting server on localhost:%s", port)
