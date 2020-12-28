@@ -14,6 +14,9 @@ func main() {
 
 	dbRoot := os.Getenv("DBROOT")
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 
 	server := &server{
 		router: http.ServeMux{},
