@@ -9,9 +9,8 @@ type Server struct {
 	Router http.ServeMux
 	Views *Views
 
+	DevMode bool
 	PrivateMode bool
-
-	DbMode DatabaseMode
 
 	Finder  *Finder
 	Db Database
@@ -43,6 +42,10 @@ func (s *Server) Routes() {
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if s.DevMode {
+		s.Templates()
+	}
+
 	s.Router.ServeHTTP(w, r)
 }
 

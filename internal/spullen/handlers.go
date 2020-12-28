@@ -30,7 +30,11 @@ func (s *Server) handleIndex() http.HandlerFunc {
 					s.Db.Close()
 				}
 
-				var mode = s.DbMode
+				var mode = ModeUseEncryption | ModeUseGzip
+				if s.DevMode {
+					mode = 0x0
+				}
+
 				if ! form.isNew {
 					mode |= ModeOpenExisting
 				}
