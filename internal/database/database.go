@@ -4,12 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/roelofruis/spullen/internal/spullen"
+	"sync"
 )
 
 func NewDatabase(repoFactory spullen.ObjectRepositoryFactory) spullen.Database {
 	return &FileDatabase{
 		repoFactory: repoFactory,
 
+		lock: &sync.Mutex{},
 		isOpened: false,
 		storage:  nil,
 		objects:  nil,
@@ -19,6 +21,7 @@ func NewDatabase(repoFactory spullen.ObjectRepositoryFactory) spullen.Database {
 type FileDatabase struct {
 	repoFactory spullen.ObjectRepositoryFactory
 
+	lock sync.Locker
 	isOpened bool
 	storage  storage
 	objects spullen.ObjectRepository
@@ -58,10 +61,13 @@ func (db *FileDatabase) Open(name string, pass []byte, isExisting bool) (spullen
 		repo = db.repoFactory.CreateNew()
 	}
 
+	db.lock.Lock()
 	db.storage = storage
 	db.objects = repo
 	db.isOpened = true
-	return repo, nil
+	db.lock.Unlock()
+
+	return db.objects, nil
 }
 
 func (db *FileDatabase) Persist() error {
@@ -83,9 +89,11 @@ func (db *FileDatabase) Persist() error {
 }
 
 func (db *FileDatabase) Close() error {
+	db.lock.Lock()
 	db.storage = nil
 	db.objects = nil
 	db.isOpened = false
+	db.lock.Unlock()
 
 	return nil
 }
