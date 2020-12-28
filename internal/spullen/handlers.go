@@ -35,7 +35,7 @@ func (s *Server) handleIndex() http.HandlerFunc {
 					s.Db.Close()
 				}
 
-				var mode = s.Mode
+				var mode = s.DbMode
 				if ! form.isNew {
 					mode |= ModeOpenExisting
 				}

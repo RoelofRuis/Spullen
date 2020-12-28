@@ -14,10 +14,16 @@ import (
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
+	mode := os.Getenv("MODE")
 	dbRoot := os.Getenv("DBROOT")
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
+	}
+
+	dbMode := spullen.ModeUseEncryption | spullen.ModeUseGzip
+	if mode == "DEV" {
+		dbMode = 0x0
 	}
 
 	factory := spullen.NewObjectRepositoryFactory()
@@ -26,7 +32,7 @@ func main() {
 		Router: http.ServeMux{},
 
 		PrivateMode: true,
-		Mode: spullen.ModeUseEncryption | spullen.ModeUseGzip,
+		DbMode:      dbMode,
 
 		Finder:  &spullen.Finder{Root: dbRoot},
 		Db: database.NewDatabase(factory),

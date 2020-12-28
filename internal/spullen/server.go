@@ -9,7 +9,7 @@ type Server struct {
 
 	PrivateMode bool
 
-	Mode DatabaseMode
+	DbMode DatabaseMode
 
 	Finder  *Finder
 	Db Database
