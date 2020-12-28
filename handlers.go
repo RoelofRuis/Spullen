@@ -88,6 +88,21 @@ func loadStorageAndRepository(name string, pass []byte, isExisting bool) (Storag
 	return storage, repo, nil
 }
 
+// TODO: extract this into separate service that handles storage state
+func (s *server) saveRepository() error {
+	data, err := Save(s.objects)
+	if err != nil {
+		return err
+	}
+
+	err = s.storage.Write(data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *server) handleView() http.HandlerFunc {
 	type viewModel struct {
 		Alert string
@@ -147,16 +162,11 @@ func (s *server) handleView() http.HandlerFunc {
 
 func (s *server) handleSave() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		data, err := Save(s.objects)
+		err := s.saveRepository()
 		if err != nil {
 			println(err.Error())
 			http.Error(w, "error", http.StatusInternalServerError)
-		}
-
-		err = s.storage.Write(data)
-		if err != nil {
-			println(err.Error())
-			http.Error(w, "error", http.StatusInternalServerError)
+			return
 		}
 
 		http.Redirect(w, r, "/view", http.StatusSeeOther)
@@ -165,6 +175,13 @@ func (s *server) handleSave() http.HandlerFunc {
 
 func (s *server) handleClose() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		err := s.saveRepository()
+		if err != nil {
+			println(err.Error())
+			http.Error(w, "error", http.StatusInternalServerError)
+			return
+		}
+
 		s.storage = nil
 		s.objects = nil
 
@@ -184,6 +201,7 @@ func (s *server) handleEdit() http.HandlerFunc {
 		if err != nil {
 			println(err.Error())
 			http.Error(w, "bad request", http.StatusBadRequest)
+			return
 		}
 
 		id := r.Form.Get("id")
