@@ -8,7 +8,6 @@ import (
 	"crypto/rand"
 	"golang.org/x/crypto/scrypt"
 	"io/ioutil"
-	"log"
 	"os"
 )
 
@@ -18,78 +17,85 @@ type storage interface {
 	write(data []byte) error
 }
 
-type encryptedStorage struct {
+type storageImpl struct {
+	useGzip bool
+	useEncryption bool
+
 	dbName string
 	path   string
 	pass   []byte
 }
 
-func (s *encryptedStorage) name() string {
+func (s *storageImpl) name() string {
 	return s.dbName
 }
 
-func (s *encryptedStorage) read() ([]byte, error) {
-	// READ
+func (s *storageImpl) read() ([]byte, error) {
 	data, err := ioutil.ReadFile(s.path)
 	if err != nil {
 		return nil, err
 	}
 
-	// DECRYPT
-	plain, err := decrypt(s.pass, data)
-	if err != nil {
-		return nil, err
+	if s.useEncryption {
+		data, err = decrypt(s.pass, data)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	// GUNZIP
-	r, err := gzip.NewReader(bytes.NewReader(plain))
-	if err != nil {
-		return nil, err
-	}
-	defer r.Close()
+	if s.useGzip {
+		r, err := gzip.NewReader(bytes.NewReader(data))
+		if err != nil {
+			return nil, err
+		}
+		defer r.Close()
+		data, err = ioutil.ReadAll(r)
 
-	unzipped, err := ioutil.ReadAll(r)
-	if err != nil {
-		log.Fatal(err)
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return unzipped, nil
+	return data, nil
 }
 
-func (s *encryptedStorage) write(data []byte) error {
-	// GZIP
-	buf := &bytes.Buffer{}
+func (s *storageImpl) write(data []byte) error {
+	if s.useGzip {
+		buf := &bytes.Buffer{}
 
-	w := gzip.NewWriter(buf)
+		w := gzip.NewWriter(buf)
 
-	_, err := w.Write(data)
-	if err != nil {
-		return err
-	}
-	err = w.Flush()
-	if err != nil {
-		return err
-	}
-	err = w.Close()
-	if err != nil {
-		return err
-	}
+		_, err := w.Write(data)
+		if err != nil {
+			return err
+		}
+		err = w.Flush()
+		if err != nil {
+			return err
+		}
+		err = w.Close()
+		if err != nil {
+			return err
+		}
 
-	// ENCRYPT
-	encrypted, err := encrypt(s.pass, buf.Bytes())
-	if err != nil {
-		return err
+		data = buf.Bytes()
 	}
 
-	// WRITE
+	if s.useEncryption {
+		var err error
+		data, err = encrypt(s.pass, data)
+		if err != nil {
+			return err
+		}
+	}
+
 	f, err := os.OpenFile(s.path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	_, err = f.Write(encrypted)
+	_, err = f.Write(data)
 	if err != nil {
 		return err
 	}

@@ -9,6 +9,8 @@ type Server struct {
 
 	PrivateMode bool
 
+	Mode DatabaseMode
+
 	Finder  *Finder
 	Db Database
 	Objects ObjectRepository

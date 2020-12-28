@@ -35,7 +35,12 @@ func (s *Server) handleIndex() http.HandlerFunc {
 					s.Db.Close()
 				}
 
-				repo, err := s.Db.Open(form.database, []byte(form.Password), !form.isNew)
+				var mode = s.Mode
+				if ! form.isNew {
+					mode |= ModeOpenExisting
+				}
+
+				repo, err := s.Db.Open(form.database, []byte(form.Password), mode)
 				if err == nil {
 					s.PrivateMode = form.isPrivateMode
 					s.Objects = repo

@@ -26,6 +26,7 @@ func main() {
 		Router: http.ServeMux{},
 
 		PrivateMode: true,
+		Mode: spullen.ModeUseEncryption | spullen.ModeUseGzip,
 
 		Finder:  &spullen.Finder{Root: dbRoot},
 		Db: database.NewDatabase(factory),

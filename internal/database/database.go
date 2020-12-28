@@ -39,19 +39,25 @@ func (db *FileDatabase) Name() string {
 	return ""
 }
 
-func (db *FileDatabase) Open(name string, pass []byte, isExisting bool) (spullen.ObjectRepository, error) {
+func (db *FileDatabase) Open(name string, pass []byte, mode spullen.DatabaseMode) (spullen.ObjectRepository, error) {
 	if db.isOpened {
 		return nil, errors.New("database is already opened")
 	}
 
-	storage := &encryptedStorage{
+	openExisting := mode & spullen.ModeOpenExisting == spullen.ModeOpenExisting
+	useGzip := mode & spullen.ModeUseGzip == spullen.ModeUseGzip
+	useEncryption := mode & spullen.ModeUseEncryption == spullen.ModeUseEncryption
+
+	storage := &storageImpl{
+		useGzip: useGzip,
+		useEncryption: useEncryption,
 		dbName: name,
 		path: fmt.Sprintf("%s.db", name),
 		pass: pass,
 	}
 
 	var repo spullen.ObjectRepository
-	if isExisting {
+	if openExisting {
 		data, err := storage.read()
 		if err != nil {
 			return nil, err
