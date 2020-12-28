@@ -1,4 +1,4 @@
-package main
+package spullen
 
 import (
 	"bytes"
@@ -10,17 +10,13 @@ import (
 	"strings"
 )
 
-type ObjectRepositoryImpl struct {
-	Objects map[string]*Object
+func NewObjectRepositoryFactory() ObjectRepositoryFactory {
+	return &objectRepositoryFactoryImpl{}
 }
 
-func NewRepository() *ObjectRepositoryImpl {
-	return &ObjectRepositoryImpl{
-		Objects: map[string]*Object{},
-	}
-}
+type objectRepositoryFactoryImpl struct {}
 
-func Load(data []byte) (*ObjectRepositoryImpl, error) {
+func (f *objectRepositoryFactoryImpl) CreateFromData(data []byte) (ObjectRepository, error) {
 	r := csv.NewReader(strings.NewReader(string(data)))
 	r.Comma = ';'
 
@@ -60,7 +56,17 @@ func Load(data []byte) (*ObjectRepositoryImpl, error) {
 	return &ObjectRepositoryImpl{Objects: objects}, nil
 }
 
-func Save(s ObjectRepository) ([]byte, error) {
+func (f *objectRepositoryFactoryImpl) CreateNew() ObjectRepository {
+	return &ObjectRepositoryImpl{
+		Objects: map[string]*Object{},
+	}
+}
+
+type ObjectRepositoryImpl struct {
+	Objects map[string]*Object
+}
+
+func (s *ObjectRepositoryImpl) ToRawData() ([]byte, error) {
 	b := &bytes.Buffer{}
 	w := csv.NewWriter(b)
 	w.Comma = ';'

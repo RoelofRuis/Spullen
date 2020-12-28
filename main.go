@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/roelofruis/spullen/internal/database"
+	"github.com/roelofruis/spullen/internal/spullen"
 	"log"
 	"math/rand"
 	"net/http"
@@ -18,17 +20,18 @@ func main() {
 		port = "8080"
 	}
 
-	server := &server{
-		router: http.ServeMux{},
+	factory := spullen.NewObjectRepositoryFactory()
 
-		privateMode: true,
+	server := &spullen.Server{
+		Router: http.ServeMux{},
 
-		finder:  &Finder{root: dbRoot},
-		storage: nil,
-		objects: nil,
+		PrivateMode: true,
+
+		Finder:  &spullen.Finder{Root: dbRoot},
+		Db: database.NewDatabase(factory),
 	}
 
-	server.routes()
+	server.Routes()
 
 	log.Printf("starting server on localhost:%s", port)
 

@@ -1,4 +1,4 @@
-package main
+package database
 
 import (
 	"bytes"
@@ -12,17 +12,23 @@ import (
 	"os"
 )
 
-type EncryptedStorage struct {
+type storage interface {
+	name() string
+	read() ([]byte, error)
+	write(data []byte) error
+}
+
+type encryptedStorage struct {
 	dbName string
 	path   string
 	pass   []byte
 }
 
-func (s *EncryptedStorage) Name() string {
+func (s *encryptedStorage) name() string {
 	return s.dbName
 }
 
-func (s *EncryptedStorage) Read() ([]byte, error) {
+func (s *encryptedStorage) read() ([]byte, error) {
 	// READ
 	data, err := ioutil.ReadFile(s.path)
 	if err != nil {
@@ -51,7 +57,7 @@ func (s *EncryptedStorage) Read() ([]byte, error) {
 	return unzipped, nil
 }
 
-func (s *EncryptedStorage) Write(data []byte) error {
+func (s *encryptedStorage) write(data []byte) error {
 	// GZIP
 	buf := &bytes.Buffer{}
 

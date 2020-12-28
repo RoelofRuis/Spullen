@@ -1,4 +1,4 @@
-package main
+package spullen
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ var index = template.Must(template.ParseFiles("./static/layout.gohtml", "./stati
 var view = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/view.gohtml"))
 var edit = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/edit.gohtml"))
 
-func (s *server) handleIndex() http.HandlerFunc {
+func (s *Server) handleIndex() http.HandlerFunc {
 	type indexModel struct {
 		Alert string
 
@@ -31,11 +31,10 @@ func (s *server) handleIndex() http.HandlerFunc {
 			form.PrivateMode = r.PostFormValue("private-mode")
 
 			if form.Validate() {
-				storage, repo, err := loadStorageAndRepository(form.database, []byte(form.Password), !form.isNew)
+				repo, err := s.Db.Open(form.database, []byte(form.Password), !form.isNew)
 				if err == nil {
-					s.privateMode = form.isPrivateMode
-					s.storage = storage
-					s.objects = repo
+					s.PrivateMode = form.isPrivateMode
+					s.Objects = repo
 
 					http.Redirect(w, r, "/view", http.StatusSeeOther)
 					return
@@ -45,7 +44,7 @@ func (s *server) handleIndex() http.HandlerFunc {
 			}
 		}
 
-		names, err := s.finder.FindDatabases()
+		names, err := s.Finder.FindDatabases()
 		if err != nil {
 			http.Error(w, "unable to detect databases", http.StatusInternalServerError)
 			return
@@ -62,48 +61,7 @@ func (s *server) handleIndex() http.HandlerFunc {
 	}
 }
 
-// TODO: extract this into separate service that handles storage state
-func loadStorageAndRepository(name string, pass []byte, isExisting bool) (Storage, ObjectRepository, error) {
-	storage := &EncryptedStorage{
-		dbName: name,
-		path:   fmt.Sprintf("%s.db", name),
-		pass:   pass,
-	}
-
-	var repo ObjectRepository
-	if isExisting {
-		data, err := storage.Read()
-		if err != nil {
-			return nil, nil, err
-		}
-
-		repo, err = Load(data)
-		if err != nil {
-			return nil, nil, err
-		}
-	} else {
-		repo = NewRepository()
-	}
-
-	return storage, repo, nil
-}
-
-// TODO: extract this into separate service that handles storage state
-func (s *server) saveRepository() error {
-	data, err := Save(s.objects)
-	if err != nil {
-		return err
-	}
-
-	err = s.storage.Write(data)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *server) handleView() http.HandlerFunc {
+func (s *Server) handleView() http.HandlerFunc {
 	type viewModel struct {
 		Alert string
 
@@ -136,22 +94,22 @@ func (s *server) handleView() http.HandlerFunc {
 					alert = fmt.Sprintf("Error when getting object from form\n%s", err.Error())
 				}
 
-				_ = s.objects.PutObject(obj)
+				_ = s.Objects.PutObject(obj)
 				form = EmptyForm()
 			}
 		}
 
 		totalCount := 0
-		for _, o := range s.objects.GetAll() {
+		for _, o := range s.Objects.GetAll() {
 			totalCount += o.Quantity
 		}
 
 		err := view.ExecuteTemplate(w, "layout", viewModel{
 			Alert:       alert,
 			TotalCount:  totalCount,
-			DbName:      s.storage.Name(),
-			Objects:     s.objects.GetAll(),
-			PrivateMode: s.privateMode,
+			DbName:      s.Db.Name(),
+			Objects:     s.Objects.GetAll(),
+			PrivateMode: s.PrivateMode,
 			Form:        form,
 		})
 		if err != nil {
@@ -160,9 +118,9 @@ func (s *server) handleView() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleSave() http.HandlerFunc {
+func (s *Server) handleSave() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := s.saveRepository()
+		err := s.Db.Persist()
 		if err != nil {
 			println(err.Error())
 			http.Error(w, "error", http.StatusInternalServerError)
@@ -173,23 +131,27 @@ func (s *server) handleSave() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleClose() http.HandlerFunc {
+func (s *Server) handleClose() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := s.saveRepository()
+		err := s.Db.Persist()
 		if err != nil {
 			println(err.Error())
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
 
-		s.storage = nil
-		s.objects = nil
+		err = s.Db.Close()
+		if err != nil {
+			println(err.Error())
+			http.Error(w, "error", http.StatusInternalServerError)
+			return
+		}
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 }
 
-func (s *server) handleEdit() http.HandlerFunc {
+func (s *Server) handleEdit() http.HandlerFunc {
 	type EditModel struct {
 		Alert string
 
@@ -205,13 +167,13 @@ func (s *server) handleEdit() http.HandlerFunc {
 		}
 
 		id := r.Form.Get("id")
-		object := s.objects.Get(id)
+		object := s.Objects.Get(id)
 		if object == nil {
 			http.Error(w, "object does not exist", http.StatusNotFound)
 			return
 		}
 
-		if !s.privateMode && object.Hidden {
+		if !s.PrivateMode && object.Hidden {
 			http.Error(w, "object can not be edited", http.StatusForbidden)
 			return
 		}
@@ -233,7 +195,7 @@ func (s *server) handleEdit() http.HandlerFunc {
 				if err != nil {
 					alert = fmt.Sprintf("Error when getting object\n%s", err.Error())
 				} else {
-					_ = s.objects.PutObject(obj)
+					_ = s.Objects.PutObject(obj)
 
 					http.Redirect(w, r, "/view", http.StatusSeeOther)
 					return
@@ -248,14 +210,14 @@ func (s *server) handleEdit() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleDelete() http.HandlerFunc {
+func (s *Server) handleDelete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
 			http.Error(w, "unable to parse form", http.StatusBadRequest)
 			return
 		}
-		err = s.objects.RemoveObject(r.Form.Get("id"))
+		err = s.Objects.RemoveObject(r.Form.Get("id"))
 		if err != nil {
 			http.Error(w, "unable to remove object", http.StatusInternalServerError)
 			return

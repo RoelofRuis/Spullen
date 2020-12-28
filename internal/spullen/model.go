@@ -1,11 +1,18 @@
-package main
+package spullen
 
 import "time"
 
-type Storage interface {
+type Database interface {
+	IsOpened() bool
 	Name() string
-	Read() ([]byte, error)
-	Write(data []byte) error
+	Open(name string, pass []byte, isExisting bool) (ObjectRepository, error)
+	Persist() error
+	Close() error
+}
+
+type ObjectRepositoryFactory interface {
+	CreateFromData(data []byte) (ObjectRepository, error)
+	CreateNew() ObjectRepository
 }
 
 type ObjectRepository interface {
@@ -13,6 +20,7 @@ type ObjectRepository interface {
 	Get(id string) *Object
 	PutObject(*Object) error
 	RemoveObject(id string) error
+	ToRawData() ([]byte, error)
 }
 
 type Object struct {

@@ -1,4 +1,4 @@
-package main
+package spullen
 
 import (
 	"fmt"
@@ -7,13 +7,13 @@ import (
 )
 
 type Finder struct {
-	root string
+	Root string
 }
 
 func (f *Finder) FindDatabases() ([]string, error) {
 	var path = "*.db"
-	if f.root != "" {
-		path = fmt.Sprintf("%s/*.db", f.root)
+	if f.Root != "" {
+		path = fmt.Sprintf("%s/*.db", f.Root)
 	}
 
 	files, err := filepath.Glob(path)
