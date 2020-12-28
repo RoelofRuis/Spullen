@@ -40,6 +40,10 @@ func (db *FileDatabase) Name() string {
 }
 
 func (db *FileDatabase) Open(name string, pass []byte, isExisting bool) (spullen.ObjectRepository, error) {
+	if db.isOpened {
+		return nil, errors.New("database is already opened")
+	}
+
 	storage := &encryptedStorage{
 		dbName: name,
 		path: fmt.Sprintf("%s.db", name),
@@ -88,12 +92,10 @@ func (db *FileDatabase) Persist() error {
 	return nil
 }
 
-func (db *FileDatabase) Close() error {
+func (db *FileDatabase) Close() {
 	db.lock.Lock()
 	db.storage = nil
 	db.objects = nil
 	db.isOpened = false
 	db.lock.Unlock()
-
-	return nil
 }

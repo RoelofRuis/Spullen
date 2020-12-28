@@ -7,7 +7,7 @@ type Database interface {
 	Name() string
 	Open(name string, pass []byte, isExisting bool) (ObjectRepository, error)
 	Persist() error
-	Close() error
+	Close()
 }
 
 type ObjectRepositoryFactory interface {

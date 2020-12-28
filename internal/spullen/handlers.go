@@ -31,6 +31,10 @@ func (s *Server) handleIndex() http.HandlerFunc {
 			form.PrivateMode = r.PostFormValue("private-mode")
 
 			if form.Validate() {
+				if s.Db.IsOpened() {
+					s.Db.Close()
+				}
+
 				repo, err := s.Db.Open(form.database, []byte(form.Password), !form.isNew)
 				if err == nil {
 					s.PrivateMode = form.isPrivateMode
@@ -140,12 +144,7 @@ func (s *Server) handleClose() http.HandlerFunc {
 			return
 		}
 
-		err = s.Db.Close()
-		if err != nil {
-			println(err.Error())
-			http.Error(w, "error", http.StatusInternalServerError)
-			return
-		}
+		s.Db.Close()
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
