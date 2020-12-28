@@ -9,16 +9,16 @@ import (
 )
 
 type ObjectForm struct {
-	Id string
+	Id        string
 	TimeAdded string
 
-	Name string
-	Quantity string
+	Name       string
+	Quantity   string
 	Categories string
-	Tags string
+	Tags       string
 	Properties string
-	Hidden string
-	Notes string
+	Hidden     string
+	Notes      string
 
 	Errors map[string]string
 
@@ -40,15 +40,15 @@ func FormFromObject(o *Object) *ObjectForm {
 		hidden = "true"
 	}
 	return &ObjectForm{
-		Id: o.Id,
-		TimeAdded: strconv.FormatInt(o.Added.Unix(), 10),
-		Name: o.Name,
-		Quantity: strconv.FormatInt(int64(o.Quantity), 10),
+		Id:         o.Id,
+		TimeAdded:  strconv.FormatInt(o.Added.Unix(), 10),
+		Name:       o.Name,
+		Quantity:   strconv.FormatInt(int64(o.Quantity), 10),
 		Categories: strings.Join(o.Categories, ","),
-		Tags: strings.Join(o.Tags, ","),
+		Tags:       strings.Join(o.Tags, ","),
 		Properties: strings.Join(propertyStrings, ","),
-		Hidden: hidden,
-		Notes: o.Notes,
+		Hidden:     hidden,
+		Notes:      o.Notes,
 	}
 }
 
@@ -137,15 +137,15 @@ func (f *ObjectForm) Validate() bool {
 	isValid := len(f.Errors) == 0
 	if isValid {
 		f.object = &Object{
-			Id: f.Id,
-			Added: time.Unix(t, 0),
-			Name: strings.ToLower(f.Name),
-			Quantity: int(q),
+			Id:         f.Id,
+			Added:      time.Unix(t, 0),
+			Name:       strings.ToLower(f.Name),
+			Quantity:   int(q),
 			Categories: categories,
-			Tags: tags,
+			Tags:       tags,
 			Properties: properties,
-			Hidden: hidden,
-			Notes: f.Notes,
+			Hidden:     hidden,
+			Notes:      f.Notes,
 		}
 	}
 

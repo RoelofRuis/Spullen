@@ -46,7 +46,7 @@ func Load(data []byte) (*ObjectRepositoryImpl, error) {
 			Notes:      record[8],
 		}
 
-		if ! form.Validate() {
+		if !form.Validate() {
 			return nil, fmt.Errorf("invalid object [%s]", record[0])
 		}
 

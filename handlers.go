@@ -31,7 +31,7 @@ func (s *server) handleIndex() http.HandlerFunc {
 			form.PrivateMode = r.PostFormValue("private-mode")
 
 			if form.Validate() {
-				storage, repo, err := loadStorageAndRepository(form.database, []byte(form.Password), ! form.isNew)
+				storage, repo, err := loadStorageAndRepository(form.database, []byte(form.Password), !form.isNew)
 				if err == nil {
 					s.privateMode = form.isPrivateMode
 					s.storage = storage
@@ -132,7 +132,7 @@ func (s *server) handleView() http.HandlerFunc {
 		}
 
 		err := view.ExecuteTemplate(w, "layout", viewModel{
-			Alert: alert,
+			Alert:       alert,
 			TotalCount:  totalCount,
 			DbName:      s.storage.Name(),
 			Objects:     s.objects.GetAll(),

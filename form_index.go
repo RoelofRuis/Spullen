@@ -4,14 +4,14 @@ import "strconv"
 
 type IndexForm struct {
 	ExistingDatabaseName string
-	NewDatabaseName string
-	Password     string
-	PrivateMode string
+	NewDatabaseName      string
+	Password             string
+	PrivateMode          string
 
 	Errors map[string]string
 
-	database string
-	isNew bool
+	database      string
+	isNew         bool
 	isPrivateMode bool
 }
 
@@ -21,7 +21,7 @@ func (f *IndexForm) Validate() bool {
 	existingSelected := len(f.ExistingDatabaseName) > 0
 	newSelected := len(f.NewDatabaseName) > 0
 
-	if ! existingSelected && ! newSelected {
+	if !existingSelected && !newSelected {
 		f.Errors["Database"] = "Geef een database op"
 	}
 
@@ -42,7 +42,6 @@ func (f *IndexForm) Validate() bool {
 	} else {
 		f.isPrivateMode = isPrivate
 	}
-
 
 	return len(f.Errors) == 0
 }
