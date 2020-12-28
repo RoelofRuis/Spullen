@@ -81,6 +81,10 @@ func (f *ObjectForm) Validate() bool {
 		f.Errors["Quantity"] = "Aantal moet een getal zijn"
 	}
 
+	if q < 1 {
+		f.Errors["Quantity"] = "Aantal moet minstens 1 zijn"
+	}
+
 	var categories []string
 	if f.Categories == "" {
 		categories = []string{""}
