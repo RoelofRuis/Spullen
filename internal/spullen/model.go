@@ -23,8 +23,8 @@ type ObjectRepositoryFactory interface {
 type ObjectRepository interface {
 	GetAll() []*Object
 	Get(id string) *Object
-	PutObject(*Object) error
-	RemoveObject(id string) error
+	Put(*Object) error
+	Remove(id string) error
 	ToRawData() ([]byte, error)
 }
 

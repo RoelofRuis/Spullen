@@ -133,13 +133,13 @@ func (s *ObjectRepositoryImpl) GetAll() []*Object {
 	return objectList
 }
 
-func (s *ObjectRepositoryImpl) PutObject(o *Object) error {
+func (s *ObjectRepositoryImpl) Put(o *Object) error {
 	s.Objects[o.Id] = o
 
 	return nil
 }
 
-func (s *ObjectRepositoryImpl) RemoveObject(id string) error {
+func (s *ObjectRepositoryImpl) Remove(id string) error {
 	delete(s.Objects, id)
 
 	return nil

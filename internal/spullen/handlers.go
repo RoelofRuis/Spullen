@@ -104,7 +104,7 @@ func (s *Server) handleView() http.HandlerFunc {
 					alert = fmt.Sprintf("Error when getting object from form\n%s", err.Error())
 				}
 
-				_ = s.Objects.PutObject(obj)
+				_ = s.Objects.Put(obj)
 				form = EmptyForm()
 			}
 		}
@@ -212,8 +212,8 @@ func (s *Server) handleSplit() http.HandlerFunc {
 				if err != nil {
 					alert = fmt.Sprintf("Error when getting object \n%s", err.Error())
 				} else {
-					_ = s.Objects.PutObject(splitObject)
-					_ = s.Objects.PutObject(&object)
+					_ = s.Objects.Put(splitObject)
+					_ = s.Objects.Put(&object)
 
 					http.Redirect(w, r, "/view", http.StatusSeeOther)
 					return
@@ -276,7 +276,7 @@ func (s *Server) handleEdit() http.HandlerFunc {
 				if err != nil {
 					alert = fmt.Sprintf("Error when getting object\n%s", err.Error())
 				} else {
-					_ = s.Objects.PutObject(obj)
+					_ = s.Objects.Put(obj)
 
 					http.Redirect(w, r, "/view", http.StatusSeeOther)
 					return
@@ -298,7 +298,7 @@ func (s *Server) handleDelete() http.HandlerFunc {
 			http.Error(w, "unable to parse form", http.StatusBadRequest)
 			return
 		}
-		err = s.Objects.RemoveObject(r.Form.Get("id"))
+		err = s.Objects.Remove(r.Form.Get("id"))
 		if err != nil {
 			http.Error(w, "unable to remove object", http.StatusInternalServerError)
 			return
