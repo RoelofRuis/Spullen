@@ -3,6 +3,7 @@ package spullen
 import "time"
 
 type DatabaseMode int
+
 const ModeOpenExisting DatabaseMode = 0x1
 const ModeUseGzip DatabaseMode = 0x2
 const ModeUseEncryption DatabaseMode = 0x4

@@ -11,7 +11,7 @@ func NewDatabase(repoFactory spullen.ObjectRepositoryFactory) spullen.Database {
 	return &FileDatabase{
 		repoFactory: repoFactory,
 
-		lock: &sync.Mutex{},
+		lock:     &sync.Mutex{},
 		isOpened: false,
 		storage:  nil,
 		objects:  nil,
@@ -21,10 +21,10 @@ func NewDatabase(repoFactory spullen.ObjectRepositoryFactory) spullen.Database {
 type FileDatabase struct {
 	repoFactory spullen.ObjectRepositoryFactory
 
-	lock sync.Locker
+	lock     sync.Locker
 	isOpened bool
 	storage  storage
-	objects spullen.ObjectRepository
+	objects  spullen.ObjectRepository
 }
 
 func (db *FileDatabase) IsOpened() bool {
@@ -44,16 +44,16 @@ func (db *FileDatabase) Open(name string, pass []byte, mode spullen.DatabaseMode
 		return nil, errors.New("database is already opened")
 	}
 
-	openExisting := mode & spullen.ModeOpenExisting == spullen.ModeOpenExisting
-	useGzip := mode & spullen.ModeUseGzip == spullen.ModeUseGzip
-	useEncryption := mode & spullen.ModeUseEncryption == spullen.ModeUseEncryption
+	openExisting := mode&spullen.ModeOpenExisting == spullen.ModeOpenExisting
+	useGzip := mode&spullen.ModeUseGzip == spullen.ModeUseGzip
+	useEncryption := mode&spullen.ModeUseEncryption == spullen.ModeUseEncryption
 
 	storage := &storageImpl{
-		useGzip: useGzip,
+		useGzip:       useGzip,
 		useEncryption: useEncryption,
-		dbName: name,
-		path: fmt.Sprintf("%s.db", name),
-		pass: pass,
+		dbName:        name,
+		path:          fmt.Sprintf("%s.db", name),
+		pass:          pass,
 	}
 
 	var repo spullen.ObjectRepository

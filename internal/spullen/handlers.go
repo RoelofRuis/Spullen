@@ -11,7 +11,7 @@ func (s *Server) handleIndex() http.HandlerFunc {
 	type indexModel struct {
 		Alert string
 
-		DevMode bool
+		DevMode   bool
 		Databases []string
 		Form      *IndexForm
 	}
@@ -36,7 +36,7 @@ func (s *Server) handleIndex() http.HandlerFunc {
 					mode = 0x0
 				}
 
-				if ! form.isNew {
+				if !form.isNew {
 					mode |= ModeOpenExisting
 				}
 
@@ -60,7 +60,7 @@ func (s *Server) handleIndex() http.HandlerFunc {
 		}
 
 		err = s.Views.Index.ExecuteTemplate(w, "layout", &indexModel{
-			DevMode: s.DevMode,
+			DevMode:   s.DevMode,
 			Alert:     loadingAlert,
 			Databases: names,
 			Form:      form,
@@ -161,10 +161,10 @@ func (s *Server) handleSplit() http.HandlerFunc {
 		Alert string
 
 		Original *ObjectForm
-		Form *ObjectForm
+		Form     *ObjectForm
 	}
 
-	return func (w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
 			println(err.Error())
@@ -223,8 +223,8 @@ func (s *Server) handleSplit() http.HandlerFunc {
 
 		err = s.Views.Split.ExecuteTemplate(w, "layout", SplitModel{
 			Original: original,
-			Form: form,
-			Alert: alert,
+			Form:     form,
+			Alert:    alert,
 		})
 		if err != nil {
 			fmt.Print(err.Error())

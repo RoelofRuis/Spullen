@@ -14,7 +14,7 @@ func NewObjectRepositoryFactory() ObjectRepositoryFactory {
 	return &objectRepositoryFactoryImpl{}
 }
 
-type objectRepositoryFactoryImpl struct {}
+type objectRepositoryFactoryImpl struct{}
 
 func (f *objectRepositoryFactoryImpl) CreateFromData(data []byte) (ObjectRepository, error) {
 	r := csv.NewReader(strings.NewReader(string(data)))

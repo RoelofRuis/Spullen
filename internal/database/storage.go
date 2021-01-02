@@ -18,7 +18,7 @@ type storage interface {
 }
 
 type storageImpl struct {
-	useGzip bool
+	useGzip       bool
 	useEncryption bool
 
 	dbName string

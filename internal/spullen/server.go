@@ -7,20 +7,20 @@ import (
 
 type Server struct {
 	Router http.ServeMux
-	Views *Views
+	Views  *Views
 
-	DevMode bool
+	DevMode     bool
 	PrivateMode bool
 
 	Finder  *Finder
-	Db Database
+	Db      Database
 	Objects ObjectRepository
 }
 
 type Views struct {
 	Index *template.Template
-	View *template.Template
-	Edit *template.Template
+	View  *template.Template
+	Edit  *template.Template
 	Split *template.Template
 }
 

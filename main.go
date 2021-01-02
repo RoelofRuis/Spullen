@@ -25,13 +25,13 @@ func main() {
 
 	server := &spullen.Server{
 		Router: http.ServeMux{},
-		Views: &spullen.Views{},
+		Views:  &spullen.Views{},
 
-		DevMode: devMode,
+		DevMode:     devMode,
 		PrivateMode: true,
 
-		Finder:  &spullen.Finder{Root: dbRoot},
-		Db: database.NewDatabase(factory),
+		Finder: &spullen.Finder{Root: dbRoot},
+		Db:     database.NewDatabase(factory),
 	}
 
 	server.Templates()
