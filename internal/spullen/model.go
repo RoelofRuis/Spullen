@@ -26,6 +26,7 @@ type ObjectRepository interface {
 	Get(id string) *Object
 	Put(*Object) error
 	Remove(id string) error
+	Has(id string) bool
 	ToRawData() ([]byte, error)
 }
 

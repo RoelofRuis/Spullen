@@ -88,7 +88,7 @@ func (s *Server) handleView() http.HandlerFunc {
 
 		var alert = ""
 		if r.Method == http.MethodPost {
-			form.Id = randSeq(16)
+			form.Id = s.makeId()
 			form.TimeAdded = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
 			form.Name = r.PostFormValue("name")
 			form.Quantity = r.PostFormValue("quantity")
@@ -197,7 +197,7 @@ func (s *Server) handleSplit() http.HandlerFunc {
 
 		var alert = ""
 		if r.Method == http.MethodPost {
-			form.Id = randSeq(16)
+			form.Id = s.makeId()
 			form.TimeAdded = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
 			form.Name = r.PostFormValue("name")
 			form.Quantity = "1"
@@ -305,5 +305,15 @@ func (s *Server) handleDelete() http.HandlerFunc {
 		}
 
 		http.Redirect(w, r, "/view", http.StatusSeeOther)
+	}
+}
+
+func (s *Server) makeId() string {
+	var id string
+	for {
+		id = randSeq(16)
+		if ! s.Objects.Has(id) {
+			return id
+		}
 	}
 }

@@ -139,6 +139,11 @@ func (s *ObjectRepositoryImpl) Put(o *Object) error {
 	return nil
 }
 
+func (s *ObjectRepositoryImpl) Has(id string) bool {
+	_, hasKey := s.Objects[id]
+	return hasKey
+}
+
 func (s *ObjectRepositoryImpl) Remove(id string) error {
 	delete(s.Objects, id)
 
