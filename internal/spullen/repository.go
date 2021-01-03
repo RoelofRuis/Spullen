@@ -10,13 +10,7 @@ import (
 	"strings"
 )
 
-func NewObjectRepositoryFactory() ObjectRepositoryFactory {
-	return &objectRepositoryFactoryImpl{}
-}
-
-type objectRepositoryFactoryImpl struct{}
-
-func (f *objectRepositoryFactoryImpl) CreateFromData(data []byte) (ObjectRepository, error) {
+func LoadRepository(data []byte) (*ObjectRepositoryImpl, error) {
 	r := csv.NewReader(strings.NewReader(string(data)))
 	r.Comma = ';'
 
@@ -53,17 +47,61 @@ func (f *objectRepositoryFactoryImpl) CreateFromData(data []byte) (ObjectReposit
 
 		objects[object.Id] = object
 	}
-	return &ObjectRepositoryImpl{Objects: objects}, nil
-}
 
-func (f *objectRepositoryFactoryImpl) CreateNew() ObjectRepository {
 	return &ObjectRepositoryImpl{
-		Objects: map[string]*Object{},
-	}
+		objects: objects,
+	}, nil
 }
 
 type ObjectRepositoryImpl struct {
-	Objects map[string]*Object
+	objects map[string]*Object
+}
+
+func (s *ObjectRepositoryImpl) Get(id string) *Object {
+	if object, found := s.objects[id]; found {
+		return object
+	}
+
+	return nil
+}
+
+type objectName struct {
+	id   string
+	name string
+}
+
+type objectNames []objectName
+
+func (o objectNames) Len() int           { return len(o) }
+func (o objectNames) Less(i, j int) bool { return o[i].name < o[j].name }
+func (o objectNames) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
+
+func (s *ObjectRepositoryImpl) GetAll() []*Object {
+	var identifiers objectNames = nil
+	for _, o := range s.objects {
+		identifiers = append(identifiers, objectName{id: o.Id, name: o.Name})
+	}
+	sort.Sort(identifiers)
+
+	var objectList []*Object = nil
+	for _, i := range identifiers {
+		objectList = append(objectList, s.objects[i.id])
+	}
+
+	return objectList
+}
+
+func (s *ObjectRepositoryImpl) Put(o *Object) {
+	s.objects[o.Id] = o
+}
+
+func (s *ObjectRepositoryImpl) Has(id string) bool {
+	_, hasKey := s.objects[id]
+	return hasKey
+}
+
+func (s *ObjectRepositoryImpl) Remove(id string) {
+	delete(s.objects, id)
 }
 
 func (s *ObjectRepositoryImpl) ToRawData() ([]byte, error) {
@@ -97,55 +135,4 @@ func (s *ObjectRepositoryImpl) ToRawData() ([]byte, error) {
 	w.Flush()
 
 	return b.Bytes(), nil
-}
-
-func (s *ObjectRepositoryImpl) Get(id string) *Object {
-	if object, found := s.Objects[id]; found {
-		return object
-	}
-
-	return nil
-}
-
-type objectName struct {
-	id   string
-	name string
-}
-
-type objectNames []objectName
-
-func (o objectNames) Len() int           { return len(o) }
-func (o objectNames) Less(i, j int) bool { return o[i].name < o[j].name }
-func (o objectNames) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
-
-func (s *ObjectRepositoryImpl) GetAll() []*Object {
-	var identifiers objectNames = nil
-	for _, o := range s.Objects {
-		identifiers = append(identifiers, objectName{id: o.Id, name: o.Name})
-	}
-	sort.Sort(identifiers)
-
-	var objectList []*Object = nil
-	for _, i := range identifiers {
-		objectList = append(objectList, s.Objects[i.id])
-	}
-
-	return objectList
-}
-
-func (s *ObjectRepositoryImpl) Put(o *Object) error {
-	s.Objects[o.Id] = o
-
-	return nil
-}
-
-func (s *ObjectRepositoryImpl) Has(id string) bool {
-	_, hasKey := s.Objects[id]
-	return hasKey
-}
-
-func (s *ObjectRepositoryImpl) Remove(id string) error {
-	delete(s.Objects, id)
-
-	return nil
 }

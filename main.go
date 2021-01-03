@@ -21,7 +21,7 @@ func main() {
 		port = "8080"
 	}
 
-	factory := spullen.NewObjectRepositoryFactory()
+	db := database.NewDatabase()
 
 	server := &spullen.Server{
 		Router: http.ServeMux{},
@@ -31,7 +31,8 @@ func main() {
 		PrivateMode: true,
 
 		Finder: &spullen.Finder{Root: dbRoot},
-		Db:     database.NewDatabase(factory),
+		Db:     db,
+		Objects: nil,
 	}
 
 	server.Templates()

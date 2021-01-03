@@ -1,30 +1,45 @@
 package database
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
-	"github.com/roelofruis/spullen/internal/spullen"
 	"sync"
 )
 
-func NewDatabase(repoFactory spullen.ObjectRepositoryFactory) spullen.Database {
-	return &FileDatabase{
-		repoFactory: repoFactory,
+type Persistable interface {
+	ToRawData() ([]byte, error)
+}
 
+type Database interface {
+	IsOpened() bool
+	Name() string
+	Open(name string, pass []byte, mode Mode) ([]byte, error)
+	Register(p Persistable)
+	Persist() error
+	Close()
+}
+
+type Mode int
+
+const ModeOpenExisting Mode = 0x1
+const ModeUseGzip Mode = 0x2
+const ModeUseEncryption Mode = 0x4
+
+func NewDatabase() Database {
+	return &FileDatabase{
 		lock:     &sync.Mutex{},
 		isOpened: false,
 		storage:  nil,
-		objects:  nil,
+		persistable: nil,
 	}
 }
 
 type FileDatabase struct {
-	repoFactory spullen.ObjectRepositoryFactory
-
 	lock     sync.Locker
 	isOpened bool
 	storage  storage
-	objects  spullen.ObjectRepository
+	persistable Persistable
 }
 
 func (db *FileDatabase) IsOpened() bool {
@@ -39,14 +54,14 @@ func (db *FileDatabase) Name() string {
 	return ""
 }
 
-func (db *FileDatabase) Open(name string, pass []byte, mode spullen.DatabaseMode) (spullen.ObjectRepository, error) {
+func (db *FileDatabase) Open(name string, pass []byte, mode Mode) ([]byte, error) {
 	if db.isOpened {
 		return nil, errors.New("database is already opened")
 	}
 
-	openExisting := mode&spullen.ModeOpenExisting == spullen.ModeOpenExisting
-	useGzip := mode&spullen.ModeUseGzip == spullen.ModeUseGzip
-	useEncryption := mode&spullen.ModeUseEncryption == spullen.ModeUseEncryption
+	openExisting := mode & ModeOpenExisting == ModeOpenExisting
+	useGzip := mode & ModeUseGzip == ModeUseGzip
+	useEncryption := mode & ModeUseEncryption == ModeUseEncryption
 
 	storage := &storageImpl{
 		useGzip:       useGzip,
@@ -56,28 +71,29 @@ func (db *FileDatabase) Open(name string, pass []byte, mode spullen.DatabaseMode
 		pass:          pass,
 	}
 
-	var repo spullen.ObjectRepository
+	var buffer *bytes.Buffer
 	if openExisting {
 		data, err := storage.read()
 		if err != nil {
 			return nil, err
 		}
-
-		repo, err = db.repoFactory.CreateFromData(data)
-		if err != nil {
-			return nil, err
-		}
+		buffer = bytes.NewBuffer(data)
 	} else {
-		repo = db.repoFactory.CreateNew()
+		buffer = &bytes.Buffer{}
 	}
 
 	db.lock.Lock()
 	db.storage = storage
-	db.objects = repo
 	db.isOpened = true
 	db.lock.Unlock()
 
-	return db.objects, nil
+	return buffer.Bytes(), nil
+}
+
+func (db *FileDatabase) Register(p Persistable) {
+	db.lock.Lock()
+	db.persistable = p
+	db.lock.Unlock()
 }
 
 func (db *FileDatabase) Persist() error {
@@ -85,7 +101,11 @@ func (db *FileDatabase) Persist() error {
 		return errors.New("database should be opened before it can be persisted")
 	}
 
-	data, err := db.objects.ToRawData()
+	if db.persistable == nil {
+		return errors.New("no persistable was registered")
+	}
+
+	data, err := db.persistable.ToRawData()
 	if err != nil {
 		return err
 	}
@@ -101,7 +121,6 @@ func (db *FileDatabase) Persist() error {
 func (db *FileDatabase) Close() {
 	db.lock.Lock()
 	db.storage = nil
-	db.objects = nil
 	db.isOpened = false
 	db.lock.Unlock()
 }

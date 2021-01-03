@@ -2,6 +2,7 @@ package spullen
 
 import (
 	"fmt"
+	"github.com/roelofruis/spullen/internal/database"
 	"net/http"
 	"strconv"
 	"time"
@@ -31,22 +32,26 @@ func (s *Server) handleIndex() http.HandlerFunc {
 					s.Db.Close()
 				}
 
-				var mode = ModeUseEncryption | ModeUseGzip
+				var mode = database.ModeUseEncryption | database.ModeUseGzip
 				if s.DevMode {
 					mode = 0x0
 				}
 
 				if !form.isNew {
-					mode |= ModeOpenExisting
+					mode |= database.ModeOpenExisting
 				}
 
-				repo, err := s.Db.Open(form.database, []byte(form.Password), mode)
+				data, err := s.Db.Open(form.database, []byte(form.Password), mode)
 				if err == nil {
-					s.PrivateMode = form.isPrivateMode
-					s.Objects = repo
+					repo, err := LoadRepository(data)
+					if err == nil {
+						s.Db.Register(repo)
+						s.Objects = repo // TODO: meh, not sufficiently decoupled..?
+						s.PrivateMode = form.isPrivateMode
 
-					http.Redirect(w, r, "/view", http.StatusSeeOther)
-					return
+						http.Redirect(w, r, "/view", http.StatusSeeOther)
+						return
+					}
 				}
 
 				loadingAlert = "De database kon niet worden geopend. Het wachtwoord is fout of de database is corrupt."
@@ -104,7 +109,7 @@ func (s *Server) handleView() http.HandlerFunc {
 					alert = fmt.Sprintf("Error when getting object from form\n%s", err.Error())
 				}
 
-				_ = s.Objects.Put(obj)
+				s.Objects.Put(obj)
 				form = EmptyForm()
 			}
 		}
@@ -212,8 +217,8 @@ func (s *Server) handleSplit() http.HandlerFunc {
 				if err != nil {
 					alert = fmt.Sprintf("Error when getting object \n%s", err.Error())
 				} else {
-					_ = s.Objects.Put(splitObject)
-					_ = s.Objects.Put(&object)
+					s.Objects.Put(splitObject)
+					s.Objects.Put(&object)
 
 					http.Redirect(w, r, "/view", http.StatusSeeOther)
 					return
@@ -276,7 +281,7 @@ func (s *Server) handleEdit() http.HandlerFunc {
 				if err != nil {
 					alert = fmt.Sprintf("Error when getting object\n%s", err.Error())
 				} else {
-					_ = s.Objects.Put(obj)
+					s.Objects.Put(obj)
 
 					http.Redirect(w, r, "/view", http.StatusSeeOther)
 					return
@@ -298,11 +303,7 @@ func (s *Server) handleDelete() http.HandlerFunc {
 			http.Error(w, "unable to parse form", http.StatusBadRequest)
 			return
 		}
-		err = s.Objects.Remove(r.Form.Get("id"))
-		if err != nil {
-			http.Error(w, "unable to remove object", http.StatusInternalServerError)
-			return
-		}
+		s.Objects.Remove(r.Form.Get("id"))
 
 		http.Redirect(w, r, "/view", http.StatusSeeOther)
 	}
