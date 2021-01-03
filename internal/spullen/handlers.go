@@ -41,17 +41,12 @@ func (s *Server) handleIndex() http.HandlerFunc {
 					mode |= database.ModeOpenExisting
 				}
 
-				data, err := s.Db.Open(form.database, []byte(form.Password), mode)
+				err := s.Db.Open(form.database, []byte(form.Password), mode)
 				if err == nil {
-					repo, err := LoadRepository(data)
-					if err == nil {
-						s.Db.Register(repo)
-						s.Objects = repo // TODO: meh, not sufficiently decoupled..?
-						s.PrivateMode = form.isPrivateMode
+					s.PrivateMode = form.isPrivateMode
 
-						http.Redirect(w, r, "/view", http.StatusSeeOther)
-						return
-					}
+					http.Redirect(w, r, "/view", http.StatusSeeOther)
+					return
 				}
 
 				loadingAlert = "De database kon niet worden geopend. Het wachtwoord is fout of de database is corrupt."

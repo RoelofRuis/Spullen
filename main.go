@@ -21,7 +21,10 @@ func main() {
 		port = "8080"
 	}
 
+	repo := &spullen.StorableObjectRepository{}
+
 	db := database.NewDatabase()
+	db.Register(repo)
 
 	server := &spullen.Server{
 		Router: http.ServeMux{},
@@ -32,7 +35,7 @@ func main() {
 
 		Finder: &spullen.Finder{Root: dbRoot},
 		Db:     db,
-		Objects: nil,
+		Objects: repo,
 	}
 
 	server.Templates()
