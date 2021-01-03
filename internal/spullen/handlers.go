@@ -29,7 +29,7 @@ func (s *Server) handleIndex() http.HandlerFunc {
 
 			if form.Validate() {
 				if s.Db.IsOpened() {
-					s.Db.Close()
+					_ = s.Db.Close()
 				}
 
 				var mode = database.ModeUseEncryption | database.ModeUseGzip
@@ -156,7 +156,7 @@ func (s *Server) handleClose() http.HandlerFunc {
 			return
 		}
 
-		s.Db.Close()
+		_ = s.Db.Close()
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}

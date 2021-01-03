@@ -7,6 +7,9 @@ import (
 	"sync"
 )
 
+// Implement this interface for any class that can be saved as and loaded from a raw binary format.
+//
+// Implementations should then be registered with a database.
 type Storable interface {
 	// Called with the raw data when the storable is instantiated by the database.
 	Instantiate([]byte) error
@@ -19,13 +22,28 @@ type Storable interface {
 }
 
 type Database interface {
+	// Whether the database is opened.
 	IsOpened() bool
+
+	// The name with which the database was opened. Can be empty if the database is not open.
 	Name() string
+
+	// Open the database by passing in the required information.
+	// A database cannot be opened twice, and should be closed first before reopening.
 	Open(name string, pass []byte, mode Mode) error
+
+	// Whether the database is dirty. A closed database is never dirty.
 	IsDirty() bool
+
+	// Register a storable to this database.
+	// The Storable will be instantiated when the database is opened and persisted when the database is persisted.
 	Register(h Storable)
+
+	// Persist the database.
 	Persist() error
-	Close()
+
+	// Close the database. A database should be opened before it can be closed.
+	Close() error
 }
 
 type Mode int
@@ -151,9 +169,15 @@ func (db *fileDatabase) Persist() error {
 	return nil
 }
 
-func (db *fileDatabase) Close() {
+func (db *fileDatabase) Close() error {
+	if !db.IsOpened() {
+		return errors.New("database should be opened before it can be closed")
+	}
+
 	db.lock.Lock()
 	db.storage = nil
 	db.isOpened = false
 	db.lock.Unlock()
+
+	return nil
 }
