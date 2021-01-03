@@ -28,26 +28,26 @@ const ModeUseGzip Mode = 0x2
 const ModeUseEncryption Mode = 0x4
 
 func NewDatabase() Database {
-	return &FileDatabase{
-		lock:       &sync.Mutex{},
-		isOpened:   false,
-		storage:    nil,
-		hydratable: nil,
+	return &fileDatabase{
+		lock:     &sync.Mutex{},
+		isOpened: false,
+		storage:  nil,
+		storable: nil,
 	}
 }
 
-type FileDatabase struct {
-	lock       sync.Locker
-	isOpened   bool
-	storage    storage
-	hydratable Storable
+type fileDatabase struct {
+	lock     sync.Locker
+	isOpened bool
+	storage  storage
+	storable Storable
 }
 
-func (db *FileDatabase) IsOpened() bool {
+func (db *fileDatabase) IsOpened() bool {
 	return db.isOpened
 }
 
-func (db *FileDatabase) Name() string {
+func (db *fileDatabase) Name() string {
 	if db.isOpened {
 		return db.storage.name()
 	}
@@ -55,13 +55,14 @@ func (db *FileDatabase) Name() string {
 	return ""
 }
 
-func (db *FileDatabase) Open(name string, pass []byte, mode Mode) error {
+func (db *fileDatabase) Open(name string, pass []byte, mode Mode) error {
 	if db.isOpened {
 		return errors.New("database is already opened")
 	}
 
-	if db.hydratable == nil {
-		return errors.New("no hydratable is registered")
+	if db.storable == nil {
+		// TODO: this shouldn't be an error per se
+		return errors.New("no storable is registered")
 	}
 
 	openExisting := mode & ModeOpenExisting == ModeOpenExisting
@@ -87,7 +88,7 @@ func (db *FileDatabase) Open(name string, pass []byte, mode Mode) error {
 		buffer = &bytes.Buffer{}
 	}
 
-	err := db.hydratable.Instantiate(buffer.Bytes())
+	err := db.storable.Instantiate(buffer.Bytes())
 	if err != nil {
 		return err
 	}
@@ -100,22 +101,23 @@ func (db *FileDatabase) Open(name string, pass []byte, mode Mode) error {
 	return nil
 }
 
-func (db *FileDatabase) Register(p Storable) {
+func (db *fileDatabase) Register(p Storable) {
 	db.lock.Lock()
-	db.hydratable = p
+	db.storable = p
 	db.lock.Unlock()
 }
 
-func (db *FileDatabase) Persist() error {
+func (db *fileDatabase) Persist() error {
 	if !db.IsOpened() {
 		return errors.New("database should be opened before it can be persisted")
 	}
 
-	if db.hydratable == nil {
-		return errors.New("no hydratable was registered")
+	if db.storable == nil {
+		// TODO: this shouldn't be an error per se
+		return errors.New("no storable was registered")
 	}
 
-	data, err := db.hydratable.ToRaw()
+	data, err := db.storable.ToRaw()
 	if err != nil {
 		return err
 	}
@@ -128,7 +130,7 @@ func (db *FileDatabase) Persist() error {
 	return nil
 }
 
-func (db *FileDatabase) Close() {
+func (db *fileDatabase) Close() {
 	db.lock.Lock()
 	db.storage = nil
 	db.isOpened = false
