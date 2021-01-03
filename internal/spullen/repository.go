@@ -61,6 +61,10 @@ func (s *StorableObjectRepository) Remove(id string) {
 	delete(s.objects, id)
 }
 
+func (s *StorableObjectRepository) IsDirty() bool {
+	return false
+}
+
 func (s *StorableObjectRepository) Instantiate(data []byte) error {
 	r := csv.NewReader(strings.NewReader(string(data)))
 	r.Comma = ';'

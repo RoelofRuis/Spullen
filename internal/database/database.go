@@ -10,12 +10,14 @@ import (
 type Storable interface {
 	Instantiate([]byte) error
 	ToRaw() ([]byte, error)
+	IsDirty() bool
 }
 
 type Database interface {
 	IsOpened() bool
 	Name() string
 	Open(name string, pass []byte, mode Mode) error
+	IsDirty() bool
 	Register(h Storable)
 	Persist() error
 	Close()
@@ -38,13 +40,23 @@ func NewDatabase() Database {
 
 type fileDatabase struct {
 	lock     sync.Locker
+
 	isOpened bool
 	storage  storage
+
 	storable Storable
 }
 
 func (db *fileDatabase) IsOpened() bool {
 	return db.isOpened
+}
+
+func (db *fileDatabase) IsDirty() bool {
+	if !db.isOpened || db.storable == nil{
+		return false
+	}
+
+	return db.storable.IsDirty()
 }
 
 func (db *fileDatabase) Name() string {
@@ -61,7 +73,6 @@ func (db *fileDatabase) Open(name string, pass []byte, mode Mode) error {
 	}
 
 	if db.storable == nil {
-		// TODO: this shouldn't be an error per se
 		return errors.New("no storable is registered")
 	}
 
@@ -113,8 +124,11 @@ func (db *fileDatabase) Persist() error {
 	}
 
 	if db.storable == nil {
-		// TODO: this shouldn't be an error per se
-		return errors.New("no storable was registered")
+		return nil
+	}
+
+	if !db.IsDirty() {
+		return nil
 	}
 
 	data, err := db.storable.ToRaw()

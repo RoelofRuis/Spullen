@@ -75,6 +75,8 @@ func (s *Server) handleView() http.HandlerFunc {
 	type viewModel struct {
 		Alert string
 
+		DatabaseIsDirty bool
+
 		TotalCount  int
 		DbName      string
 		Objects     []*Object
@@ -115,12 +117,13 @@ func (s *Server) handleView() http.HandlerFunc {
 		}
 
 		err := s.Views.View.ExecuteTemplate(w, "layout", viewModel{
-			Alert:       alert,
-			TotalCount:  totalCount,
-			DbName:      s.Db.Name(),
-			Objects:     s.Objects.GetAll(),
-			PrivateMode: s.PrivateMode,
-			Form:        form,
+			Alert:           alert,
+			DatabaseIsDirty: s.Db.IsDirty(),
+			TotalCount:      totalCount,
+			DbName:          s.Db.Name(),
+			Objects:         s.Objects.GetAll(),
+			PrivateMode:     s.PrivateMode,
+			Form:            form,
 		})
 		if err != nil {
 			fmt.Print(err.Error())
