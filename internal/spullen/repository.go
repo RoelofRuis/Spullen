@@ -84,6 +84,13 @@ func (s *StorableObjectRepository) IsDirty() bool {
 	return s.dirty
 }
 
+func (s *StorableObjectRepository) WasPersisted() {
+	// FIXME: proper multithreaded usage requires checking whether the state was changed between `ToRaw` and this call.
+	s.lock.Lock()
+	s.dirty = false
+	s.lock.Unlock()
+}
+
 func (s *StorableObjectRepository) Instantiate(data []byte) error {
 	r := csv.NewReader(strings.NewReader(string(data)))
 	r.Comma = ';'

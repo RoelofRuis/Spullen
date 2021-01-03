@@ -8,9 +8,14 @@ import (
 )
 
 type Storable interface {
+	// Called with the raw data when the storable is instantiated by the database.
 	Instantiate([]byte) error
+	// Called by the database to request the raw data representation for storage.
 	ToRaw() ([]byte, error)
+	// Called by the database to check whether the storable contains dirty data, to allow for storage optimizations.
 	IsDirty() bool
+	// Called by the database right after data was successfully persisted.
+	WasPersisted()
 }
 
 type Database interface {
@@ -140,6 +145,8 @@ func (db *fileDatabase) Persist() error {
 	if err != nil {
 		return err
 	}
+
+	db.storable.WasPersisted()
 
 	return nil
 }
