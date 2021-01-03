@@ -82,6 +82,8 @@ func (s *Server) handleView() http.HandlerFunc {
 		Objects     []*Object
 		PrivateMode bool
 
+		DevMode bool
+
 		Form *ObjectForm
 	}
 
@@ -123,6 +125,7 @@ func (s *Server) handleView() http.HandlerFunc {
 			DbName:          s.Db.Name(),
 			Objects:         s.Objects.GetAll(),
 			PrivateMode:     s.PrivateMode,
+			DevMode: s.DevMode,
 			Form:            form,
 		})
 		if err != nil {
