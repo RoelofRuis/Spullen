@@ -62,7 +62,7 @@ func NewDatabase() Database {
 }
 
 type fileDatabase struct {
-	lock     sync.Locker
+	lock sync.Locker
 
 	isOpened bool
 	storage  storage
@@ -75,7 +75,7 @@ func (db *fileDatabase) IsOpened() bool {
 }
 
 func (db *fileDatabase) IsDirty() bool {
-	if !db.isOpened || db.storable == nil{
+	if !db.isOpened || db.storable == nil {
 		return false
 	}
 
@@ -99,9 +99,9 @@ func (db *fileDatabase) Open(name string, pass []byte, mode Mode) error {
 		return errors.New("no storable is registered")
 	}
 
-	openExisting := mode & ModeOpenExisting == ModeOpenExisting
-	useGzip := mode & ModeUseGzip == ModeUseGzip
-	useEncryption := mode & ModeUseEncryption == ModeUseEncryption
+	openExisting := mode&ModeOpenExisting == ModeOpenExisting
+	useGzip := mode&ModeUseGzip == ModeUseGzip
+	useEncryption := mode&ModeUseEncryption == ModeUseEncryption
 
 	storage := &storageImpl{
 		useGzip:       useGzip,

@@ -16,7 +16,7 @@ func NewStorableObjectRepository() *StorableObjectRepository {
 		lock: sync.Mutex{},
 
 		objects: map[string]*Object{},
-		dirty: false,
+		dirty:   false,
 	}
 }
 
@@ -24,7 +24,7 @@ type StorableObjectRepository struct {
 	lock sync.Mutex
 
 	objects map[string]*Object
-	dirty bool
+	dirty   bool
 }
 
 func (s *StorableObjectRepository) Get(id string) *Object {

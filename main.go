@@ -33,8 +33,8 @@ func main() {
 		DevMode:     devMode,
 		PrivateMode: true,
 
-		Finder: &spullen.Finder{Root: dbRoot},
-		Db:     db,
+		Finder:  &spullen.Finder{Root: dbRoot},
+		Db:      db,
 		Objects: repo,
 	}
 

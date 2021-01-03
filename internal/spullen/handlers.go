@@ -125,7 +125,7 @@ func (s *Server) handleView() http.HandlerFunc {
 			DbName:          s.Db.Name(),
 			Objects:         s.Objects.GetAll(),
 			PrivateMode:     s.PrivateMode,
-			DevMode: s.DevMode,
+			DevMode:         s.DevMode,
 			Form:            form,
 		})
 		if err != nil {
@@ -314,7 +314,7 @@ func (s *Server) makeId() string {
 	var id string
 	for {
 		id = randSeq(16)
-		if ! s.Objects.Has(id) {
+		if !s.Objects.Has(id) {
 			return id
 		}
 	}
