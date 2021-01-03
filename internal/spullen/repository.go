@@ -8,10 +8,23 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 )
 
+func NewStorableObjectRepository() *StorableObjectRepository {
+	return &StorableObjectRepository{
+		lock: sync.Mutex{},
+
+		objects: map[string]*Object{},
+		dirty: false,
+	}
+}
+
 type StorableObjectRepository struct {
+	lock sync.Mutex
+
 	objects map[string]*Object
+	dirty bool
 }
 
 func (s *StorableObjectRepository) Get(id string) *Object {
@@ -49,7 +62,10 @@ func (s *StorableObjectRepository) GetAll() []*Object {
 }
 
 func (s *StorableObjectRepository) Put(o *Object) {
+	s.lock.Lock()
 	s.objects[o.Id] = o
+	s.dirty = true
+	s.lock.Unlock()
 }
 
 func (s *StorableObjectRepository) Has(id string) bool {
@@ -58,11 +74,14 @@ func (s *StorableObjectRepository) Has(id string) bool {
 }
 
 func (s *StorableObjectRepository) Remove(id string) {
+	s.lock.Lock()
 	delete(s.objects, id)
+	s.dirty = true
+	s.lock.Unlock()
 }
 
 func (s *StorableObjectRepository) IsDirty() bool {
-	return false
+	return s.dirty
 }
 
 func (s *StorableObjectRepository) Instantiate(data []byte) error {
@@ -103,7 +122,10 @@ func (s *StorableObjectRepository) Instantiate(data []byte) error {
 		objects[object.Id] = object
 	}
 
+	s.lock.Lock()
 	s.objects = objects
+	s.dirty = false
+	s.lock.Unlock()
 
 	return nil
 }

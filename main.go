@@ -21,7 +21,7 @@ func main() {
 		port = "8080"
 	}
 
-	repo := &spullen.StorableObjectRepository{}
+	repo := spullen.NewStorableObjectRepository()
 
 	db := database.NewDatabase()
 	db.Register(repo)

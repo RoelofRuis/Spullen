@@ -1,16 +1,12 @@
 {{ define "navbar" }}
+{{ if .DevMode }}<b class="text-danger">DEV MODE</b>{{ end }}
 <ul class="navbar navbar-nav ml-auto">
     <li class="navbar-item">
         {{ if .DatabaseIsDirty }}
             <a href="/save" class="btn btn-outline-success btn-sm mr-1 btn-spinner">
                 <i class="fa fa-database"></i>
-                Opslaan
+                Aanpassingen Opslaan
                 <span class="spinner-border spinner-border-sm" role="status" style="display:none" aria-hidden="true"></span>
-            </a>
-        {{ else }}
-            <a href="/save" class="btn btn-outline-secondary btn-sm mr-1 disabled">
-                <i class="fa fa-database"></i>
-                Opslaan
             </a>
         {{ end }}
     </li>
