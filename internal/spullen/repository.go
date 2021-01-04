@@ -13,7 +13,7 @@ import (
 
 func NewStorableObjectRepository() *StorableObjectRepository {
 	return &StorableObjectRepository{
-		lock: sync.Mutex{},
+		lock: sync.Mutex{}, // FIXME: use RWMutex!
 
 		objects: map[string]*Object{},
 		dirty:   false,
