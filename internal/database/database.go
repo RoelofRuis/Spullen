@@ -18,7 +18,7 @@ type Storable interface {
 	// Called by the database to check whether the storable contains dirty data, to allow for storage optimizations.
 	IsDirty() bool
 	// Called by the database right after data was successfully persisted.
-	WasPersisted()
+	AfterPersist()
 }
 
 type Database interface {
@@ -164,7 +164,7 @@ func (db *fileDatabase) Persist() error {
 		return err
 	}
 
-	db.storable.WasPersisted()
+	db.storable.AfterPersist()
 
 	return nil
 }
