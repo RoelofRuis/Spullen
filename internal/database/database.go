@@ -10,10 +10,6 @@ import (
 //
 // Implementations should then be registered with a database.
 type Storable interface {
-	// Should return a name by which this storable can be uniquely identified within all the
-	// storables registered with a database.
-	Identifier() string
-
 	// Called with the raw data when the storable is instantiated by the database.
 	Instantiate([]byte) error
 
@@ -42,8 +38,11 @@ type Database interface {
 	IsDirty() bool
 
 	// Register a storable to this database.
-	// The Storable will be instantiated when the database is opened and persisted when the database is persisted.
-	Register(h Storable)
+	// Upon opening the database, all Storables will receive a call to Initialize() with their appropriate data.
+	// After a successful persist, all Storables will receive a call to their AfterPersist callback.
+	//
+	// Calling register twice with the same id will result in an error.
+	Register(id string, h Storable) error
 
 	// Persist the database.
 	Persist() error
@@ -63,7 +62,7 @@ func NewDatabase() Database {
 		lock:     &sync.Mutex{},
 		isOpened: false,
 		storage:  nil,
-		storables: nil,
+		storables: map[string]Storable{},
 	}
 }
 
@@ -73,7 +72,7 @@ type fileDatabase struct {
 	isOpened bool
 	storage  storage
 
-	storables []Storable
+	storables map[string]Storable
 }
 
 func (db *fileDatabase) IsOpened() bool {
@@ -107,10 +106,6 @@ func (db *fileDatabase) Open(name string, pass []byte, mode Mode) error {
 		return errors.New("database is already opened")
 	}
 
-	if len(db.storables) == 0 {
-		return errors.New("no storable is registered")
-	}
-
 	openExisting := mode&ModeOpenExisting == ModeOpenExisting
 	useGzip := mode&ModeUseGzip == ModeUseGzip
 	useEncryption := mode&ModeUseEncryption == ModeUseEncryption
@@ -123,27 +118,23 @@ func (db *fileDatabase) Open(name string, pass []byte, mode Mode) error {
 		pass:          pass,
 	}
 
+	var dataMap = map[string][]byte{}
 	if openExisting {
-		dataMap, err := storage.read()
+		data, err := storage.read()
 		if err != nil {
 			return err
 		}
-		for _, s := range db.storables {
-			data, hasKey := dataMap[s.Identifier()]
-			if !hasKey {
-				return fmt.Errorf("data missing for storable [%s]", s.Identifier())
-			}
-			err := s.Instantiate(data)
-			if err != nil {
-				return err
-			}
+		dataMap = data
+	}
+
+	for name, s := range db.storables {
+		data, hasKey := dataMap[name]
+		if openExisting && !hasKey {
+			return fmt.Errorf("data missing for storable [%s]", name)
 		}
-	} else {
-		for _, s := range db.storables {
-			err := s.Instantiate([]byte{})
-			if err != nil {
-				return err
-			}
+		err := s.Instantiate(data)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -155,10 +146,17 @@ func (db *fileDatabase) Open(name string, pass []byte, mode Mode) error {
 	return nil
 }
 
-func (db *fileDatabase) Register(p Storable) {
+func (db *fileDatabase) Register(id string, p Storable) error {
+	_, exists := db.storables[id]
+	if exists {
+		return fmt.Errorf("storable with id [%s] was already registered", id)
+	}
+
 	db.lock.Lock()
-	db.storables = append(db.storables, p)
+	db.storables[id] = p
 	db.lock.Unlock()
+
+	return nil
 }
 
 func (db *fileDatabase) Persist() error {
@@ -171,13 +169,13 @@ func (db *fileDatabase) Persist() error {
 	}
 
 	var dataMap = map[string][]byte{}
-	for _, s := range db.storables {
+	for name, s := range db.storables {
 		data, err := s.ToRaw()
 		if err != nil {
 			return err
 		}
 
-		dataMap[s.Identifier()] = data
+		dataMap[name] = data
 	}
 
 	err := db.storage.write(dataMap)
