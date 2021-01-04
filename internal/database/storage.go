@@ -17,7 +17,7 @@ import (
 type storage interface {
 	name() string
 	read() (map[string][]byte, error)
-	write(data map[string][]byte) error
+	write(blocks map[string][]byte) error
 }
 
 type storageImpl struct {
@@ -33,48 +33,7 @@ func (s *storageImpl) name() string {
 	return s.dbName
 }
 
- func (s *storageImpl) read() (map[string][]byte, error) {
- 	data, err := s.readRaw()
- 	if err != nil {
- 		return nil, err
-	}
-
-	dataMap := map[string][]byte{}
- 	for {
- 		if len(data) == 0 {
- 			break
-		}
-
-		lengthParts := bytes.SplitN(data, []byte(":"), 2)
-		if len (lengthParts) != 2 {
-			return nil, errors.New("invalid data: unable to determine block length")
-		}
-
-		blockLength, err := strconv.ParseInt(string(lengthParts[0]), 10, 64)
-		if err != nil {
-			return nil, err
-		}
-
-		nameParts := bytes.SplitN(lengthParts[1], []byte("\n"), 2)
-		if len(nameParts) != 2 {
-			return nil, errors.New("invalid data: unable to determine block name")
-		}
-
-		name := string(nameParts[0])
-		if len(nameParts[1]) < int(blockLength) {
-			return nil, errors.New("invalid data: block too short")
-		}
-
-		block := nameParts[1][0:blockLength]
-		dataMap[name] = block
-
-		data = nameParts[1][blockLength:]
-	}
-
-	return dataMap, nil
- }
-
-func (s *storageImpl) readRaw() ([]byte, error) {
+func (s *storageImpl) read() (map[string][]byte, error) {
 	data, err := ioutil.ReadFile(s.path)
 	if err != nil {
 		return nil, err
@@ -100,20 +59,49 @@ func (s *storageImpl) readRaw() ([]byte, error) {
 		}
 	}
 
-	return data, nil
-}
+	blocks := map[string][]byte{}
+	for {
+		if len(data) == 0 {
+			break
+		}
 
-func (s *storageImpl) write(dataMap map[string][]byte) error {
-	var fullData []byte
-	for name, data := range dataMap {
-		blockId := fmt.Sprintf("%d:%s\n", len(data), name)
-		block := append([]byte(blockId), data...)
-		fullData = append(fullData, block...)
+		lengthParts := bytes.SplitN(data, []byte(":"), 2)
+		if len (lengthParts) != 2 {
+			return nil, errors.New("invalid data: unable to determine block length")
+		}
+
+		blockLength, err := strconv.ParseInt(string(lengthParts[0]), 10, 64)
+		if err != nil {
+			return nil, err
+		}
+
+		nameParts := bytes.SplitN(lengthParts[1], []byte("\n"), 2)
+		if len(nameParts) != 2 {
+			return nil, errors.New("invalid data: unable to determine block name")
+		}
+
+		name := string(nameParts[0])
+		if len(nameParts[1]) < int(blockLength) {
+			return nil, errors.New("invalid data: block too short")
+		}
+
+		block := nameParts[1][0:blockLength]
+		blocks[name] = block
+
+		data = nameParts[1][blockLength:]
 	}
-	return s.writeRaw(fullData)
+
+	return blocks, nil
 }
 
-func (s *storageImpl) writeRaw(data []byte) error {
+func (s *storageImpl) write(blocks map[string][]byte) error {
+	var data []byte
+	for name, blockData := range blocks {
+		blockId := fmt.Sprintf("%d:%s\n", len(blockData), name)
+		block := append([]byte(blockId), blockData...)
+		data = append(data, block...)
+	}
+
 	if s.useGzip {
 		buf := &bytes.Buffer{}
 
