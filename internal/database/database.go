@@ -139,9 +139,10 @@ func (db *fileDatabase) Open(name string, pass []byte, mode Mode) error {
 	}
 
 	db.lock.Lock()
+	defer db.lock.Unlock()
+
 	db.storage = storage
 	db.isOpened = true
-	db.lock.Unlock()
 
 	return nil
 }
@@ -153,8 +154,9 @@ func (db *fileDatabase) Register(id string, p Storable) error {
 	}
 
 	db.lock.Lock()
+	defer db.lock.Unlock()
+
 	db.storables[id] = p
-	db.lock.Unlock()
 
 	return nil
 }
@@ -196,9 +198,10 @@ func (db *fileDatabase) Close() error {
 	}
 
 	db.lock.Lock()
+	defer db.lock.Unlock()
+
 	db.storage = nil
 	db.isOpened = false
-	db.lock.Unlock()
 
 	return nil
 }
