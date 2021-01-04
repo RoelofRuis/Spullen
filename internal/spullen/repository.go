@@ -13,7 +13,7 @@ import (
 
 func NewStorableObjectRepository() *StorableObjectRepository {
 	return &StorableObjectRepository{
-		lock: sync.Mutex{}, // FIXME: use RWMutex!
+		lock: sync.RWMutex{},
 
 		objects: map[string]*Object{},
 		dirty:   false,
@@ -21,13 +21,16 @@ func NewStorableObjectRepository() *StorableObjectRepository {
 }
 
 type StorableObjectRepository struct {
-	lock sync.Mutex
+	lock sync.RWMutex
 
 	objects map[string]*Object
 	dirty   bool
 }
 
 func (s *StorableObjectRepository) Get(id string) *Object {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
 	if object, found := s.objects[id]; found {
 		return object
 	}
@@ -47,6 +50,9 @@ func (o objectNames) Less(i, j int) bool { return o[i].name < o[j].name }
 func (o objectNames) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
 
 func (s *StorableObjectRepository) GetAll() []*Object {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
 	var identifiers objectNames = nil
 	for _, o := range s.objects {
 		identifiers = append(identifiers, objectName{id: o.Id, name: o.Name})
@@ -63,32 +69,38 @@ func (s *StorableObjectRepository) GetAll() []*Object {
 
 func (s *StorableObjectRepository) Put(o *Object) {
 	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	s.objects[o.Id] = o
 	s.dirty = true
-	s.lock.Unlock()
 }
 
 func (s *StorableObjectRepository) Has(id string) bool {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
 	_, hasKey := s.objects[id]
 	return hasKey
 }
 
 func (s *StorableObjectRepository) Remove(id string) {
 	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	delete(s.objects, id)
 	s.dirty = true
-	s.lock.Unlock()
 }
 
 func (s *StorableObjectRepository) IsDirty() bool {
 	return s.dirty
 }
 
+// FIXME: proper multithreaded usage requires checking whether the state was changed between `ToRaw` and this call.
 func (s *StorableObjectRepository) AfterPersist() {
-	// FIXME: proper multithreaded usage requires checking whether the state was changed between `ToRaw` and this call.
 	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	s.dirty = false
-	s.lock.Unlock()
 }
 
 func (s *StorableObjectRepository) Instantiate(data []byte) error {
@@ -130,9 +142,10 @@ func (s *StorableObjectRepository) Instantiate(data []byte) error {
 	}
 
 	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	s.objects = objects
 	s.dirty = false
-	s.lock.Unlock()
 
 	return nil
 }
