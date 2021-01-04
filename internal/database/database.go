@@ -59,9 +59,9 @@ const ModeUseEncryption Mode = 0x4
 
 func NewDatabase() Database {
 	return &fileDatabase{
-		lock:     &sync.Mutex{},
-		isOpened: false,
-		storage:  nil,
+		lock:      &sync.Mutex{},
+		isOpened:  false,
+		storage:   nil,
 		storables: map[string]Storable{},
 	}
 }

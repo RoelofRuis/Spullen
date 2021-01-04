@@ -66,7 +66,7 @@ func (s *storageImpl) read() (map[string][]byte, error) {
 		}
 
 		lengthParts := bytes.SplitN(data, []byte(":"), 2)
-		if len (lengthParts) != 2 {
+		if len(lengthParts) != 2 {
 			return nil, errors.New("invalid data: unable to determine block length")
 		}
 
