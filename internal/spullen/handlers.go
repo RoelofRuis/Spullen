@@ -49,6 +49,7 @@ func (s *Server) handleIndex() http.HandlerFunc {
 					return
 				}
 
+				println(err.Error())
 				loadingAlert = "De database kon niet worden geopend. Het wachtwoord is fout of de database is corrupt."
 			}
 		}

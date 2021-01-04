@@ -84,7 +84,11 @@ func (s *StorableObjectRepository) IsDirty() bool {
 	return s.dirty
 }
 
-func (s *StorableObjectRepository) WasPersisted() {
+func (s *StorableObjectRepository) Identifier() string {
+	return "object-repository"
+}
+
+func (s *StorableObjectRepository) AfterPersist() {
 	// FIXME: proper multithreaded usage requires checking whether the state was changed between `ToRaw` and this call.
 	s.lock.Lock()
 	s.dirty = false

@@ -1,7 +1,6 @@
 package database
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"sync"
@@ -11,12 +10,19 @@ import (
 //
 // Implementations should then be registered with a database.
 type Storable interface {
+	// Should return a name by which this storable can be uniquely identified within all the
+	// storables registered with a database.
+	Identifier() string
+
 	// Called with the raw data when the storable is instantiated by the database.
 	Instantiate([]byte) error
+
 	// Called by the database to request the raw data representation for storage.
 	ToRaw() ([]byte, error)
+
 	// Called by the database to check whether the storable contains dirty data, to allow for storage optimizations.
 	IsDirty() bool
+
 	// Called by the database right after data was successfully persisted.
 	AfterPersist()
 }
@@ -57,7 +63,7 @@ func NewDatabase() Database {
 		lock:     &sync.Mutex{},
 		isOpened: false,
 		storage:  nil,
-		storable: nil,
+		storables: nil,
 	}
 }
 
@@ -67,7 +73,7 @@ type fileDatabase struct {
 	isOpened bool
 	storage  storage
 
-	storable Storable
+	storables []Storable
 }
 
 func (db *fileDatabase) IsOpened() bool {
@@ -75,11 +81,17 @@ func (db *fileDatabase) IsOpened() bool {
 }
 
 func (db *fileDatabase) IsDirty() bool {
-	if !db.isOpened || db.storable == nil {
+	if !db.isOpened {
 		return false
 	}
 
-	return db.storable.IsDirty()
+	for _, s := range db.storables {
+		if s.IsDirty() {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (db *fileDatabase) Name() string {
@@ -95,7 +107,7 @@ func (db *fileDatabase) Open(name string, pass []byte, mode Mode) error {
 		return errors.New("database is already opened")
 	}
 
-	if db.storable == nil {
+	if len(db.storables) == 0 {
 		return errors.New("no storable is registered")
 	}
 
@@ -111,20 +123,28 @@ func (db *fileDatabase) Open(name string, pass []byte, mode Mode) error {
 		pass:          pass,
 	}
 
-	var buffer *bytes.Buffer
 	if openExisting {
-		data, err := storage.read()
+		dataMap, err := storage.read()
 		if err != nil {
 			return err
 		}
-		buffer = bytes.NewBuffer(data)
+		for _, s := range db.storables {
+			data, hasKey := dataMap[s.Identifier()]
+			if !hasKey {
+				return fmt.Errorf("data missing for storable [%s]", s.Identifier())
+			}
+			err := s.Instantiate(data)
+			if err != nil {
+				return err
+			}
+		}
 	} else {
-		buffer = &bytes.Buffer{}
-	}
-
-	err := db.storable.Instantiate(buffer.Bytes())
-	if err != nil {
-		return err
+		for _, s := range db.storables {
+			err := s.Instantiate([]byte{})
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	db.lock.Lock()
@@ -137,7 +157,7 @@ func (db *fileDatabase) Open(name string, pass []byte, mode Mode) error {
 
 func (db *fileDatabase) Register(p Storable) {
 	db.lock.Lock()
-	db.storable = p
+	db.storables = append(db.storables, p)
 	db.lock.Unlock()
 }
 
@@ -146,25 +166,28 @@ func (db *fileDatabase) Persist() error {
 		return errors.New("database should be opened before it can be persisted")
 	}
 
-	if db.storable == nil {
-		return nil
-	}
-
 	if !db.IsDirty() {
 		return nil
 	}
 
-	data, err := db.storable.ToRaw()
+	var dataMap = map[string][]byte{}
+	for _, s := range db.storables {
+		data, err := s.ToRaw()
+		if err != nil {
+			return err
+		}
+
+		dataMap[s.Identifier()] = data
+	}
+
+	err := db.storage.write(dataMap)
 	if err != nil {
 		return err
 	}
 
-	err = db.storage.write(data)
-	if err != nil {
-		return err
+	for _, s := range db.storables {
+		s.AfterPersist()
 	}
-
-	db.storable.AfterPersist()
 
 	return nil
 }
