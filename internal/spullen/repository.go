@@ -3,28 +3,34 @@ package spullen
 import (
 	"bytes"
 	"encoding/csv"
-	"fmt"
 	"io"
 	"sort"
-	"strconv"
 	"strings"
 	"sync"
 )
 
-func NewStorableObjectRepository() *StorableObjectRepository {
+type StorableObjectRepository struct {
+	lock sync.RWMutex
+
+	marshaller ObjectMarshaller
+	objects    map[string]*Object
+	dirty      bool
+}
+
+type ObjectMarshaller interface {
+	Unmarshall(record []string) (*Object, error)
+	Marshall(obj *Object) []string
+}
+
+func NewStorableObjectRepository(marshaller ObjectMarshaller) *StorableObjectRepository {
 	return &StorableObjectRepository{
 		lock: sync.RWMutex{},
+
+		marshaller: marshaller,
 
 		objects: map[string]*Object{},
 		dirty:   false,
 	}
-}
-
-type StorableObjectRepository struct {
-	lock sync.RWMutex
-
-	objects map[string]*Object
-	dirty   bool
 }
 
 func (s *StorableObjectRepository) Get(id string) *Object {
@@ -117,28 +123,12 @@ func (s *StorableObjectRepository) Instantiate(data []byte) error {
 			return err
 		}
 
-		form := &ObjectForm{
-			Id:         record[0],
-			TimeAdded:  record[1],
-			Name:       record[2],
-			Quantity:   record[3],
-			Categories: record[4],
-			Tags:       record[5],
-			Properties: record[6],
-			Hidden:     record[7],
-			Notes:      record[8],
-		}
-
-		if !form.Validate() {
-			return fmt.Errorf("invalid object [%s]", record[0])
-		}
-
-		object, err := form.GetObject()
+		obj, err := s.marshaller.Unmarshall(record)
 		if err != nil {
 			return err
 		}
 
-		objects[object.Id] = object
+		objects[obj.Id] = obj
 	}
 
 	s.lock.Lock()
@@ -155,24 +145,9 @@ func (s *StorableObjectRepository) ToRaw() ([]byte, error) {
 	w := csv.NewWriter(b)
 	w.Comma = ';'
 
-	var data []string
 	for _, o := range s.GetAll() {
-		var properties []string
-		for _, p := range o.Properties {
-			properties = append(properties, fmt.Sprintf("%s=%s", p.Key, p.Value))
-		}
-		data = []string{
-			o.Id,
-			strconv.FormatInt(o.Added.Unix(), 10),
-			o.Name,
-			fmt.Sprintf("%d", o.Quantity),
-			strings.Join(o.Categories, ","),
-			strings.Join(o.Tags, ","),
-			strings.Join(properties, ","),
-			strconv.FormatBool(o.Hidden),
-			o.Notes,
-		}
-		err := w.Write(data)
+		record := s.marshaller.Marshall(o)
+		err := w.Write(record)
 		if err != nil {
 			return nil, err
 		}

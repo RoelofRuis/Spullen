@@ -21,7 +21,7 @@ func main() {
 		port = "8080"
 	}
 
-	objectRepo := spullen.NewStorableObjectRepository()
+	objectRepo := spullen.NewStorableObjectRepository(&spullen.ObjectMarshallerImpl{})
 
 	var db *database.FileDatabase
 	if devMode {
