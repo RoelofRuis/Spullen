@@ -82,6 +82,54 @@ func (s *StorableObjectRepository) Put(o *spullen.Object) {
 	s.dirty = true
 }
 
+func (s *StorableObjectRepository) GetDistinctCategories() []string {
+	seen := map[string]struct{}{}
+	var categories []string
+	for _, o := range s.objects {
+		for _, c := range o.Categories {
+			_, found := seen[c]
+			if !found {
+				seen[c] = struct{}{}
+				categories = append(categories, c)
+			}
+		}
+	}
+
+	return categories
+}
+
+func (s *StorableObjectRepository) GetDistinctTags() []string {
+	seen := map[string]struct{}{}
+	var tags []string
+	for _, o := range s.objects {
+		for _, t := range o.Tags {
+			_, found := seen[t]
+			if !found {
+				seen[t] = struct{}{}
+				tags = append(tags, t)
+			}
+		}
+	}
+
+	return tags
+}
+
+func (s *StorableObjectRepository) GetDistinctPropertyKeys() []string {
+	seen := map[string]struct{}{}
+	var propKeys []string
+	for _, o := range s.objects {
+		for _, p := range o.Properties {
+			_, found := seen[p.Key]
+			if !found {
+				seen[p.Key] = struct{}{}
+				propKeys = append(propKeys, p.Key)
+			}
+		}
+	}
+
+	return propKeys
+}
+
 func (s *StorableObjectRepository) Has(id string) bool {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
@@ -96,24 +144,6 @@ func (s *StorableObjectRepository) Remove(id string) {
 
 	delete(s.objects, id)
 	s.dirty = true
-}
-
-func (s *StorableObjectRepository) GetDistinctCategories() []string {
-	// TODO: implement
-
-	return nil
-}
-
-func (s *StorableObjectRepository) GetDistinctTags() []string {
-	// TODO: implement
-
-	return nil
-}
-
-func (s *StorableObjectRepository) GetDistinctPropertyKeys() []string {
-	// TODO: implement
-
-	return nil
 }
 
 // --- LOADING AND SAVING
