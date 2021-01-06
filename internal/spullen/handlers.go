@@ -2,7 +2,6 @@ package spullen
 
 import (
 	"fmt"
-	"github.com/roelofruis/spullen/internal/database"
 	"net/http"
 	"strconv"
 	"time"
@@ -32,16 +31,9 @@ func (s *Server) handleIndex() http.HandlerFunc {
 					_ = s.Db.Close()
 				}
 
-				var mode = database.ModeUseEncryption | database.ModeUseGzip
-				if s.DevMode {
-					mode = 0x0
-				}
+				openExisting := !form.isNew
 
-				if !form.isNew {
-					mode |= database.ModeOpenExisting
-				}
-
-				err := s.Db.Open(form.database, []byte(form.Password), mode)
+				err := s.Db.Open(form.database, []byte(form.Password), openExisting)
 				if err == nil {
 					s.PrivateMode = form.isPrivateMode
 

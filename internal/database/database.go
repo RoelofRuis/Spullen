@@ -32,7 +32,7 @@ type Database interface {
 
 	// Open the database by passing in the required information.
 	// A database cannot be opened twice, and should be closed first before reopening.
-	Open(name string, pass []byte, mode Mode) error
+	Open(name string, pass []byte, openExisting bool) error
 
 	// Whether the database is dirty. A closed database is never dirty.
 	IsDirty() bool
@@ -51,15 +51,11 @@ type Database interface {
 	Close() error
 }
 
-type Mode int
-
-const ModeOpenExisting Mode = 0x1
-const ModeUseGzip Mode = 0x2
-const ModeUseEncryption Mode = 0x4
-
-func NewDatabase() Database {
+func NewDatabase(useGzip bool, useEncryption bool) Database {
 	return &fileDatabase{
 		lock:      &sync.Mutex{},
+		useGzip: useGzip,
+		useEncryption: useEncryption,
 		isOpened:  false,
 		storage:   nil,
 		storables: map[string]Storable{},
@@ -69,6 +65,8 @@ func NewDatabase() Database {
 type fileDatabase struct {
 	lock sync.Locker
 
+	useGzip bool
+	useEncryption bool
 	isOpened bool
 	storage  storage
 
@@ -101,18 +99,14 @@ func (db *fileDatabase) Name() string {
 	return ""
 }
 
-func (db *fileDatabase) Open(name string, pass []byte, mode Mode) error {
+func (db *fileDatabase) Open(name string, pass []byte, openExisting bool) error {
 	if db.isOpened {
 		return errors.New("database is already opened")
 	}
 
-	openExisting := mode&ModeOpenExisting == ModeOpenExisting
-	useGzip := mode&ModeUseGzip == ModeUseGzip
-	useEncryption := mode&ModeUseEncryption == ModeUseEncryption
-
 	storage := &storageImpl{
-		useGzip:       useGzip,
-		useEncryption: useEncryption,
+		useGzip:       db.useGzip,
+		useEncryption: db.useEncryption,
 		dbName:        name,
 		path:          fmt.Sprintf("%s.db", name),
 		pass:          pass,
