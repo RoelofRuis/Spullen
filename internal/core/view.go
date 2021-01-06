@@ -2,23 +2,20 @@ package core
 
 import "github.com/roelofruis/spullen"
 
-type appInfoModel struct {
+type AppInfo struct {
 	DevMode bool
-}
 
-type alertModel struct {
 	Alert string
 }
 
-type IndexModel struct {
-	appInfoModel
-	alertModel
+type Index struct {
+	AppInfo
 
 	Databases []string
-	From *IndexForm
+	Form      *IndexForm
 }
 
-type editableObjectModel struct {
+type EditObject struct {
 	ExistingTags []string
 	ExistingCategories []string
 	ExistingPropertyKeys []string
@@ -26,10 +23,9 @@ type editableObjectModel struct {
 	Form *ObjectForm
 }
 
-type ViewModel struct {
-	appInfoModel
-	alertModel
-	editableObjectModel
+type View struct {
+	AppInfo
+	EditObject
 
 	DatabaseIsDirty bool
 
@@ -39,16 +35,14 @@ type ViewModel struct {
 	PrivateMode bool
 }
 
-type SplitModel struct {
-	appInfoModel
-	alertModel
-	editableObjectModel
+type Split struct {
+	AppInfo
+	EditObject
 
 	Original *ObjectForm
 }
 
-type EditModel struct {
-	appInfoModel
-	alertModel
-	editableObjectModel
+type Edit struct {
+	AppInfo
+	EditObject
 }

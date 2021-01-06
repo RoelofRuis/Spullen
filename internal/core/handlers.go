@@ -2,21 +2,12 @@ package core
 
 import (
 	"fmt"
-	"github.com/roelofruis/spullen"
 	"net/http"
 	"strconv"
 	"time"
 )
 
 func (s *Server) handleIndex() http.HandlerFunc {
-	type indexModel struct {
-		Alert string
-
-		DevMode   bool
-		Databases []string
-		Form      *IndexForm
-	}
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		form := &IndexForm{}
 
@@ -53,9 +44,8 @@ func (s *Server) handleIndex() http.HandlerFunc {
 			return
 		}
 
-		err = s.Views.Index.ExecuteTemplate(w, "layout", &indexModel{
-			DevMode:   s.DevMode,
-			Alert:     loadingAlert,
+		err = s.Views.Index.ExecuteTemplate(w, "layout", &Index{
+			AppInfo:   AppInfo{s.DevMode, loadingAlert},
 			Databases: names,
 			Form:      form,
 		})
@@ -66,25 +56,6 @@ func (s *Server) handleIndex() http.HandlerFunc {
 }
 
 func (s *Server) handleView() http.HandlerFunc {
-	type viewModel struct {
-		Alert string
-
-		DatabaseIsDirty bool
-
-		ExistingTags []string
-		ExistingCategories []string
-		ExistingPropertyKeys []string
-
-		TotalCount  int
-		DbName      string
-		Objects     []*spullen.Object
-		PrivateMode bool
-
-		DevMode bool
-
-		Form *ObjectForm
-	}
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		form := EmptyForm()
 
@@ -116,18 +87,19 @@ func (s *Server) handleView() http.HandlerFunc {
 			totalCount += o.Quantity
 		}
 
-		err := s.Views.View.ExecuteTemplate(w, "layout", viewModel{
-			Alert:           alert,
+		err := s.Views.View.ExecuteTemplate(w, "layout", View{
+			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
+			EditObject: EditObject{
+				ExistingTags: s.Objects.GetDistinctTags(),
+				ExistingCategories: s.Objects.GetDistinctCategories(),
+				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(),
+				Form: form,
+			},
 			DatabaseIsDirty: s.Db.IsDirty(),
-			ExistingTags: s.Objects.GetDistinctTags(),
-			ExistingCategories: s.Objects.GetDistinctCategories(),
-			ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(),
 			TotalCount:      totalCount,
 			DbName:          s.Db.Name(),
 			Objects:         s.Objects.GetAll(),
 			PrivateMode:     s.PrivateMode,
-			DevMode:         s.DevMode,
-			Form:            form,
 		})
 		if err != nil {
 			fmt.Print(err.Error())
@@ -164,13 +136,6 @@ func (s *Server) handleClose() http.HandlerFunc {
 }
 
 func (s *Server) handleSplit() http.HandlerFunc {
-	type SplitModel struct {
-		Alert string
-
-		Original *ObjectForm
-		Form     *ObjectForm
-	}
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
@@ -228,10 +193,15 @@ func (s *Server) handleSplit() http.HandlerFunc {
 			}
 		}
 
-		err = s.Views.Split.ExecuteTemplate(w, "layout", SplitModel{
+		err = s.Views.Split.ExecuteTemplate(w, "layout", Split{
+			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
+			EditObject: EditObject{
+				ExistingTags: s.Objects.GetDistinctTags(),
+				ExistingCategories: s.Objects.GetDistinctCategories(),
+				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(),
+				Form: form,
+			},
 			Original: original,
-			Form:     form,
-			Alert:    alert,
 		})
 		if err != nil {
 			fmt.Print(err.Error())
@@ -240,12 +210,6 @@ func (s *Server) handleSplit() http.HandlerFunc {
 }
 
 func (s *Server) handleEdit() http.HandlerFunc {
-	type EditModel struct {
-		Alert string
-
-		Form *ObjectForm
-	}
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
@@ -291,7 +255,15 @@ func (s *Server) handleEdit() http.HandlerFunc {
 			}
 		}
 
-		err = s.Views.Edit.ExecuteTemplate(w, "layout", EditModel{Form: form, Alert: alert})
+		err = s.Views.Edit.ExecuteTemplate(w, "layout", Edit{
+			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
+			EditObject: EditObject{
+				ExistingTags: s.Objects.GetDistinctTags(),
+				ExistingCategories: s.Objects.GetDistinctCategories(),
+				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(),
+				Form: form,
+			},
+		})
 		if err != nil {
 			fmt.Print(err.Error())
 		}
