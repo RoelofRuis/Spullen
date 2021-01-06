@@ -95,7 +95,7 @@ func (f *ObjectForm) Validate() bool {
 				f.Errors["Categories"] = "Categorieën mag geen lege waardes bevatten"
 				break
 			}
-			categories = append(categories, strings.ToLower(c))
+			categories = append(categories, normalize(c))
 		}
 	}
 
@@ -108,7 +108,7 @@ func (f *ObjectForm) Validate() bool {
 				f.Errors["Tags"] = "Tags mag geen lege waardes bevatten"
 				break
 			}
-			tags = append(tags, strings.ToLower(t))
+			tags = append(tags, normalize(t))
 		}
 	}
 
@@ -128,8 +128,8 @@ func (f *ObjectForm) Validate() bool {
 				break
 			}
 			properties = append(properties, &spullen.Property{
-				strings.ToLower(keyValue[0]),
-				strings.ToLower(keyValue[1]),
+				Key:   normalize(keyValue[0]),
+				Value: normalize(keyValue[1]),
 			})
 		}
 	}
@@ -144,7 +144,7 @@ func (f *ObjectForm) Validate() bool {
 		f.object = &spullen.Object{
 			Id:         f.Id,
 			Added:      time.Unix(t, 0),
-			Name:       strings.ToLower(f.Name),
+			Name:       normalize(f.Name),
 			Quantity:   int(q),
 			Categories: categories,
 			Tags:       tags,
@@ -155,4 +155,8 @@ func (f *ObjectForm) Validate() bool {
 	}
 
 	return isValid
+}
+
+func normalize(s string) string {
+	return strings.ToLower(strings.Trim(s, " "))
 }
