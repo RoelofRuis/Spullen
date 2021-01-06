@@ -2,6 +2,15 @@ package spullen
 
 import "time"
 
+type Database interface {
+	IsOpened() bool
+	Name() string
+	Open(name string, pass []byte, openExisting bool) error
+	IsDirty() bool
+	Persist() error
+	Close() error
+}
+
 type ObjectRepository interface {
 	GetAll() []*Object
 	Get(id string) *Object

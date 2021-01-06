@@ -8,7 +8,7 @@ import (
 
 // Implement this interface for any class that can be saved as and loaded from a raw binary format.
 //
-// Implementations should then be registered with a database.
+// Implementations should then be registered with a class that implements StorableRegistry
 type Storable interface {
 	// Called with the raw data when the storable is instantiated by the database.
 	Instantiate([]byte) error
@@ -23,36 +23,12 @@ type Storable interface {
 	AfterPersist()
 }
 
-type Database interface {
-	// Whether the database is opened.
-	IsOpened() bool
-
-	// The name with which the database was opened. Can be empty if the database is not open.
-	Name() string
-
-	// Open the database by passing in the required information.
-	// A database cannot be opened twice, and should be closed first before reopening.
-	Open(name string, pass []byte, openExisting bool) error
-
-	// Whether the database is dirty. A closed database is never dirty.
-	IsDirty() bool
-
-	// Register a storable to this database.
-	// Upon opening the database, all Storables will receive a call to Initialize() with their appropriate data.
-	// After a successful persist, all Storables will receive a call to their AfterPersist callback.
-	//
-	// Calling register twice with the same id will result in an error.
-	Register(id string, h Storable) error
-
-	// Persist the database.
-	Persist() error
-
-	// Close the database. A database should be opened before it can be closed.
-	Close() error
+type StorableRegistry interface {
+	Register(id string, p Storable) error
 }
 
-func NewDatabase(useGzip bool, useEncryption bool) Database {
-	return &fileDatabase{
+func NewDatabase(useGzip bool, useEncryption bool) *FileDatabase {
+	return &FileDatabase{
 		lock:      &sync.Mutex{},
 		useGzip: useGzip,
 		useEncryption: useEncryption,
@@ -62,7 +38,7 @@ func NewDatabase(useGzip bool, useEncryption bool) Database {
 	}
 }
 
-type fileDatabase struct {
+type FileDatabase struct {
 	lock sync.Locker
 
 	useGzip bool
@@ -73,11 +49,11 @@ type fileDatabase struct {
 	storables map[string]Storable
 }
 
-func (db *fileDatabase) IsOpened() bool {
+func (db *FileDatabase) IsOpened() bool {
 	return db.isOpened
 }
 
-func (db *fileDatabase) IsDirty() bool {
+func (db *FileDatabase) IsDirty() bool {
 	if !db.isOpened {
 		return false
 	}
@@ -91,7 +67,7 @@ func (db *fileDatabase) IsDirty() bool {
 	return false
 }
 
-func (db *fileDatabase) Name() string {
+func (db *FileDatabase) Name() string {
 	if db.isOpened {
 		return db.storage.name()
 	}
@@ -99,7 +75,7 @@ func (db *fileDatabase) Name() string {
 	return ""
 }
 
-func (db *fileDatabase) Open(name string, pass []byte, openExisting bool) error {
+func (db *FileDatabase) Open(name string, pass []byte, openExisting bool) error {
 	if db.isOpened {
 		return errors.New("database is already opened")
 	}
@@ -141,7 +117,7 @@ func (db *fileDatabase) Open(name string, pass []byte, openExisting bool) error 
 	return nil
 }
 
-func (db *fileDatabase) Register(id string, p Storable) error {
+func (db *FileDatabase) Register(id string, p Storable) error {
 	_, exists := db.storables[id]
 	if exists {
 		return fmt.Errorf("storable with id [%s] was already registered", id)
@@ -155,7 +131,7 @@ func (db *fileDatabase) Register(id string, p Storable) error {
 	return nil
 }
 
-func (db *fileDatabase) Persist() error {
+func (db *FileDatabase) Persist() error {
 	if !db.IsOpened() {
 		return errors.New("database should be opened before it can be persisted")
 	}
@@ -186,7 +162,7 @@ func (db *fileDatabase) Persist() error {
 	return nil
 }
 
-func (db *fileDatabase) Close() error {
+func (db *FileDatabase) Close() error {
 	if !db.IsOpened() {
 		return errors.New("database should be opened before it can be closed")
 	}

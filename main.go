@@ -23,12 +23,14 @@ func main() {
 
 	objectRepo := spullen.NewStorableObjectRepository()
 
-	var db database.Database
+	var db *database.FileDatabase
 	if devMode {
 		db = database.NewDatabase(false, false)
 	} else {
 		db = database.NewDatabase(true, true)
 	}
+
+	_ = db.Register("object-repository", objectRepo)
 
 	server := &spullen.Server{
 		Router: http.ServeMux{},
