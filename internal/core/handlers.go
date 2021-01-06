@@ -159,6 +159,8 @@ func (s *Server) handleSplit() http.HandlerFunc {
 		}
 
 		form := FormFromObject(&object)
+		form.Quantity = "1"
+
 		object.Quantity -= 1
 		original := FormFromObject(&object)
 
