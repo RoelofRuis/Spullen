@@ -46,6 +46,9 @@ func (o objectNames) Less(i, j int) bool { return o[i].name < o[j].name }
 func (o objectNames) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
 
 func (s *StorableObjectRepository) Count() int {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
 	return len(s.objects)
 }
 
@@ -86,10 +89,16 @@ func (s *StorableObjectRepository) Put(o *spullen.Object) {
 	s.dirty = true
 }
 
-func (s *StorableObjectRepository) GetDistinctCategories() []string {
+func (s *StorableObjectRepository) GetDistinctCategories(includeHidden bool) []string {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
 	seen := map[string]struct{}{}
 	var categories []string
 	for _, o := range s.objects {
+		if !includeHidden && o.Hidden {
+			continue
+		}
 		for _, c := range o.Categories {
 			_, found := seen[c]
 			if !found {
@@ -102,10 +111,16 @@ func (s *StorableObjectRepository) GetDistinctCategories() []string {
 	return categories
 }
 
-func (s *StorableObjectRepository) GetDistinctTags() []string {
+func (s *StorableObjectRepository) GetDistinctTags(includeHidden bool) []string {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
 	seen := map[string]struct{}{}
 	var tags []string
 	for _, o := range s.objects {
+		if !includeHidden && o.Hidden {
+			continue
+		}
 		for _, t := range o.Tags {
 			_, found := seen[t]
 			if !found {
@@ -118,10 +133,16 @@ func (s *StorableObjectRepository) GetDistinctTags() []string {
 	return tags
 }
 
-func (s *StorableObjectRepository) GetDistinctPropertyKeys() []string {
+func (s *StorableObjectRepository) GetDistinctPropertyKeys(includeHidden bool) []string {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
 	seen := map[string]struct{}{}
 	var propKeys []string
 	for _, o := range s.objects {
+		if !includeHidden && o.Hidden {
+			continue
+		}
 		for _, p := range o.Properties {
 			_, found := seen[p.Key]
 			if !found {

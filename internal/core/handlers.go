@@ -85,9 +85,9 @@ func (s *Server) handleView() http.HandlerFunc {
 		err := s.Views.View.ExecuteTemplate(w, "layout", View{
 			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
 			EditObject: EditObject{
-				ExistingTags: s.Objects.GetDistinctTags(),
-				ExistingCategories: s.Objects.GetDistinctCategories(),
-				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(),
+				ExistingTags: s.Objects.GetDistinctTags(s.PrivateMode),
+				ExistingCategories: s.Objects.GetDistinctCategories(s.PrivateMode),
+				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
 				Form: form,
 			},
 			DatabaseIsDirty: s.Db.IsDirty(),
@@ -191,9 +191,9 @@ func (s *Server) handleSplit() http.HandlerFunc {
 		err = s.Views.Split.ExecuteTemplate(w, "layout", Split{
 			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
 			EditObject: EditObject{
-				ExistingTags: s.Objects.GetDistinctTags(),
-				ExistingCategories: s.Objects.GetDistinctCategories(),
-				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(),
+				ExistingTags: s.Objects.GetDistinctTags(s.PrivateMode),
+				ExistingCategories: s.Objects.GetDistinctCategories(s.PrivateMode),
+				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
 				Form: form,
 			},
 			Original: original,
@@ -253,9 +253,9 @@ func (s *Server) handleEdit() http.HandlerFunc {
 		err = s.Views.Edit.ExecuteTemplate(w, "layout", Edit{
 			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
 			EditObject: EditObject{
-				ExistingTags: s.Objects.GetDistinctTags(),
-				ExistingCategories: s.Objects.GetDistinctCategories(),
-				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(),
+				ExistingTags: s.Objects.GetDistinctTags(s.PrivateMode),
+				ExistingCategories: s.Objects.GetDistinctCategories(s.PrivateMode),
+				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
 				Form: form,
 			},
 		})

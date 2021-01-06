@@ -15,9 +15,9 @@ type ObjectRepository interface {
 	GetAll() []*Object
 	Count() int
 	Get(id string) *Object
-	GetDistinctCategories() []string
-	GetDistinctTags() []string
-	GetDistinctPropertyKeys() []string
+	GetDistinctCategories(includeHidden bool) []string
+	GetDistinctTags(includeHidden bool) []string
+	GetDistinctPropertyKeys(includeHidden bool) []string
 	Put(*Object)
 	Remove(id string)
 	Has(id string) bool
