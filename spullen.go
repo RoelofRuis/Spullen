@@ -13,6 +13,7 @@ type Database interface {
 
 type ObjectRepository interface {
 	GetAll() []*Object
+	Count() int
 	Get(id string) *Object
 	GetDistinctCategories() []string
 	GetDistinctTags() []string

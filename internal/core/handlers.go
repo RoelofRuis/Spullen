@@ -82,11 +82,6 @@ func (s *Server) handleView() http.HandlerFunc {
 			}
 		}
 
-		totalCount := 0
-		for _, o := range s.Objects.GetAll() {
-			totalCount += o.Quantity
-		}
-
 		err := s.Views.View.ExecuteTemplate(w, "layout", View{
 			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
 			EditObject: EditObject{
@@ -96,7 +91,7 @@ func (s *Server) handleView() http.HandlerFunc {
 				Form: form,
 			},
 			DatabaseIsDirty: s.Db.IsDirty(),
-			TotalCount:      totalCount,
+			TotalCount:      s.Objects.Count(),
 			DbName:          s.Db.Name(),
 			Objects:         s.Objects.GetAll(),
 			PrivateMode:     s.PrivateMode,

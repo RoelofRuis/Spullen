@@ -45,6 +45,10 @@ func (o objectNames) Len() int           { return len(o) }
 func (o objectNames) Less(i, j int) bool { return o[i].name < o[j].name }
 func (o objectNames) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
 
+func (s *StorableObjectRepository) Count() int {
+	return len(s.objects)
+}
+
 func (s *StorableObjectRepository) Get(id string) *spullen.Object {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
