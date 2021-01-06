@@ -49,7 +49,12 @@ func (s *StorableObjectRepository) Count() int {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
-	return len(s.objects)
+	var total = 0
+	for _, o := range s.objects {
+		total += o.Quantity
+	}
+
+	return total
 }
 
 func (s *StorableObjectRepository) Get(id string) *spullen.Object {
