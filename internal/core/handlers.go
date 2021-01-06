@@ -71,6 +71,10 @@ func (s *Server) handleView() http.HandlerFunc {
 
 		DatabaseIsDirty bool
 
+		ExistingTags []string
+		ExistingCategories []string
+		ExistingPropertyKeys []string
+
 		TotalCount  int
 		DbName      string
 		Objects     []*spullen.Object
@@ -115,6 +119,9 @@ func (s *Server) handleView() http.HandlerFunc {
 		err := s.Views.View.ExecuteTemplate(w, "layout", viewModel{
 			Alert:           alert,
 			DatabaseIsDirty: s.Db.IsDirty(),
+			ExistingTags: s.Objects.GetDistinctTags(),
+			ExistingCategories: s.Objects.GetDistinctCategories(),
+			ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(),
 			TotalCount:      totalCount,
 			DbName:          s.Db.Name(),
 			Objects:         s.Objects.GetAll(),
