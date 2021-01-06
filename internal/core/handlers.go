@@ -1,7 +1,8 @@
-package spullen
+package core
 
 import (
 	"fmt"
+	"github.com/roelofruis/spullen"
 	"net/http"
 	"strconv"
 	"time"
@@ -72,7 +73,7 @@ func (s *Server) handleView() http.HandlerFunc {
 
 		TotalCount  int
 		DbName      string
-		Objects     []*Object
+		Objects     []*spullen.Object
 		PrivateMode bool
 
 		DevMode bool

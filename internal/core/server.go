@@ -1,6 +1,7 @@
-package spullen
+package core
 
 import (
+	"github.com/roelofruis/spullen"
 	"html/template"
 	"net/http"
 )
@@ -13,8 +14,8 @@ type Server struct {
 	PrivateMode bool
 
 	Finder  *Finder
-	Db      Database
-	Objects ObjectRepository
+	Db      spullen.Database
+	Objects spullen.ObjectRepository
 }
 
 type Views struct {

@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/roelofruis/spullen/internal/core"
 	"github.com/roelofruis/spullen/internal/database"
-	"github.com/roelofruis/spullen/internal/spullen"
+	"github.com/roelofruis/spullen/internal/repository"
 	"log"
 	"math/rand"
 	"net/http"
@@ -21,7 +22,7 @@ func main() {
 		port = "8080"
 	}
 
-	objectRepo := spullen.NewStorableObjectRepository(&spullen.ObjectMarshallerImpl{})
+	objectRepo := repository.NewStorableObjectRepository(&core.ObjectMarshallerImpl{})
 
 	var db *database.FileDatabase
 	if devMode {
@@ -32,14 +33,14 @@ func main() {
 
 	_ = db.Register("object-repository", objectRepo)
 
-	server := &spullen.Server{
+	server := &core.Server{
 		Router: http.ServeMux{},
-		Views:  &spullen.Views{},
+		Views:  &core.Views{},
 
 		DevMode:     devMode,
 		PrivateMode: true,
 
-		Finder:  &spullen.Finder{Root: dbRoot},
+		Finder:  &core.Finder{Root: dbRoot},
 		Db:      db,
 		Objects: objectRepo,
 	}

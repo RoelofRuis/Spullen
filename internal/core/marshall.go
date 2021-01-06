@@ -1,14 +1,15 @@
-package spullen
+package core
 
 import (
 	"fmt"
+	"github.com/roelofruis/spullen"
 	"strconv"
 	"strings"
 )
 
 type ObjectMarshallerImpl struct{}
 
-func (o *ObjectMarshallerImpl) Unmarshall(record []string) (*Object, error) {
+func (o *ObjectMarshallerImpl) Unmarshall(record []string) (*spullen.Object, error) {
 	form := &ObjectForm{
 		Id:         record[0],
 		TimeAdded:  record[1],
@@ -33,7 +34,7 @@ func (o *ObjectMarshallerImpl) Unmarshall(record []string) (*Object, error) {
 	return object, nil
 }
 
-func (o *ObjectMarshallerImpl) Marshall(obj *Object) []string {
+func (o *ObjectMarshallerImpl) Marshall(obj *spullen.Object) []string {
 	var properties []string
 	for _, p := range obj.Properties {
 		properties = append(properties, fmt.Sprintf("%s=%s", p.Key, p.Value))

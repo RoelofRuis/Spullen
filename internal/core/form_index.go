@@ -1,4 +1,4 @@
-package spullen
+package core
 
 import "strconv"
 

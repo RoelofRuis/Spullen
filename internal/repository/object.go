@@ -1,8 +1,9 @@
-package spullen
+package repository
 
 import (
 	"bytes"
 	"encoding/csv"
+	"github.com/roelofruis/spullen"
 	"io"
 	"sort"
 	"strings"
@@ -13,13 +14,13 @@ type StorableObjectRepository struct {
 	lock sync.RWMutex
 
 	marshaller ObjectMarshaller
-	objects    map[string]*Object
+	objects    map[string]*spullen.Object
 	dirty      bool
 }
 
 type ObjectMarshaller interface {
-	Unmarshall(record []string) (*Object, error)
-	Marshall(obj *Object) []string
+	Unmarshall(record []string) (*spullen.Object, error)
+	Marshall(obj *spullen.Object) []string
 }
 
 func NewStorableObjectRepository(marshaller ObjectMarshaller) *StorableObjectRepository {
@@ -28,12 +29,12 @@ func NewStorableObjectRepository(marshaller ObjectMarshaller) *StorableObjectRep
 
 		marshaller: marshaller,
 
-		objects: map[string]*Object{},
+		objects: map[string]*spullen.Object{},
 		dirty:   false,
 	}
 }
 
-func (s *StorableObjectRepository) Get(id string) *Object {
+func (s *StorableObjectRepository) Get(id string) *spullen.Object {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
@@ -55,7 +56,7 @@ func (o objectNames) Len() int           { return len(o) }
 func (o objectNames) Less(i, j int) bool { return o[i].name < o[j].name }
 func (o objectNames) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
 
-func (s *StorableObjectRepository) GetAll() []*Object {
+func (s *StorableObjectRepository) GetAll() []*spullen.Object {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
@@ -65,7 +66,7 @@ func (s *StorableObjectRepository) GetAll() []*Object {
 	}
 	sort.Sort(identifiers)
 
-	var objectList []*Object = nil
+	var objectList []*spullen.Object = nil
 	for _, i := range identifiers {
 		objectList = append(objectList, s.objects[i.id])
 	}
@@ -73,7 +74,7 @@ func (s *StorableObjectRepository) GetAll() []*Object {
 	return objectList
 }
 
-func (s *StorableObjectRepository) Put(o *Object) {
+func (s *StorableObjectRepository) Put(o *spullen.Object) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
@@ -113,7 +114,7 @@ func (s *StorableObjectRepository) Instantiate(data []byte) error {
 	r := csv.NewReader(strings.NewReader(string(data)))
 	r.Comma = ';'
 
-	var objects = make(map[string]*Object)
+	var objects = make(map[string]*spullen.Object)
 	for {
 		record, err := r.Read()
 		if err == io.EOF {

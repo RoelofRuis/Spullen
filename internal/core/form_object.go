@@ -1,8 +1,9 @@
-package spullen
+package core
 
 import (
 	"errors"
 	"fmt"
+	"github.com/roelofruis/spullen"
 	"strconv"
 	"strings"
 	"time"
@@ -22,14 +23,14 @@ type ObjectForm struct {
 
 	Errors map[string]string
 
-	object *Object
+	object *spullen.Object
 }
 
 func EmptyForm() *ObjectForm {
 	return &ObjectForm{Quantity: "1"}
 }
 
-func FormFromObject(o *Object) *ObjectForm {
+func FormFromObject(o *spullen.Object) *ObjectForm {
 	var propertyStrings []string = nil
 	for _, p := range o.Properties {
 		propertyStrings = append(propertyStrings, p.Key+"="+p.Value)
@@ -52,7 +53,7 @@ func FormFromObject(o *Object) *ObjectForm {
 	}
 }
 
-func (f *ObjectForm) GetObject() (*Object, error) {
+func (f *ObjectForm) GetObject() (*spullen.Object, error) {
 	if f.object == nil {
 		return nil, errors.New("form has not been validated")
 	}
@@ -111,9 +112,9 @@ func (f *ObjectForm) Validate() bool {
 		}
 	}
 
-	var properties []*Property
+	var properties []*spullen.Property
 	if f.Properties == "" {
-		properties = []*Property{}
+		properties = []*spullen.Property{}
 	} else {
 		for _, p := range strings.Split(f.Properties, ",") {
 			if len(p) == 0 {
@@ -126,7 +127,7 @@ func (f *ObjectForm) Validate() bool {
 				f.Errors["Properties"] = fmt.Sprintf("Ongeldige eigenschap '%s'", p)
 				break
 			}
-			properties = append(properties, &Property{
+			properties = append(properties, &spullen.Property{
 				strings.ToLower(keyValue[0]),
 				strings.ToLower(keyValue[1]),
 			})
@@ -140,7 +141,7 @@ func (f *ObjectForm) Validate() bool {
 
 	isValid := len(f.Errors) == 0
 	if isValid {
-		f.object = &Object{
+		f.object = &spullen.Object{
 			Id:         f.Id,
 			Added:      time.Unix(t, 0),
 			Name:       strings.ToLower(f.Name),
