@@ -27,9 +27,9 @@ type Views struct {
 
 func (s *Server) Templates() {
 	s.Views.Index = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/index.gohtml"))
-	s.Views.View = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/view.gohtml"))
-	s.Views.Edit = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/edit.gohtml"))
-	s.Views.Split = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/split.gohtml"))
+	s.Views.View = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/object-form.gohtml", "./static/view.gohtml"))
+	s.Views.Edit = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/object-form.gohtml", "./static/edit.gohtml"))
+	s.Views.Split = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/object-form.gohtml", "./static/split.gohtml"))
 }
 
 func (s *Server) Routes() {
