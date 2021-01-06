@@ -37,6 +37,9 @@
                 {{ else }}
                     <input id="tags-field" name="tags" type="text" class="form-control form-control-sm" value="{{ .Form.Tags }}" autocomplete="off">
                 {{ end }}
+                {{ range .ExistingTags }}
+                    <span class="badge badge-pill badge-info">{{ . }}</span>
+                {{ end }}
             </div>
             <div class="form-group">
                 <label for="category-field">Categorieën</label>
@@ -47,6 +50,9 @@
                 {{ else }}
                     <input id="category-field" name="categories" type="text" class="form-control form-control-sm" value="{{ .Form.Categories }}" autocomplete="off">
                 {{ end }}
+                {{ range .ExistingCategories }}
+                    <span class="badge badge-pill badge-dark">{{ . }}</span>
+                {{ end }}
             </div>
             <div class="form-group">
                 <label for="properties-field">Eigenschappen</label>
@@ -56,6 +62,9 @@
                     <div class="invalid-feedback">{{ .Form.Errors.Properties }}</div>
                 {{ else }}
                     <input id="properties-field" name="properties" type="text" class="form-control form-control-sm" value="{{ .Form.Properties }}" autocomplete="off">
+                {{ end }}
+                {{ range .ExistingPropertyKeys }}
+                    <span class="badge badge-pill badge-secondary">{{ . }}</span>
                 {{ end }}
             </div>
             <div class="form-group">
