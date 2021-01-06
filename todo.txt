@@ -1,6 +1,5 @@
 - Zie de logica/gebruik van 'Notion'
 - Categorieen en tags vullen
 - Afsplitsen met variabel aantal
-- Privemodus hernoemen: 'inclusief verborgen items'
 - Objecten niet weggooien, metadata toevoegen, wanneer veranderd
-- Metadata van plaats
+- Metadata van plaats?
