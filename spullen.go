@@ -14,6 +14,9 @@ type Database interface {
 type ObjectRepository interface {
 	GetAll() []*Object
 	Get(id string) *Object
+	GetDistinctCategories() []string
+	GetDistinctTags() []string
+	GetDistinctPropertyKeys() []string
 	Put(*Object)
 	Remove(id string)
 	Has(id string) bool

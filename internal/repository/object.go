@@ -34,17 +34,6 @@ func NewStorableObjectRepository(marshaller ObjectMarshaller) *StorableObjectRep
 	}
 }
 
-func (s *StorableObjectRepository) Get(id string) *spullen.Object {
-	s.lock.RLock()
-	defer s.lock.RUnlock()
-
-	if object, found := s.objects[id]; found {
-		return object
-	}
-
-	return nil
-}
-
 type objectName struct {
 	id   string
 	name string
@@ -55,6 +44,17 @@ type objectNames []objectName
 func (o objectNames) Len() int           { return len(o) }
 func (o objectNames) Less(i, j int) bool { return o[i].name < o[j].name }
 func (o objectNames) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
+
+func (s *StorableObjectRepository) Get(id string) *spullen.Object {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
+	if object, found := s.objects[id]; found {
+		return object
+	}
+
+	return nil
+}
 
 func (s *StorableObjectRepository) GetAll() []*spullen.Object {
 	s.lock.RLock()
@@ -98,6 +98,26 @@ func (s *StorableObjectRepository) Remove(id string) {
 	s.dirty = true
 }
 
+func (s *StorableObjectRepository) GetDistinctCategories() []string {
+	// TODO: implement
+
+	return nil
+}
+
+func (s *StorableObjectRepository) GetDistinctTags() []string {
+	// TODO: implement
+
+	return nil
+}
+
+func (s *StorableObjectRepository) GetDistinctPropertyKeys() []string {
+	// TODO: implement
+
+	return nil
+}
+
+// --- LOADING AND SAVING
+// Ensuring it is a Storable
 func (s *StorableObjectRepository) IsDirty() bool {
 	return s.dirty
 }
@@ -109,7 +129,6 @@ func (s *StorableObjectRepository) AfterPersist() {
 
 	s.dirty = false
 }
-
 func (s *StorableObjectRepository) Instantiate(data []byte) error {
 	r := csv.NewReader(strings.NewReader(string(data)))
 	r.Comma = ';'
