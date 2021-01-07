@@ -23,6 +23,7 @@ type Views struct {
 	New   *template.Template
 	View  *template.Template
 	Edit  *template.Template
+	Delete *template.Template
 	Split *template.Template
 }
 
@@ -31,6 +32,7 @@ func (s *Server) Templates() {
 	s.Views.New = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/new.gohtml"))
 	s.Views.View = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/object-form.gohtml", "./static/view.gohtml"))
 	s.Views.Edit = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/object-form.gohtml", "./static/edit.gohtml"))
+	s.Views.Delete = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/delete.gohtml"))
 	s.Views.Split = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/object-form.gohtml", "./static/split.gohtml"))
 }
 

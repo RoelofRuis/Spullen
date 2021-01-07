@@ -1,0 +1,16 @@
+{{ define "navbar" }}{{ end }}
+
+{{ define "content" }}
+<div class="row mt-2">
+    <div class="col">
+        <h4>Verwijderen</h4>
+        {{ with .Alert }}
+            <div class="alert alert-danger">{{ . }}</div>
+        {{ end }}
+        <form action="/delete?id={{ .Form.Id }}" method="post">
+
+        </form>
+    </div>
+    <div class="col"></div>
+</div>
+{{ end }}

@@ -315,12 +315,39 @@ func (s *Server) handleDelete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
-			http.Error(w, "unable to parse form", http.StatusBadRequest)
+			println(err.Error())
+			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
-		s.Objects.Remove(r.Form.Get("id"))
 
-		http.Redirect(w, r, "/view", http.StatusSeeOther)
+		id := r.Form.Get("id")
+		object := s.Objects.Get(id)
+		if object == nil {
+			http.Error(w, "object does not exist", http.StatusNotFound)
+			return
+		}
+
+		if !s.PrivateMode && object.Hidden {
+			http.Error(w, "object can not be edited", http.StatusForbidden)
+			return
+		}
+
+		original := FormFromObject(object)
+
+		var alert = ""
+		form := &DeleteForm{}
+		if r.Method == http.MethodPost {
+			// TODO:
+		}
+
+		err = s.Views.Split.ExecuteTemplate(w, "layout", Delete{
+			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
+			Original: original,
+			Form: form,
+		})
+		if err != nil {
+			fmt.Print(err.Error())
+		}
 	}
 }
 

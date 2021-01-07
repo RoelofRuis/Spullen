@@ -45,3 +45,10 @@ type Edit struct {
 	AppInfo
 	EditObject
 }
+
+type Delete struct {
+	AppInfo
+
+	Original *ObjectForm
+	Form *DeleteForm
+}
