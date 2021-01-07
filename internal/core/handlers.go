@@ -7,27 +7,30 @@ import (
 	"time"
 )
 
-func (s *Server) handleIndex() http.HandlerFunc {
+func (s *Server) handleNew() http.HandlerFunc {
+	return func (w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "todo", http.StatusNotImplemented)
+	}
+}
+
+func (s *Server) handleOpen() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		form := &IndexForm{}
+		form := &OpenDatabaseForm{}
 
 		var loadingAlert = ""
 		if r.Method == http.MethodPost {
-			form.ExistingDatabaseName = r.PostFormValue("existing-db")
-			form.NewDatabaseName = r.PostFormValue("new-db")
+			form.Database = r.PostFormValue("database")
 			form.Password = r.PostFormValue("password")
-			form.PrivateMode = r.PostFormValue("private-mode")
+			form.ShowHiddenItems = r.PostFormValue("show-hidden-items")
 
 			if form.Validate() {
 				if s.Db.IsOpened() {
 					_ = s.Db.Close()
 				}
 
-				openExisting := !form.isNew
-
-				err := s.Db.Open(form.database, []byte(form.Password), openExisting)
+				err := s.Db.Open(form.Database, []byte(form.Password), true)
 				if err == nil {
-					s.PrivateMode = form.isPrivateMode
+					s.PrivateMode = form.showHiddenItems
 
 					http.Redirect(w, r, "/view", http.StatusSeeOther)
 					return
@@ -44,7 +47,7 @@ func (s *Server) handleIndex() http.HandlerFunc {
 			return
 		}
 
-		err = s.Views.Index.ExecuteTemplate(w, "layout", &Index{
+		err = s.Views.Open.ExecuteTemplate(w, "layout", &Index{
 			AppInfo:   AppInfo{s.DevMode, loadingAlert},
 			Databases: names,
 			Form:      form,

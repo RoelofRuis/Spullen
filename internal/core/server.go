@@ -19,21 +19,24 @@ type Server struct {
 }
 
 type Views struct {
-	Index *template.Template
+	Open  *template.Template
+	New   *template.Template
 	View  *template.Template
 	Edit  *template.Template
 	Split *template.Template
 }
 
 func (s *Server) Templates() {
-	s.Views.Index = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/index.gohtml"))
+	s.Views.Open = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/open.gohtml"))
+	s.Views.New = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/new.gohtml"))
 	s.Views.View = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/object-form.gohtml", "./static/view.gohtml"))
 	s.Views.Edit = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/object-form.gohtml", "./static/edit.gohtml"))
 	s.Views.Split = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/object-form.gohtml", "./static/split.gohtml"))
 }
 
 func (s *Server) Routes() {
-	s.Router.HandleFunc("/", s.handleIndex())
+	s.Router.HandleFunc("/", s.handleOpen())
+	s.Router.HandleFunc("/new", s.handleNew())
 	s.Router.HandleFunc("/view", s.withDatabase(s.handleView()))
 	s.Router.HandleFunc("/edit", s.withDatabase(s.handleEdit()))
 	s.Router.HandleFunc("/split", s.withDatabase(s.handleSplit()))

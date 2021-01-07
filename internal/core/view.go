@@ -12,7 +12,7 @@ type Index struct {
 	AppInfo
 
 	Databases []string
-	Form      *IndexForm
+	Form      *OpenDatabaseForm
 }
 
 type EditObject struct {
