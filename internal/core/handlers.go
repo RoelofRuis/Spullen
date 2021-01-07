@@ -13,10 +13,7 @@ import (
 
 func (s *Server) handleNew() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		form, err := NewDatabaseForm(s.Finder)
-		if err != nil {
-			log.Fatal("Error when creating form database form", err.Error())
-		}
+		form := NewDatabaseForm(s.Finder)
 
 		var alert = ""
 		if r.Method == http.MethodPost {
@@ -53,10 +50,7 @@ func (s *Server) handleNew() http.HandlerFunc {
 
 func (s *Server) handleOpen() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		form, err := NewDatabaseForm(s.Finder)
-		if err != nil {
-			log.Fatal("Error when creating form database form", err.Error())
-		}
+		form := NewDatabaseForm(s.Finder)
 
 		var alert = ""
 		if r.Method == http.MethodPost {

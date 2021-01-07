@@ -1,15 +1,18 @@
 package core
 
 import (
+	"fmt"
+	"log"
 	"strconv"
 )
 
-func NewDatabaseForm(finder *Finder) (*DatabaseForm, error) {
+func NewDatabaseForm(finder *Finder) *DatabaseForm {
 	databases, err := finder.FindDatabases()
 	if err != nil {
-		return nil, err
+		log.Print(fmt.Sprintf("Error finding database: %s", err.Error()))
+		databases = []string{}
 	}
-	return &DatabaseForm{AvailableDatabases: databases}, nil
+	return &DatabaseForm{AvailableDatabases: databases}
 }
 
 type DatabaseForm struct {
