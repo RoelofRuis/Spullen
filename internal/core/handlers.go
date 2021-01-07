@@ -26,6 +26,7 @@ func (s *Server) handleLoadDatabase(view *template.Template, isExistingDatabase 
 					if err != nil {
 						log.Print(fmt.Sprintf("unable to close database: %s", err.Error()))
 						http.Error(w, "error", http.StatusInternalServerError)
+						return
 					}
 				}
 
@@ -47,7 +48,6 @@ func (s *Server) handleLoadDatabase(view *template.Template, isExistingDatabase 
 			Alert:   alert,
 			Form:    form,
 		})
-
 	}
 }
 
@@ -55,7 +55,6 @@ func (s *Server) handleView() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		form := EmptyForm()
 
-		var alert = ""
 		if r.Method == http.MethodPost {
 			form.Id = s.MakeId()
 			form.TimeAdded = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
@@ -64,7 +63,9 @@ func (s *Server) handleView() http.HandlerFunc {
 			if form.Validate() {
 				obj, err := form.GetObject()
 				if err != nil {
-					alert = fmt.Sprintf("Error when getting object from form\n%s", err.Error())
+					log.Print(err.Error())
+					http.Error(w, "error", http.StatusInternalServerError)
+					return
 				}
 
 				s.Objects.Put(obj)
@@ -74,7 +75,6 @@ func (s *Server) handleView() http.HandlerFunc {
 
 		Render(w, s.Views.View, &View{
 			AppInfo: s.AppInfo(),
-			Alert:   alert,
 			EditObject: EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
@@ -116,6 +116,7 @@ func (s *Server) handleClose() http.HandlerFunc {
 		if err != nil {
 			log.Print(fmt.Sprintf("unable to close database: %s", err.Error()))
 			http.Error(w, "error", http.StatusInternalServerError)
+			return
 		}
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -125,7 +126,7 @@ func (s *Server) handleClose() http.HandlerFunc {
 func (s *Server) handleSplit(object *spullen.Object) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if object.Quantity < 2 {
-			http.Error(w, "object cannot be split", http.StatusBadRequest)
+			http.Error(w, "object cannot be split", http.StatusConflict)
 			return
 		}
 
@@ -222,6 +223,7 @@ func (s *Server) handleDelete(object *spullen.Object) http.HandlerFunc {
 			form.Reason = r.PostFormValue("reason")
 
 			if form.Validate() {
+				// TODO: implement actual logic
 				alert = "TODO: this is not implemented yet, object should now be deleted!"
 			}
 		}

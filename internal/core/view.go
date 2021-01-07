@@ -28,8 +28,6 @@ type View struct {
 	AppInfo
 	EditObject
 
-	Alert string
-
 	DatabaseIsDirty bool
 
 	TotalCount  int

@@ -24,9 +24,6 @@
 <div class="row mt-2">
     <div class="col">
         <h4>Toevoegen</h4>
-        {{ with .Alert }}
-            <div class="alert alert-danger">{{ . }}</div>
-        {{ end }}
         <form action="/view" method="post">
             {{ template "object-edit" . }}
             <button type="submit" class="btn btn-outline-primary">Toevoegen</button>
