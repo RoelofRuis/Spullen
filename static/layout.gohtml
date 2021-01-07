@@ -9,7 +9,7 @@
 <body>
 <div class="container">
     <nav class="navbar navbar-expand navbar-light bg-light">
-        <span class="navbar-brand mb-1 h1">Spullen <small class="text-muted">{{ .Version }}</small></span>
+        <span class="navbar-brand mb-1 h1">Spullen <small class="text-muted">{{ .Version.String }}</small></span>
         {{ if .DevMode }}
             <b class="text-danger">DEV MODE{{ if .DbOpen }} [DB OPEN]{{ end }}</b>
         {{ end }}
