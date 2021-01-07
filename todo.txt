@@ -1,3 +1,6 @@
 - Zie de logica/gebruik van 'Notion'
 - Categorieen en tags vullen
 - Objecten niet weggooien, metadata toevoegen, wanneer veranderd
+
+BUGS:
+- Fix object reference error in `Split` (maybe pass object from middleware in stead of reference)
