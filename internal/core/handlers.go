@@ -55,13 +55,7 @@ func (s *Server) handleView() http.HandlerFunc {
 		if r.Method == http.MethodPost {
 			form.Id = s.MakeId()
 			form.TimeAdded = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
-			form.Name = r.PostFormValue("name")
-			form.Quantity = r.PostFormValue("quantity")
-			form.Categories = r.PostFormValue("categories")
-			form.Tags = r.PostFormValue("tags")
-			form.Properties = r.PostFormValue("properties")
-			form.Hidden = r.PostFormValue("hidden")
-			form.Notes = r.PostFormValue("notes")
+			form.FillFromRequest(r)
 
 			if form.Validate() {
 				obj, err := form.GetObject()
@@ -122,13 +116,6 @@ func (s *Server) handleClose() http.HandlerFunc {
 
 func (s *Server) handleSplit() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseForm()
-		if err != nil {
-			println(err.Error())
-			http.Error(w, "bad request", http.StatusBadRequest)
-			return
-		}
-
 		id := spullen.ObjectId(r.Form.Get("id"))
 		objectPointer := s.Objects.Get(id)
 		if objectPointer == nil {
@@ -155,13 +142,7 @@ func (s *Server) handleSplit() http.HandlerFunc {
 		if r.Method == http.MethodPost {
 			form.Id = s.MakeId()
 			form.TimeAdded = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
-			form.Name = r.PostFormValue("name")
-			form.Quantity = r.PostFormValue("quantity")
-			form.Categories = r.PostFormValue("categories")
-			form.Tags = r.PostFormValue("tags")
-			form.Properties = r.PostFormValue("properties")
-			form.Hidden = r.PostFormValue("hidden")
-			form.Notes = r.PostFormValue("notes")
+			form.FillFromRequest(r)
 
 			if form.Validate() {
 				splitObject, err := form.GetObject()
@@ -204,13 +185,6 @@ func (s *Server) handleSplit() http.HandlerFunc {
 
 func (s *Server) handleEdit() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseForm()
-		if err != nil {
-			println(err.Error())
-			http.Error(w, "bad request", http.StatusBadRequest)
-			return
-		}
-
 		id := spullen.ObjectId(r.Form.Get("id"))
 		object := s.Objects.Get(id)
 		if object == nil {
@@ -227,13 +201,7 @@ func (s *Server) handleEdit() http.HandlerFunc {
 
 		var alert = ""
 		if r.Method == http.MethodPost {
-			form.Name = r.PostFormValue("name")
-			form.Quantity = r.PostFormValue("quantity")
-			form.Categories = r.PostFormValue("categories")
-			form.Tags = r.PostFormValue("tags")
-			form.Properties = r.PostFormValue("properties")
-			form.Hidden = r.PostFormValue("hidden")
-			form.Notes = r.PostFormValue("notes")
+			form.FillFromRequest(r)
 
 			if form.Validate() {
 				obj, err := form.GetObject()
@@ -263,13 +231,6 @@ func (s *Server) handleEdit() http.HandlerFunc {
 
 func (s *Server) handleDelete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseForm()
-		if err != nil {
-			println(err.Error())
-			http.Error(w, "bad request", http.StatusBadRequest)
-			return
-		}
-
 		id := spullen.ObjectId(r.Form.Get("id"))
 		object := s.Objects.Get(id)
 		if object == nil {
@@ -306,13 +267,6 @@ func (s *Server) handleDelete() http.HandlerFunc {
 
 func (s *Server) handleDestroy() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseForm()
-		if err != nil {
-			println(err.Error())
-			http.Error(w, "bad request", http.StatusBadRequest)
-			return
-		}
-
 		id := spullen.ObjectId(r.Form.Get("id"))
 		if !s.Objects.Has(id) {
 			http.Error(w, "object does not exist", http.StatusNotFound)

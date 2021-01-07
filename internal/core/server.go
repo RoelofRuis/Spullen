@@ -1,8 +1,10 @@
 package core
 
 import (
+	"fmt"
 	"github.com/roelofruis/spullen"
 	"html/template"
+	"log"
 	"net/http"
 )
 
@@ -40,14 +42,14 @@ func (s *Server) Templates() {
 func (s *Server) Routes() {
 	s.Router.HandleFunc("/", s.handleLoadDatabase(s.Views.Open, true))
 	s.Router.HandleFunc("/new", s.handleLoadDatabase(s.Views.New, false))
-
-	s.Router.HandleFunc("/view", s.withDatabase(s.handleView()))
-	s.Router.HandleFunc("/edit", s.withDatabase(s.handleEdit()))
-	s.Router.HandleFunc("/split", s.withDatabase(s.handleSplit()))
-	s.Router.HandleFunc("/delete", s.withDatabase(s.handleDelete()))
 	s.Router.HandleFunc("/save", s.withDatabase(s.handleSave()))
 	s.Router.HandleFunc("/close", s.withDatabase(s.handleClose()))
-	s.Router.HandleFunc("/destroy", s.withDatabase(s.handleDestroy()))
+
+	s.Router.HandleFunc("/view", s.withDatabase(s.handleView()))
+	s.Router.HandleFunc("/edit", s.withDatabase(s.withParsedForm(s.handleEdit())))
+	s.Router.HandleFunc("/split", s.withDatabase(s.withParsedForm(s.handleSplit())))
+	s.Router.HandleFunc("/delete", s.withDatabase(s.withParsedForm(s.handleDelete())))
+	s.Router.HandleFunc("/destroy", s.withDatabase(s.withParsedForm(s.handleDestroy())))
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -62,6 +64,18 @@ func (s *Server) withDatabase(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !s.Db.IsOpened() {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+		h(w, r)
+	}
+}
+
+func (s *Server) withParsedForm(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
+		if err != nil {
+			log.Print(fmt.Sprintf("error when parsing form: %s", err.Error()))
+			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
 		h(w, r)

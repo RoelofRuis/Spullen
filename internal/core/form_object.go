@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/roelofruis/spullen"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -28,6 +29,16 @@ type ObjectForm struct {
 
 func EmptyForm() *ObjectForm {
 	return &ObjectForm{Quantity: "1"}
+}
+
+func (f *ObjectForm) FillFromRequest(r *http.Request) {
+	f.Name = r.PostFormValue("name")
+	f.Quantity = r.PostFormValue("quantity")
+	f.Categories = r.PostFormValue("categories")
+	f.Tags = r.PostFormValue("tags")
+	f.Properties = r.PostFormValue("properties")
+	f.Hidden = r.PostFormValue("hidden")
+	f.Notes = r.PostFormValue("notes")
 }
 
 func FormFromObject(o *spullen.Object) *ObjectForm {
