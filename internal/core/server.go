@@ -47,6 +47,7 @@ func (s *Server) Routes() {
 	s.Router.HandleFunc("/delete", s.withDatabase(s.handleDelete()))
 	s.Router.HandleFunc("/save", s.withDatabase(s.handleSave()))
 	s.Router.HandleFunc("/close", s.withDatabase(s.handleClose()))
+	s.Router.HandleFunc("/destroy", s.withDatabase(s.handleDestroy()))
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {

@@ -351,6 +351,28 @@ func (s *Server) handleDelete() http.HandlerFunc {
 	}
 }
 
+func (s *Server) handleDestroy() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
+		if err != nil {
+			println(err.Error())
+			http.Error(w, "bad request", http.StatusBadRequest)
+			return
+		}
+
+		id := r.Form.Get("id")
+		if !s.Objects.Has(id) {
+			http.Error(w, "object does not exist", http.StatusNotFound)
+			return
+		}
+
+		s.Objects.Remove(id)
+
+		http.Redirect(w, r, "/view", http.StatusSeeOther)
+		return
+	}
+}
+
 func (s *Server) makeId() string {
 	var id string
 	for {
