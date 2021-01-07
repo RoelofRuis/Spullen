@@ -11,12 +11,12 @@ type AppInfo struct {
 type Database struct {
 	AppInfo
 
-	Form      *DatabaseForm
+	Form *DatabaseForm
 }
 
 type EditObject struct {
-	ExistingTags []string
-	ExistingCategories []string
+	ExistingTags         []string
+	ExistingCategories   []string
 	ExistingPropertyKeys []string
 
 	Form *ObjectForm
@@ -28,9 +28,9 @@ type View struct {
 
 	DatabaseIsDirty bool
 
-	TotalCount int
-	DbName string
-	Objects []*spullen.Object
+	TotalCount  int
+	DbName      string
+	Objects     []*spullen.Object
 	PrivateMode bool
 }
 

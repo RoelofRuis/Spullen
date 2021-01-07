@@ -3,6 +3,7 @@ package database
 import (
 	"errors"
 	"fmt"
+	"log"
 	"sync"
 )
 
@@ -29,22 +30,22 @@ type StorableRegistry interface {
 
 func NewDatabase(useGzip bool, useEncryption bool) *FileDatabase {
 	return &FileDatabase{
-		lock:      &sync.Mutex{},
-		useGzip: useGzip,
+		lock:          &sync.Mutex{},
+		useGzip:       useGzip,
 		useEncryption: useEncryption,
-		isOpened:  false,
-		storage:   nil,
-		storables: map[string]Storable{},
+		isOpened:      false,
+		storage:       nil,
+		storables:     map[string]Storable{},
 	}
 }
 
 type FileDatabase struct {
 	lock sync.Locker
 
-	useGzip bool
+	useGzip       bool
 	useEncryption bool
-	isOpened bool
-	storage  storage
+	isOpened      bool
+	storage       storage
 
 	storables map[string]Storable
 }
@@ -100,7 +101,8 @@ func (db *FileDatabase) Open(name string, pass []byte, openExisting bool) error 
 	for name, s := range db.storables {
 		data, hasKey := dataMap[name]
 		if openExisting && !hasKey {
-			return fmt.Errorf("data missing for storable [%s]", name)
+			log.Printf("data missing for storable [%s]", name)
+			continue
 		}
 		err := s.Instantiate(data)
 		if err != nil {
