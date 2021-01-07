@@ -30,22 +30,22 @@ type StorableRegistry interface {
 
 func NewDatabase(useGzip bool, useEncryption bool) *FileDatabase {
 	return &FileDatabase{
-		lock:      &sync.Mutex{},
-		useGzip: useGzip,
+		lock:          &sync.Mutex{},
+		useGzip:       useGzip,
 		useEncryption: useEncryption,
-		isOpened:  false,
-		storage:   nil,
-		storables: map[string]Storable{},
+		isOpened:      false,
+		storage:       nil,
+		storables:     map[string]Storable{},
 	}
 }
 
 type FileDatabase struct {
 	lock sync.Locker
 
-	useGzip bool
+	useGzip       bool
 	useEncryption bool
-	isOpened bool
-	storage  storage
+	isOpened      bool
+	storage       storage
 
 	storables map[string]Storable
 }

@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) handleNew() http.HandlerFunc {
-	return func (w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		form, err := NewDatabaseForm(s.Finder)
 		if err != nil {
 			log.Fatal("Error when creating form database form", err.Error())
@@ -40,8 +40,8 @@ func (s *Server) handleNew() http.HandlerFunc {
 		}
 
 		err = s.Views.New.ExecuteTemplate(w, "layout", &Database{
-			AppInfo:   AppInfo{s.DevMode, alert},
-			Form:      form,
+			AppInfo: AppInfo{s.DevMode, alert},
+			Form:    form,
 		})
 		if err != nil {
 			fmt.Print(err.Error())
@@ -82,8 +82,8 @@ func (s *Server) handleOpen() http.HandlerFunc {
 		}
 
 		err = s.Views.Open.ExecuteTemplate(w, "layout", &Database{
-			AppInfo:   AppInfo{s.DevMode, alert},
-			Form:      form,
+			AppInfo: AppInfo{s.DevMode, alert},
+			Form:    form,
 		})
 		if err != nil {
 			fmt.Print(err.Error())
@@ -121,10 +121,10 @@ func (s *Server) handleView() http.HandlerFunc {
 		err := s.Views.View.ExecuteTemplate(w, "layout", View{
 			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
 			EditObject: EditObject{
-				ExistingTags: s.Objects.GetDistinctTags(s.PrivateMode),
-				ExistingCategories: s.Objects.GetDistinctCategories(s.PrivateMode),
+				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
+				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
 				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
-				Form: form,
+				Form:                 form,
 			},
 			DatabaseIsDirty: s.Db.IsDirty(),
 			TotalCount:      s.Objects.Count(),
@@ -237,10 +237,10 @@ func (s *Server) handleSplit() http.HandlerFunc {
 		err = s.Views.Split.ExecuteTemplate(w, "layout", Split{
 			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
 			EditObject: EditObject{
-				ExistingTags: s.Objects.GetDistinctTags(s.PrivateMode),
-				ExistingCategories: s.Objects.GetDistinctCategories(s.PrivateMode),
+				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
+				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
 				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
-				Form: form,
+				Form:                 form,
 			},
 			Original: original,
 		})
@@ -299,10 +299,10 @@ func (s *Server) handleEdit() http.HandlerFunc {
 		err = s.Views.Edit.ExecuteTemplate(w, "layout", Edit{
 			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
 			EditObject: EditObject{
-				ExistingTags: s.Objects.GetDistinctTags(s.PrivateMode),
-				ExistingCategories: s.Objects.GetDistinctCategories(s.PrivateMode),
+				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
+				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
 				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
-				Form: form,
+				Form:                 form,
 			},
 		})
 		if err != nil {

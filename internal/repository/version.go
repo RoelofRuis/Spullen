@@ -3,7 +3,7 @@ package repository
 import "strconv"
 
 type StorableVersionRepository struct {
-	appVersion int
+	appVersion    int
 	storedVersion int
 }
 
