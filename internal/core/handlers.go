@@ -114,28 +114,14 @@ func (s *Server) handleClose() http.HandlerFunc {
 	}
 }
 
-func (s *Server) handleSplit() http.HandlerFunc {
+func (s *Server) handleSplit(object *spullen.Object) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := spullen.ObjectId(r.Form.Get("id"))
-		objectPointer := s.Objects.Get(id)
-		if objectPointer == nil {
-			http.Error(w, "object does not exist", http.StatusNotFound)
-			return
-		}
-
-		object := *objectPointer
-
 		if object.Quantity < 2 {
 			http.Error(w, "object cannot be split", http.StatusBadRequest)
 			return
 		}
 
-		if !s.PrivateMode && object.Hidden {
-			http.Error(w, "object can not be edited", http.StatusForbidden)
-			return
-		}
-
-		form := FormFromObject(&object)
+		form := FormFromObject(object)
 		form.Quantity = "1"
 
 		var alert = ""
@@ -152,7 +138,7 @@ func (s *Server) handleSplit() http.HandlerFunc {
 					object.Quantity -= splitObject.Quantity
 
 					s.Objects.Put(splitObject)
-					s.Objects.Put(&object)
+					s.Objects.Put(object)
 
 					http.Redirect(w, r, "/view", http.StatusSeeOther)
 					return
@@ -167,7 +153,7 @@ func (s *Server) handleSplit() http.HandlerFunc {
 			object.Quantity -= int(qty)
 		}
 
-		original := FormFromObject(&object)
+		original := FormFromObject(object)
 
 		Render(w, s.Views.Split, &Split{
 			AppInfo: s.AppInfo(),
@@ -183,20 +169,8 @@ func (s *Server) handleSplit() http.HandlerFunc {
 	}
 }
 
-func (s *Server) handleEdit() http.HandlerFunc {
+func (s *Server) handleEdit(object *spullen.Object) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := spullen.ObjectId(r.Form.Get("id"))
-		object := s.Objects.Get(id)
-		if object == nil {
-			http.Error(w, "object does not exist", http.StatusNotFound)
-			return
-		}
-
-		if !s.PrivateMode && object.Hidden {
-			http.Error(w, "object can not be edited", http.StatusForbidden)
-			return
-		}
-
 		form := FormFromObject(object)
 
 		var alert = ""
@@ -229,24 +203,12 @@ func (s *Server) handleEdit() http.HandlerFunc {
 	}
 }
 
-func (s *Server) handleDelete() http.HandlerFunc {
+func (s *Server) handleDelete(object *spullen.Object) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := spullen.ObjectId(r.Form.Get("id"))
-		object := s.Objects.Get(id)
-		if object == nil {
-			http.Error(w, "object does not exist", http.StatusNotFound)
-			return
-		}
-
-		if !s.PrivateMode && object.Hidden {
-			http.Error(w, "object can not be edited", http.StatusForbidden)
-			return
-		}
-
 		original := FormFromObject(object)
 
 		var alert = ""
-		form := &DeleteForm{Id: id}
+		form := &DeleteForm{Id: object.Id}
 		if r.Method == http.MethodPost {
 			form.RemovedAt = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
 			form.Reason = r.PostFormValue("reason")
@@ -265,15 +227,9 @@ func (s *Server) handleDelete() http.HandlerFunc {
 	}
 }
 
-func (s *Server) handleDestroy() http.HandlerFunc {
+func (s *Server) handleDestroy(object *spullen.Object) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := spullen.ObjectId(r.Form.Get("id"))
-		if !s.Objects.Has(id) {
-			http.Error(w, "object does not exist", http.StatusNotFound)
-			return
-		}
-
-		s.Objects.Remove(id)
+		s.Objects.Remove(object.Id)
 
 		http.Redirect(w, r, "/view", http.StatusSeeOther)
 		return

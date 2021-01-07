@@ -46,10 +46,10 @@ func (s *Server) Routes() {
 	s.Router.HandleFunc("/close", s.withDatabase(s.handleClose()))
 
 	s.Router.HandleFunc("/view", s.withDatabase(s.handleView()))
-	s.Router.HandleFunc("/edit", s.withDatabase(s.withParsedForm(s.handleEdit())))
-	s.Router.HandleFunc("/split", s.withDatabase(s.withParsedForm(s.handleSplit())))
-	s.Router.HandleFunc("/delete", s.withDatabase(s.withParsedForm(s.handleDelete())))
-	s.Router.HandleFunc("/destroy", s.withDatabase(s.withParsedForm(s.handleDestroy())))
+	s.Router.HandleFunc("/edit", s.withDatabase(s.withValidObject(s.handleEdit)))
+	s.Router.HandleFunc("/split", s.withDatabase(s.withValidObject(s.handleSplit)))
+	s.Router.HandleFunc("/delete", s.withDatabase(s.withValidObject(s.handleDelete)))
+	s.Router.HandleFunc("/destroy", s.withDatabase(s.withValidObject(s.handleDestroy)))
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -70,15 +70,28 @@ func (s *Server) withDatabase(h http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func (s *Server) withParsedForm(h http.HandlerFunc) http.HandlerFunc {
+func (s *Server) withValidObject(f func(object *spullen.Object) http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
 			log.Print(fmt.Sprintf("error when parsing form: %s", err.Error()))
-			http.Error(w, "bad request", http.StatusBadRequest)
+			http.Error(w, "invalid form data", http.StatusBadRequest)
 			return
 		}
-		h(w, r)
+
+		id := spullen.ObjectId(r.Form.Get("id"))
+		object := s.Objects.Get(id)
+		if object == nil {
+			http.Error(w, "object does not exist", http.StatusNotFound)
+			return
+		}
+
+		if !s.PrivateMode && object.Hidden {
+			http.Error(w, "object can not be edited", http.StatusForbidden)
+			return
+		}
+
+		f(object)(w, r)
 	}
 }
 
