@@ -197,15 +197,12 @@ func (s *Server) handleSplit() http.HandlerFunc {
 		form := FormFromObject(&object)
 		form.Quantity = "1"
 
-		object.Quantity -= 1
-		original := FormFromObject(&object)
-
 		var alert = ""
 		if r.Method == http.MethodPost {
 			form.Id = s.makeId()
 			form.TimeAdded = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
 			form.Name = r.PostFormValue("name")
-			form.Quantity = "1"
+			form.Quantity = r.PostFormValue("quantity")
 			form.Categories = r.PostFormValue("categories")
 			form.Tags = r.PostFormValue("tags")
 			form.Properties = r.PostFormValue("properties")
@@ -217,6 +214,8 @@ func (s *Server) handleSplit() http.HandlerFunc {
 				if err != nil {
 					alert = fmt.Sprintf("Error when getting object \n%s", err.Error())
 				} else {
+					object.Quantity -= splitObject.Quantity
+
 					s.Objects.Put(splitObject)
 					s.Objects.Put(&object)
 
@@ -225,6 +224,15 @@ func (s *Server) handleSplit() http.HandlerFunc {
 				}
 			}
 		}
+
+		qty, err := strconv.ParseInt(form.Quantity, 10, 64)
+		if err != nil {
+			object.Quantity -= 1
+		} else {
+			object.Quantity -= int(qty)
+		}
+
+		original := FormFromObject(&object)
 
 		err = s.Views.Split.ExecuteTemplate(w, "layout", Split{
 			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
