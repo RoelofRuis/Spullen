@@ -15,36 +15,7 @@
     </div>
     <div class="col">
         <h4 class="text-muted">Origineel</h4>
-        <div class="form-row">
-            <div class="form-group col">
-                <label for="orig-name-field">Objectnaam</label>
-                <input id="orig-name-field" name="name" type="text" class="form-control form-control-sm" autocomplete="off" value="{{ .Original.Name }}" disabled>
-            </div>
-            <div class="form-group col">
-                <label for="orig-quantity-field">Aantal</label>
-                <input id="orig-quantity-field" name="quantity" type="number" class="form-control form-control-sm" value="{{ .Original.Quantity }}" autocomplete="off" disabled>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="orig-tags-field">Tags</label>
-            <input id="orig-tags-field" name="tags" type="text" class="form-control form-control-sm" value="{{ .Original.Tags }}" autocomplete="off" disabled>
-        </div>
-        <div class="form-group">
-            <label for="orig-category-field">Categorieën</label>
-            <input id="orig-category-field" name="categories" type="text" class="form-control form-control-sm" value="{{ .Original.Categories }}" autocomplete="off" disabled>
-        </div>
-        <div class="form-group">
-            <label for="orig-properties-field">Eigenschappen</label>
-            <input id="orig-properties-field" name="properties" type="text" class="form-control form-control-sm" value="{{ .Original.Properties }}" autocomplete="off" disabled>
-        </div>
-        <div class="form-group">
-            <label for="orig-properties-field">Aantekeningen</label>
-            <textarea id="orig-properties-field" name="notes" rows="3" class="form-control form-control-sm" autocomplete="off" disabled>{{ .Original.Notes }}</textarea>
-        </div>
-        <div class="form-check mb-3">
-            <input type="checkbox" name="hidden" class="form-control-sm form-check-input" id="orig-check-hidden" value="true" {{ if eq .Original.Hidden "true" }}checked{{ end }} disabled>
-            <label class="form-check-label" for="orig-check-hidden">Verborgen</label>
-        </div>
+        {{ template "object-original" . }}
     </div>
 </div>
 <script>

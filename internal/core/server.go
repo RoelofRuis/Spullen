@@ -30,10 +30,11 @@ type Views struct {
 func (s *Server) Templates() {
 	s.Views.Open = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/open.gohtml"))
 	s.Views.New = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/new.gohtml"))
+
 	s.Views.View = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/object-form.gohtml", "./static/view.gohtml"))
 	s.Views.Edit = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/object-form.gohtml", "./static/edit.gohtml"))
-	s.Views.Delete = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/delete.gohtml"))
-	s.Views.Split = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/object-form.gohtml", "./static/split.gohtml"))
+	s.Views.Delete = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/object-original.gohtml", "./static/delete.gohtml"))
+	s.Views.Split = template.Must(template.ParseFiles("./static/layout.gohtml", "./static/object-form.gohtml", "./static/object-original.gohtml", "./static/split.gohtml"))
 }
 
 func (s *Server) Routes() {

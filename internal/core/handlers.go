@@ -335,12 +335,12 @@ func (s *Server) handleDelete() http.HandlerFunc {
 		original := FormFromObject(object)
 
 		var alert = ""
-		form := &DeleteForm{}
+		form := &DeleteForm{Id: id}
 		if r.Method == http.MethodPost {
 			// TODO:
 		}
 
-		err = s.Views.Split.ExecuteTemplate(w, "layout", Delete{
+		err = s.Views.Delete.ExecuteTemplate(w, "layout", Delete{
 			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
 			Original: original,
 			Form: form,
