@@ -11,10 +11,6 @@ type Database interface {
 	Close() error
 }
 
-type VersionManager interface {
-	GetVersion() int
-}
-
 type ObjectId string
 
 type ObjectRepository interface {

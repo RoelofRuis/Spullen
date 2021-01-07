@@ -16,7 +16,6 @@ type Server struct {
 	Finder  *Finder
 	Db      spullen.Database
 	Objects spullen.ObjectRepository
-	Version spullen.VersionManager
 }
 
 type Views struct {
@@ -83,6 +82,5 @@ func (s *Server) AppInfo() AppInfo {
 	return AppInfo{
 		DevMode: s.DevMode,
 		DbOpen:  s.Db.IsOpened(),
-		Version: s.Version.GetVersion(),
 	}
 }

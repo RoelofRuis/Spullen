@@ -22,7 +22,6 @@ func main() {
 		port = "8080"
 	}
 
-	versionManager := repository.NewVersionManager(1)
 	objectRepo := repository.NewStorableObjectRepository(&core.ObjectMarshallerImpl{})
 
 	var db *database.FileDatabase
@@ -33,7 +32,6 @@ func main() {
 	}
 
 	_ = db.Register("object-repository", objectRepo)
-	_ = db.Register("version-manager", versionManager)
 
 	server := &core.Server{
 		Router: http.ServeMux{},
@@ -45,7 +43,6 @@ func main() {
 		Finder:  &core.Finder{Root: dbRoot},
 		Db:      db,
 		Objects: objectRepo,
-		Version: versionManager,
 	}
 
 	server.Templates()
