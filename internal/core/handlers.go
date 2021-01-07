@@ -188,7 +188,7 @@ func (s *Server) handleSplit() http.HandlerFunc {
 
 		original := FormFromObject(&object)
 
-		Render(w, s.Views.Split, & Split{
+		Render(w, s.Views.Split, &Split{
 			AppInfo: s.AppInfo(),
 			Alert:   alert,
 			EditObject: EditObject{

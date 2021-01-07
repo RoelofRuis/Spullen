@@ -43,7 +43,7 @@ type Property struct {
 }
 
 type ObjectDeletion struct {
-	Id ObjectId
-	Reason string
+	Id        ObjectId
+	Reason    string
 	DeletedAt time.Time
 }
