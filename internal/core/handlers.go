@@ -3,6 +3,8 @@ package core
 import (
 	"fmt"
 	"github.com/roelofruis/spullen"
+	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -40,14 +42,11 @@ func (s *Server) handleNew() http.HandlerFunc {
 			}
 		}
 
-		err = s.Views.New.ExecuteTemplate(w, "layout", &Database{
+		Render(w, s.Views.New, &Database{
 			AppInfo: s.AppInfo(),
 			Alert:   alert,
 			Form:    form,
 		})
-		if err != nil {
-			fmt.Print(err.Error())
-		}
 
 	}
 }
@@ -83,14 +82,11 @@ func (s *Server) handleOpen() http.HandlerFunc {
 			}
 		}
 
-		err = s.Views.Open.ExecuteTemplate(w, "layout", &Database{
+		Render(w, s.Views.Open, &Database{
 			AppInfo: s.AppInfo(),
 			Alert:   alert,
 			Form:    form,
 		})
-		if err != nil {
-			fmt.Print(err.Error())
-		}
 	}
 }
 
@@ -100,7 +96,7 @@ func (s *Server) handleView() http.HandlerFunc {
 
 		var alert = ""
 		if r.Method == http.MethodPost {
-			form.Id = s.makeId()
+			form.Id = s.MakeId()
 			form.TimeAdded = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
 			form.Name = r.PostFormValue("name")
 			form.Quantity = r.PostFormValue("quantity")
@@ -121,7 +117,7 @@ func (s *Server) handleView() http.HandlerFunc {
 			}
 		}
 
-		err := s.Views.View.ExecuteTemplate(w, "layout", View{
+		Render(w, s.Views.View, &View{
 			AppInfo: s.AppInfo(),
 			Alert:   alert,
 			EditObject: EditObject{
@@ -136,9 +132,6 @@ func (s *Server) handleView() http.HandlerFunc {
 			Objects:         s.Objects.GetAll(),
 			PrivateMode:     s.PrivateMode,
 		})
-		if err != nil {
-			fmt.Print(err.Error())
-		}
 	}
 }
 
@@ -146,7 +139,7 @@ func (s *Server) handleSave() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := s.Db.Persist()
 		if err != nil {
-			println(err.Error())
+			log.Print(err.Error())
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
@@ -159,7 +152,7 @@ func (s *Server) handleClose() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := s.Db.Persist()
 		if err != nil {
-			println(err.Error())
+			log.Print(err.Error())
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
@@ -203,7 +196,7 @@ func (s *Server) handleSplit() http.HandlerFunc {
 
 		var alert = ""
 		if r.Method == http.MethodPost {
-			form.Id = s.makeId()
+			form.Id = s.MakeId()
 			form.TimeAdded = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
 			form.Name = r.PostFormValue("name")
 			form.Quantity = r.PostFormValue("quantity")
@@ -238,7 +231,7 @@ func (s *Server) handleSplit() http.HandlerFunc {
 
 		original := FormFromObject(&object)
 
-		err = s.Views.Split.ExecuteTemplate(w, "layout", Split{
+		Render(w, s.Views.Split, & Split{
 			AppInfo: s.AppInfo(),
 			Alert:   alert,
 			EditObject: EditObject{
@@ -249,9 +242,6 @@ func (s *Server) handleSplit() http.HandlerFunc {
 			},
 			Original: original,
 		})
-		if err != nil {
-			fmt.Print(err.Error())
-		}
 	}
 }
 
@@ -301,7 +291,7 @@ func (s *Server) handleEdit() http.HandlerFunc {
 			}
 		}
 
-		err = s.Views.Edit.ExecuteTemplate(w, "layout", Edit{
+		Render(w, s.Views.Edit, &Edit{
 			AppInfo: s.AppInfo(),
 			Alert:   alert,
 			EditObject: EditObject{
@@ -311,9 +301,6 @@ func (s *Server) handleEdit() http.HandlerFunc {
 				Form:                 form,
 			},
 		})
-		if err != nil {
-			fmt.Print(err.Error())
-		}
 	}
 }
 
@@ -351,15 +338,12 @@ func (s *Server) handleDelete() http.HandlerFunc {
 			}
 		}
 
-		err = s.Views.Delete.ExecuteTemplate(w, "layout", Delete{
+		Render(w, s.Views.Delete, &Delete{
 			AppInfo:  s.AppInfo(),
 			Alert:    alert,
 			Original: original,
 			Form:     form,
 		})
-		if err != nil {
-			fmt.Print(err.Error())
-		}
 	}
 }
 
@@ -385,20 +369,9 @@ func (s *Server) handleDestroy() http.HandlerFunc {
 	}
 }
 
-func (s *Server) makeId() spullen.ObjectId {
-	var id spullen.ObjectId
-	for {
-		id = spullen.ObjectId(randSeq(16))
-		if !s.Objects.Has(id) {
-			return id
-		}
-	}
-}
-
-func (s *Server) AppInfo() AppInfo {
-	return AppInfo{
-		DevMode: s.DevMode,
-		DbOpen:  s.Db.IsOpened(),
-		Version: s.Version.GetVersion(),
+func Render(w io.Writer, t *template.Template, data interface{}) {
+	err := t.ExecuteTemplate(w, "layout", data)
+	if err != nil {
+		log.Fatal(err.Error())
 	}
 }

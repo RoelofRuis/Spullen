@@ -68,3 +68,21 @@ func (s *Server) withDatabase(h http.HandlerFunc) http.HandlerFunc {
 		h(w, r)
 	}
 }
+
+func (s *Server) MakeId() spullen.ObjectId {
+	var id spullen.ObjectId
+	for {
+		id = spullen.ObjectId(randSeq(16))
+		if !s.Objects.Has(id) {
+			return id
+		}
+	}
+}
+
+func (s *Server) AppInfo() AppInfo {
+	return AppInfo{
+		DevMode: s.DevMode,
+		DbOpen:  s.Db.IsOpened(),
+		Version: s.Version.GetVersion(),
+	}
+}
