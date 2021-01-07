@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-var VERSION = core.Version{Major: 0, Minor: 7, Patch: 4}
+var VERSION = core.Version{Major: 0, Minor: 7, Patch: 5}
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -52,6 +52,10 @@ func main() {
 	server.Templates()
 	server.Routes()
 
+	log.Printf("spullen app [%s]", VERSION.String())
+	if devMode {
+		log.Printf("development mode enabled")
+	}
 	log.Printf("starting server on localhost:%s", port)
 
 	err := http.ListenAndServe(fmt.Sprintf(":%s", port), server)
