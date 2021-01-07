@@ -4,12 +4,14 @@ import "github.com/roelofruis/spullen"
 
 type AppInfo struct {
 	DevMode bool
-
-	Alert string
+	StoredVersion int
+	AppVersion int
 }
 
 type Database struct {
 	AppInfo
+
+	Alert string
 
 	Form *DatabaseForm
 }
@@ -26,6 +28,8 @@ type View struct {
 	AppInfo
 	EditObject
 
+	Alert string
+
 	DatabaseIsDirty bool
 
 	TotalCount  int
@@ -38,16 +42,22 @@ type Split struct {
 	AppInfo
 	EditObject
 
+	Alert string
+
 	Original *ObjectForm
 }
 
 type Edit struct {
 	AppInfo
 	EditObject
+
+	Alert string
 }
 
 type Delete struct {
 	AppInfo
+
+	Alert string
 
 	Original *ObjectForm
 	Form *DeleteForm

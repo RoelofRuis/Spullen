@@ -11,7 +11,7 @@ func NewVersionRepository() *StorableVersionRepository {
 	return &StorableVersionRepository{appVersion: 1, storedVersion: 0}
 }
 
-func (s *StorableVersionRepository) GetApplicationVersion() int {
+func (s *StorableVersionRepository) GetAppVersion() int {
 	return s.appVersion
 }
 
@@ -28,6 +28,11 @@ func (s *StorableVersionRepository) IsDirty() bool {
 func (s *StorableVersionRepository) AfterPersist() {}
 
 func (s *StorableVersionRepository) Instantiate(data []byte) error {
+	if len(data) == 0 {
+		s.storedVersion = s.appVersion
+		return nil
+	}
+
 	versionBigint, err := strconv.ParseInt(string(data), 10, 64)
 	if err != nil {
 		return err

@@ -40,7 +40,8 @@ func (s *Server) handleNew() http.HandlerFunc {
 		}
 
 		err = s.Views.New.ExecuteTemplate(w, "layout", &Database{
-			AppInfo: AppInfo{s.DevMode, alert},
+			AppInfo: s.AppInfo(),
+			Alert: alert,
 			Form:    form,
 		})
 		if err != nil {
@@ -82,7 +83,8 @@ func (s *Server) handleOpen() http.HandlerFunc {
 		}
 
 		err = s.Views.Open.ExecuteTemplate(w, "layout", &Database{
-			AppInfo: AppInfo{s.DevMode, alert},
+			AppInfo: s.AppInfo(),
+			Alert: alert,
 			Form:    form,
 		})
 		if err != nil {
@@ -119,7 +121,8 @@ func (s *Server) handleView() http.HandlerFunc {
 		}
 
 		err := s.Views.View.ExecuteTemplate(w, "layout", View{
-			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
+			AppInfo: s.AppInfo(),
+			Alert: alert,
 			EditObject: EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
@@ -235,7 +238,8 @@ func (s *Server) handleSplit() http.HandlerFunc {
 		original := FormFromObject(&object)
 
 		err = s.Views.Split.ExecuteTemplate(w, "layout", Split{
-			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
+			AppInfo: s.AppInfo(),
+			Alert: alert,
 			EditObject: EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
@@ -297,7 +301,8 @@ func (s *Server) handleEdit() http.HandlerFunc {
 		}
 
 		err = s.Views.Edit.ExecuteTemplate(w, "layout", Edit{
-			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
+			AppInfo: s.AppInfo(),
+			Alert: alert,
 			EditObject: EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
@@ -341,7 +346,8 @@ func (s *Server) handleDelete() http.HandlerFunc {
 		}
 
 		err = s.Views.Delete.ExecuteTemplate(w, "layout", Delete{
-			AppInfo: AppInfo{DevMode: s.DevMode, Alert: alert},
+			AppInfo: s.AppInfo(),
+			Alert: alert,
 			Original: original,
 			Form: form,
 		})
@@ -380,5 +386,13 @@ func (s *Server) makeId() string {
 		if !s.Objects.Has(id) {
 			return id
 		}
+	}
+}
+
+func (s *Server) AppInfo() AppInfo {
+	return AppInfo{
+		DevMode:       s.DevMode,
+		StoredVersion: s.Version.GetStoredVersion(),
+		AppVersion:    s.Version.GetAppVersion(),
 	}
 }

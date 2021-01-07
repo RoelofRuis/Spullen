@@ -12,7 +12,9 @@
 <div class="container">
     <nav class="navbar navbar-expand navbar-light bg-light">
         <span class="navbar-brand mb-1 h1">Spullen <small class="text-muted">{{ template "version" }}</small></span>
-        {{ if .DevMode }}<b class="text-danger">DEV MODE</b>{{ end }}
+        {{ if .DevMode }}
+            <b class="text-danger">DEV MODE (APP: v{{ .AppVersion }}, DB: v{{ .StoredVersion }})</b>
+        {{ end }}
         {{ template "navbar" . }}
     </nav>
     {{ template "content" . }}

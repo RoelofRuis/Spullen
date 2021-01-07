@@ -45,6 +45,7 @@ func main() {
 		Finder:  &core.Finder{Root: dbRoot},
 		Db:      db,
 		Objects: objectRepo,
+		Version: versionRepo,
 	}
 
 	server.Templates()

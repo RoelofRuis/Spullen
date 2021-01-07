@@ -12,7 +12,7 @@ type Database interface {
 }
 
 type VersionRepository interface {
-	GetApplicationVersion() int
+	GetAppVersion() int
 	GetStoredVersion() int
 }
 
