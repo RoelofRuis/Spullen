@@ -10,7 +10,10 @@ import (
 
 func (s *Server) handleNew() http.HandlerFunc {
 	return func (w http.ResponseWriter, r *http.Request) {
-		form := &NewDatabaseForm{}
+		form, err := NewDatabaseForm(s.Finder)
+		if err != nil {
+			log.Fatal("Error when creating form database form", err.Error())
+		}
 
 		var alert = ""
 		if r.Method == http.MethodPost {
@@ -18,7 +21,7 @@ func (s *Server) handleNew() http.HandlerFunc {
 			form.Password = r.PostFormValue("password")
 			form.ShowHiddenItems = r.PostFormValue("show-hidden-items")
 
-			if form.Validate() {
+			if form.Validate(false) {
 				if s.Db.IsOpened() {
 					_ = s.Db.Close()
 				}
@@ -36,7 +39,7 @@ func (s *Server) handleNew() http.HandlerFunc {
 			}
 		}
 
-		err := s.Views.New.ExecuteTemplate(w, "layout", &NewDatabase{
+		err = s.Views.New.ExecuteTemplate(w, "layout", &Database{
 			AppInfo:   AppInfo{s.DevMode, alert},
 			Form:      form,
 		})
@@ -49,20 +52,9 @@ func (s *Server) handleNew() http.HandlerFunc {
 
 func (s *Server) handleOpen() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		databases, err := s.Finder.FindDatabases()
+		form, err := NewDatabaseForm(s.Finder)
 		if err != nil {
-			log.Printf("Error when trying to open filesystem: %s", err.Error())
-			http.Redirect(w, r, "/new", http.StatusSeeOther)
-			return
-		}
-
-		if len(databases) == 0 {
-			http.Redirect(w, r, "/new", http.StatusSeeOther)
-			return
-		}
-
-		form := &OpenDatabaseForm{
-			AvailableDatabases: databases,
+			log.Fatal("Error when creating form database form", err.Error())
 		}
 
 		var alert = ""
@@ -71,7 +63,7 @@ func (s *Server) handleOpen() http.HandlerFunc {
 			form.Password = r.PostFormValue("password")
 			form.ShowHiddenItems = r.PostFormValue("show-hidden-items")
 
-			if form.Validate() {
+			if form.Validate(true) {
 				if s.Db.IsOpened() {
 					_ = s.Db.Close()
 				}
@@ -89,7 +81,7 @@ func (s *Server) handleOpen() http.HandlerFunc {
 			}
 		}
 
-		err = s.Views.Open.ExecuteTemplate(w, "layout", &OpenDatabase{
+		err = s.Views.Open.ExecuteTemplate(w, "layout", &Database{
 			AppInfo:   AppInfo{s.DevMode, alert},
 			Form:      form,
 		})
