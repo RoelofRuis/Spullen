@@ -28,7 +28,7 @@
             <div class="alert alert-danger">{{ . }}</div>
         {{ end }}
         <form action="/view" method="post">
-            {{ template "object-form-fields" . }}
+            {{ template "object-edit" . }}
             <button type="submit" class="btn btn-outline-primary">Toevoegen</button>
         </form>
     </div>
