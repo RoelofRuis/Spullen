@@ -392,6 +392,7 @@ func (s *Server) makeId() string {
 func (s *Server) AppInfo() AppInfo {
 	return AppInfo{
 		DevMode:       s.DevMode,
+		DbOpen:        s.Db.IsOpened(),
 		StoredVersion: s.Version.GetStoredVersion(),
 		AppVersion:    s.Version.GetAppVersion(),
 	}
