@@ -22,7 +22,11 @@ func (s *Server) handleLoadDatabase(view *template.Template, isExistingDatabase 
 
 			if form.Validate() {
 				if s.Db.IsOpened() {
-					_ = s.Db.Close()
+					err := s.Db.Close()
+					if err != nil {
+						log.Print(fmt.Sprintf("unable to close database: %s", err.Error()))
+						http.Error(w, "error", http.StatusInternalServerError)
+					}
 				}
 
 				err := s.Db.Open(form.Database, []byte(form.Password), form.IsExistingDatabase)
@@ -103,12 +107,16 @@ func (s *Server) handleClose() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := s.Db.Persist()
 		if err != nil {
-			log.Print(err.Error())
+			log.Print(fmt.Sprintf("unable to persist database: %s", err.Error()))
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
 
-		_ = s.Db.Close()
+		err = s.Db.Close()
+		if err != nil {
+			log.Print(fmt.Sprintf("unable to close database: %s", err.Error()))
+			http.Error(w, "error", http.StatusInternalServerError)
+		}
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
