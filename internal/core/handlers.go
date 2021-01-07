@@ -343,7 +343,12 @@ func (s *Server) handleDelete() http.HandlerFunc {
 		var alert = ""
 		form := &DeleteForm{Id: id}
 		if r.Method == http.MethodPost {
-			// TODO:
+			form.RemovedAt = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
+			form.Reason = r.PostFormValue("reason")
+
+			if form.Validate() {
+				alert = "TODO: this is not implemented yet, object should now be deleted!"
+			}
 		}
 
 		err = s.Views.Delete.ExecuteTemplate(w, "layout", Delete{
