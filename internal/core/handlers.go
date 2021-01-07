@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"github.com/roelofruis/spullen"
 	"log"
 	"net/http"
 	"strconv"
@@ -178,7 +179,7 @@ func (s *Server) handleSplit() http.HandlerFunc {
 			return
 		}
 
-		id := r.Form.Get("id")
+		id := spullen.ObjectId(r.Form.Get("id"))
 		objectPointer := s.Objects.Get(id)
 		if objectPointer == nil {
 			http.Error(w, "object does not exist", http.StatusNotFound)
@@ -263,7 +264,7 @@ func (s *Server) handleEdit() http.HandlerFunc {
 			return
 		}
 
-		id := r.Form.Get("id")
+		id := spullen.ObjectId(r.Form.Get("id"))
 		object := s.Objects.Get(id)
 		if object == nil {
 			http.Error(w, "object does not exist", http.StatusNotFound)
@@ -325,7 +326,7 @@ func (s *Server) handleDelete() http.HandlerFunc {
 			return
 		}
 
-		id := r.Form.Get("id")
+		id := spullen.ObjectId(r.Form.Get("id"))
 		object := s.Objects.Get(id)
 		if object == nil {
 			http.Error(w, "object does not exist", http.StatusNotFound)
@@ -366,7 +367,7 @@ func (s *Server) handleDestroy() http.HandlerFunc {
 			return
 		}
 
-		id := r.Form.Get("id")
+		id := spullen.ObjectId(r.Form.Get("id"))
 		if !s.Objects.Has(id) {
 			http.Error(w, "object does not exist", http.StatusNotFound)
 			return
@@ -379,10 +380,10 @@ func (s *Server) handleDestroy() http.HandlerFunc {
 	}
 }
 
-func (s *Server) makeId() string {
-	var id string
+func (s *Server) makeId() spullen.ObjectId {
+	var id spullen.ObjectId
 	for {
-		id = randSeq(16)
+		id = spullen.ObjectId(randSeq(16))
 		if !s.Objects.Has(id) {
 			return id
 		}

@@ -1,7 +1,11 @@
 package core
 
-type DeleteForm struct {
-	Reason string
+import (
+	"github.com/roelofruis/spullen"
+)
 
-	Id string
+type DeleteForm struct {
+	Id        spullen.ObjectId
+	Reason    string
+	RemovedAt string
 }

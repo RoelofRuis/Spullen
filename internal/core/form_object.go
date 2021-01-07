@@ -10,7 +10,7 @@ import (
 )
 
 type ObjectForm struct {
-	Id        string
+	Id        spullen.ObjectId
 	TimeAdded string
 
 	Name       string

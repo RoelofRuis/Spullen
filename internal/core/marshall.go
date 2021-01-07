@@ -11,7 +11,7 @@ type ObjectMarshallerImpl struct{}
 
 func (o *ObjectMarshallerImpl) Unmarshall(record []string) (*spullen.Object, error) {
 	form := &ObjectForm{
-		Id:         record[0],
+		Id:         spullen.ObjectId(record[0]),
 		TimeAdded:  record[1],
 		Name:       record[2],
 		Quantity:   record[3],
@@ -41,7 +41,7 @@ func (o *ObjectMarshallerImpl) Marshall(obj *spullen.Object) []string {
 	}
 
 	record := []string{
-		obj.Id,
+		string(obj.Id),
 		strconv.FormatInt(obj.Added.Unix(), 10),
 		obj.Name,
 		fmt.Sprintf("%d", obj.Quantity),

@@ -15,20 +15,22 @@ type VersionManager interface {
 	GetVersion() int
 }
 
+type ObjectId string
+
 type ObjectRepository interface {
 	GetAll() []*Object
 	Count() int
-	Get(id string) *Object
+	Get(id ObjectId) *Object
 	GetDistinctCategories(includeHidden bool) []string
 	GetDistinctTags(includeHidden bool) []string
 	GetDistinctPropertyKeys(includeHidden bool) []string
 	Put(*Object)
-	Remove(id string)
-	Has(id string) bool
+	Remove(id ObjectId)
+	Has(id ObjectId) bool
 }
 
 type Object struct {
-	Id         string
+	Id         ObjectId
 	Added      time.Time
 	Name       string
 	Quantity   int
@@ -42,4 +44,10 @@ type Object struct {
 type Property struct {
 	Key   string
 	Value string
+}
+
+type ObjectDeletion struct {
+	Id ObjectId
+	Reason string
+	DeletedAt time.Time
 }

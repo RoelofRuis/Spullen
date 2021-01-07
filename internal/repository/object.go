@@ -14,7 +14,7 @@ type StorableObjectRepository struct {
 	lock sync.RWMutex
 
 	marshaller ObjectMarshaller
-	objects    map[string]*spullen.Object
+	objects    map[spullen.ObjectId]*spullen.Object
 	dirty      bool
 }
 
@@ -29,13 +29,13 @@ func NewStorableObjectRepository(marshaller ObjectMarshaller) *StorableObjectRep
 
 		marshaller: marshaller,
 
-		objects: map[string]*spullen.Object{},
+		objects: map[spullen.ObjectId]*spullen.Object{},
 		dirty:   false,
 	}
 }
 
 type objectName struct {
-	id   string
+	id   spullen.ObjectId
 	name string
 }
 
@@ -57,7 +57,7 @@ func (s *StorableObjectRepository) Count() int {
 	return total
 }
 
-func (s *StorableObjectRepository) Get(id string) *spullen.Object {
+func (s *StorableObjectRepository) Get(id spullen.ObjectId) *spullen.Object {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
@@ -160,7 +160,7 @@ func (s *StorableObjectRepository) GetDistinctPropertyKeys(includeHidden bool) [
 	return propKeys
 }
 
-func (s *StorableObjectRepository) Has(id string) bool {
+func (s *StorableObjectRepository) Has(id spullen.ObjectId) bool {
 	s.lock.RLock()
 	defer s.lock.RUnlock()
 
@@ -168,7 +168,7 @@ func (s *StorableObjectRepository) Has(id string) bool {
 	return hasKey
 }
 
-func (s *StorableObjectRepository) Remove(id string) {
+func (s *StorableObjectRepository) Remove(id spullen.ObjectId) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
@@ -193,7 +193,7 @@ func (s *StorableObjectRepository) Instantiate(data []byte) error {
 	r := csv.NewReader(strings.NewReader(string(data)))
 	r.Comma = ';'
 
-	var objects = make(map[string]*spullen.Object)
+	var objects = make(map[spullen.ObjectId]*spullen.Object)
 	for {
 		record, err := r.Read()
 		if err == io.EOF {
