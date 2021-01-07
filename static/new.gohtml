@@ -7,7 +7,7 @@
         {{ with .Alert }}
         <div class="alert alert-danger">{{ . }}</div>
         {{ end }}
-        <form action="/" method="post">
+        <form action="/new" method="post">
             <div class="form-group">
                 <label for="db-field">Database</label>
                 {{ with .Form.Errors.Database }}
