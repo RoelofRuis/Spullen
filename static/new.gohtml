@@ -10,11 +10,11 @@
         <form action="/new" method="post">
             <div class="form-group">
                 <label for="db-field">Database</label>
-                {{ with .Form.Errors.Database }}
-                    <input id="db-field" name="database" class="form-control form-control-sm is-invalid" autocomplete="off">
-                    <div class="invalid-feedback">{{ . }}</div>
+                {{ if .Form.Errors.Database }}
+                    <input id="db-field" name="database" class="form-control form-control-sm is-invalid" autocomplete="off" value="{{ .Form.Database }}">
+                    <div class="invalid-feedback">{{ .Form.Errors.Database }}</div>
                 {{ else }}
-                    <input id="db-field" name="database" class="form-control form-control-sm" autocomplete="off">
+                    <input id="db-field" name="database" class="form-control form-control-sm" autocomplete="off" value="{{ .Form.Database }}">
                 {{ end }}
             </div>
             <hr>
