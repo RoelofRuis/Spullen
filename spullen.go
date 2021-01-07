@@ -11,6 +11,11 @@ type Database interface {
 	Close() error
 }
 
+type VersionRepository interface {
+	GetApplicationVersion() int
+	GetStoredVersion() int
+}
+
 type ObjectRepository interface {
 	GetAll() []*Object
 	Count() int

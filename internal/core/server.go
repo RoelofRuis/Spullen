@@ -16,6 +16,7 @@ type Server struct {
 	Finder  *Finder
 	Db      spullen.Database
 	Objects spullen.ObjectRepository
+	Version spullen.VersionRepository
 }
 
 type Views struct {

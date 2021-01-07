@@ -22,6 +22,7 @@ func main() {
 		port = "8080"
 	}
 
+	versionRepo := repository.NewVersionRepository()
 	objectRepo := repository.NewStorableObjectRepository(&core.ObjectMarshallerImpl{})
 
 	var db *database.FileDatabase
@@ -32,6 +33,7 @@ func main() {
 	}
 
 	_ = db.Register("object-repository", objectRepo)
+	_ = db.Register("version-repository", versionRepo)
 
 	server := &core.Server{
 		Router: http.ServeMux{},

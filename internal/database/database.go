@@ -3,6 +3,7 @@ package database
 import (
 	"errors"
 	"fmt"
+	"log"
 	"sync"
 )
 
@@ -100,7 +101,8 @@ func (db *FileDatabase) Open(name string, pass []byte, openExisting bool) error 
 	for name, s := range db.storables {
 		data, hasKey := dataMap[name]
 		if openExisting && !hasKey {
-			return fmt.Errorf("data missing for storable [%s]", name)
+			log.Printf("data missing for storable [%s]", name)
+			continue
 		}
 		err := s.Instantiate(data)
 		if err != nil {
