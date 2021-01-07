@@ -39,8 +39,8 @@ func (s *Server) Templates() {
 }
 
 func (s *Server) Routes() {
-	s.Router.HandleFunc("/", s.handleOpen())
-	s.Router.HandleFunc("/new", s.handleNew())
+	s.Router.HandleFunc("/", s.handleLoadDatabase(s.Views.Open, true))
+	s.Router.HandleFunc("/new", s.handleLoadDatabase(s.Views.New, false))
 
 	s.Router.HandleFunc("/view", s.withDatabase(s.handleView()))
 	s.Router.HandleFunc("/edit", s.withDatabase(s.handleEdit()))

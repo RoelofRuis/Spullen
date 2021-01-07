@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"strconv"
 )
 
@@ -16,6 +17,8 @@ func NewDatabaseForm(finder *Finder) *DatabaseForm {
 }
 
 type DatabaseForm struct {
+	IsExistingDatabase bool
+
 	Database        string
 	Password        string
 	ShowHiddenItems string
@@ -27,7 +30,13 @@ type DatabaseForm struct {
 	ParsedShowHiddenItems bool
 }
 
-func (f *DatabaseForm) Validate(isExisting bool) bool {
+func (f *DatabaseForm) FillFromRequest(r *http.Request) {
+	f.Database = r.PostFormValue("database")
+	f.Password = r.PostFormValue("password")
+	f.ShowHiddenItems = r.PostFormValue("show-hidden-items")
+}
+
+func (f *DatabaseForm) Validate() bool {
 	f.Errors = make(map[string]string)
 
 	var found = false
@@ -38,7 +47,7 @@ func (f *DatabaseForm) Validate(isExisting bool) bool {
 		}
 	}
 
-	if isExisting {
+	if f.IsExistingDatabase {
 		if !found {
 			f.Errors["Database"] = "Geef een bestaande database op"
 		}

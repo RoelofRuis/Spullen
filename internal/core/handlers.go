@@ -11,22 +11,21 @@ import (
 	"time"
 )
 
-func (s *Server) handleNew() http.HandlerFunc {
+func (s *Server) handleLoadDatabase(view *template.Template, isExistingDatabase bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		form := NewDatabaseForm(s.Finder)
+		form.IsExistingDatabase = isExistingDatabase
 
 		var alert = ""
 		if r.Method == http.MethodPost {
-			form.Database = r.PostFormValue("database")
-			form.Password = r.PostFormValue("password")
-			form.ShowHiddenItems = r.PostFormValue("show-hidden-items")
+			form.FillFromRequest(r)
 
-			if form.Validate(false) {
+			if form.Validate() {
 				if s.Db.IsOpened() {
 					_ = s.Db.Close()
 				}
 
-				err := s.Db.Open(form.Database, []byte(form.Password), false)
+				err := s.Db.Open(form.Database, []byte(form.Password), form.IsExistingDatabase)
 				if err == nil {
 					s.PrivateMode = form.ParsedShowHiddenItems
 
@@ -39,48 +38,12 @@ func (s *Server) handleNew() http.HandlerFunc {
 			}
 		}
 
-		Render(w, s.Views.New, &Database{
+		Render(w, view, &Database{
 			AppInfo: s.AppInfo(),
 			Alert:   alert,
 			Form:    form,
 		})
 
-	}
-}
-
-func (s *Server) handleOpen() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		form := NewDatabaseForm(s.Finder)
-
-		var alert = ""
-		if r.Method == http.MethodPost {
-			form.Database = r.PostFormValue("database")
-			form.Password = r.PostFormValue("password")
-			form.ShowHiddenItems = r.PostFormValue("show-hidden-items")
-
-			if form.Validate(true) {
-				if s.Db.IsOpened() {
-					_ = s.Db.Close()
-				}
-
-				err := s.Db.Open(form.Database, []byte(form.Password), true)
-				if err == nil {
-					s.PrivateMode = form.ParsedShowHiddenItems
-
-					http.Redirect(w, r, "/view", http.StatusSeeOther)
-					return
-				}
-
-				log.Printf("Error when trying to open database: %s", err.Error())
-				alert = "De database kon niet worden geopend. Het wachtwoord is fout of de database is corrupt."
-			}
-		}
-
-		Render(w, s.Views.Open, &Database{
-			AppInfo: s.AppInfo(),
-			Alert:   alert,
-			Form:    form,
-		})
 	}
 }
 
