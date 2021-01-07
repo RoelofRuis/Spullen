@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+var VERSION = core.Version{Major: 0, Minor: 7, Patch: 3}
+
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
@@ -43,6 +45,8 @@ func main() {
 		Finder:  &core.Finder{Root: dbRoot},
 		Db:      db,
 		Objects: objectRepo,
+
+		Version: VERSION,
 	}
 
 	server.Templates()

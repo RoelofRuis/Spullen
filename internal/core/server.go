@@ -18,6 +18,18 @@ type Server struct {
 	Finder  *Finder
 	Db      spullen.Database
 	Objects spullen.ObjectRepository
+
+	Version Version
+}
+
+type Version struct {
+	Major int
+	Minor int
+	Patch int
+}
+
+func (v *Version) String() string {
+	return fmt.Sprintf("v%d.%d.%d", v.Major, v.Minor, v.Patch)
 }
 
 type Views struct {
@@ -109,5 +121,6 @@ func (s *Server) AppInfo() AppInfo {
 	return AppInfo{
 		DevMode: s.DevMode,
 		DbOpen:  s.Db.IsOpened(),
+		Version: s.Version,
 	}
 }

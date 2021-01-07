@@ -5,7 +5,7 @@ import "github.com/roelofruis/spullen"
 type AppInfo struct {
 	DevMode bool
 	DbOpen  bool
-	Version int
+	Version Version
 }
 
 type Database struct {
