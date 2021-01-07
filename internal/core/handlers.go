@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -9,15 +10,62 @@ import (
 
 func (s *Server) handleNew() http.HandlerFunc {
 	return func (w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "todo", http.StatusNotImplemented)
+		form := &NewDatabaseForm{}
+
+		var alert = ""
+		if r.Method == http.MethodPost {
+			form.Database = r.PostFormValue("database")
+			form.Password = r.PostFormValue("password")
+			form.ShowHiddenItems = r.PostFormValue("show-hidden-items")
+
+			if form.Validate() {
+				if s.Db.IsOpened() {
+					_ = s.Db.Close()
+				}
+
+				err := s.Db.Open(form.Database, []byte(form.Password), false)
+				if err == nil {
+					s.PrivateMode = form.ParsedShowHiddenItems
+
+					http.Redirect(w, r, "/view", http.StatusSeeOther)
+					return
+				}
+
+				log.Printf("Error when trying to open database: %s", err.Error())
+				alert = "De database kon niet worden geopend. Het wachtwoord is fout of de database is corrupt."
+			}
+		}
+
+		err := s.Views.New.ExecuteTemplate(w, "layout", &NewDatabase{
+			AppInfo:   AppInfo{s.DevMode, alert},
+			Form:      form,
+		})
+		if err != nil {
+			fmt.Print(err.Error())
+		}
+
 	}
 }
 
 func (s *Server) handleOpen() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		form := &OpenDatabaseForm{}
+		databases, err := s.Finder.FindDatabases()
+		if err != nil {
+			log.Printf("Error when trying to open filesystem: %s", err.Error())
+			http.Redirect(w, r, "/new", http.StatusSeeOther)
+			return
+		}
 
-		var loadingAlert = ""
+		if len(databases) == 0 {
+			http.Redirect(w, r, "/new", http.StatusSeeOther)
+			return
+		}
+
+		form := &OpenDatabaseForm{
+			AvailableDatabases: databases,
+		}
+
+		var alert = ""
 		if r.Method == http.MethodPost {
 			form.Database = r.PostFormValue("database")
 			form.Password = r.PostFormValue("password")
@@ -30,26 +78,19 @@ func (s *Server) handleOpen() http.HandlerFunc {
 
 				err := s.Db.Open(form.Database, []byte(form.Password), true)
 				if err == nil {
-					s.PrivateMode = form.showHiddenItems
+					s.PrivateMode = form.ParsedShowHiddenItems
 
 					http.Redirect(w, r, "/view", http.StatusSeeOther)
 					return
 				}
 
-				println(err.Error())
-				loadingAlert = "De database kon niet worden geopend. Het wachtwoord is fout of de database is corrupt."
+				log.Printf("Error when trying to open database: %s", err.Error())
+				alert = "De database kon niet worden geopend. Het wachtwoord is fout of de database is corrupt."
 			}
 		}
 
-		names, err := s.Finder.FindDatabases()
-		if err != nil {
-			http.Error(w, "unable to detect databases", http.StatusInternalServerError)
-			return
-		}
-
-		err = s.Views.Open.ExecuteTemplate(w, "layout", &Index{
-			AppInfo:   AppInfo{s.DevMode, loadingAlert},
-			Databases: names,
+		err = s.Views.Open.ExecuteTemplate(w, "layout", &OpenDatabase{
+			AppInfo:   AppInfo{s.DevMode, alert},
 			Form:      form,
 		})
 		if err != nil {

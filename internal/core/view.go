@@ -8,11 +8,16 @@ type AppInfo struct {
 	Alert string
 }
 
-type Index struct {
+type OpenDatabase struct {
 	AppInfo
 
-	Databases []string
 	Form      *OpenDatabaseForm
+}
+
+type NewDatabase struct {
+	AppInfo
+
+	Form *NewDatabaseForm
 }
 
 type EditObject struct {
