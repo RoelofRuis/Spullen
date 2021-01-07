@@ -4,9 +4,8 @@ import "github.com/roelofruis/spullen"
 
 type AppInfo struct {
 	DevMode bool
-	DbOpen bool
-	StoredVersion int
-	AppVersion int
+	DbOpen  bool
+	Version int
 }
 
 type Database struct {
@@ -61,5 +60,5 @@ type Delete struct {
 	Alert string
 
 	Original *ObjectForm
-	Form *DeleteForm
+	Form     *DeleteForm
 }

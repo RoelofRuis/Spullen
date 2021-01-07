@@ -2,34 +2,30 @@ package repository
 
 import "strconv"
 
-type StorableVersionRepository struct {
-	appVersion    int
+type StorableVersionManager struct {
+	latestVersion int
 	storedVersion int
 }
 
-func NewVersionRepository() *StorableVersionRepository {
-	return &StorableVersionRepository{appVersion: 1, storedVersion: 0}
+func NewVersionManager(latestVersion int) *StorableVersionManager {
+	return &StorableVersionManager{latestVersion: latestVersion, storedVersion: 0}
 }
 
-func (s *StorableVersionRepository) GetAppVersion() int {
-	return s.appVersion
-}
-
-func (s *StorableVersionRepository) GetStoredVersion() int {
+func (s *StorableVersionManager) GetVersion() int {
 	return s.storedVersion
 }
 
 // --- LOADING AND SAVING
 // Ensuring it is a Storable
-func (s *StorableVersionRepository) IsDirty() bool {
+func (s *StorableVersionManager) IsDirty() bool {
 	return false
 }
 
-func (s *StorableVersionRepository) AfterPersist() {}
+func (s *StorableVersionManager) AfterPersist() {}
 
-func (s *StorableVersionRepository) Instantiate(data []byte) error {
+func (s *StorableVersionManager) Instantiate(data []byte) error {
 	if len(data) == 0 {
-		s.storedVersion = s.appVersion
+		s.storedVersion = s.latestVersion
 		return nil
 	}
 
@@ -44,6 +40,6 @@ func (s *StorableVersionRepository) Instantiate(data []byte) error {
 	return nil
 }
 
-func (s *StorableVersionRepository) ToRaw() ([]byte, error) {
-	return []byte(strconv.Itoa(s.appVersion)), nil
+func (s *StorableVersionManager) ToRaw() ([]byte, error) {
+	return []byte(strconv.Itoa(s.latestVersion)), nil
 }

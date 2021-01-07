@@ -16,16 +16,16 @@ type Server struct {
 	Finder  *Finder
 	Db      spullen.Database
 	Objects spullen.ObjectRepository
-	Version spullen.VersionRepository
+	Version spullen.VersionManager
 }
 
 type Views struct {
-	Open  *template.Template
-	New   *template.Template
-	View  *template.Template
-	Edit  *template.Template
+	Open   *template.Template
+	New    *template.Template
+	View   *template.Template
+	Edit   *template.Template
 	Delete *template.Template
-	Split *template.Template
+	Split  *template.Template
 }
 
 func (s *Server) Templates() {

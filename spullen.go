@@ -11,9 +11,8 @@ type Database interface {
 	Close() error
 }
 
-type VersionRepository interface {
-	GetAppVersion() int
-	GetStoredVersion() int
+type VersionManager interface {
+	GetVersion() int
 }
 
 type ObjectRepository interface {

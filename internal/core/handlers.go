@@ -41,7 +41,7 @@ func (s *Server) handleNew() http.HandlerFunc {
 
 		err = s.Views.New.ExecuteTemplate(w, "layout", &Database{
 			AppInfo: s.AppInfo(),
-			Alert: alert,
+			Alert:   alert,
 			Form:    form,
 		})
 		if err != nil {
@@ -84,7 +84,7 @@ func (s *Server) handleOpen() http.HandlerFunc {
 
 		err = s.Views.Open.ExecuteTemplate(w, "layout", &Database{
 			AppInfo: s.AppInfo(),
-			Alert: alert,
+			Alert:   alert,
 			Form:    form,
 		})
 		if err != nil {
@@ -122,7 +122,7 @@ func (s *Server) handleView() http.HandlerFunc {
 
 		err := s.Views.View.ExecuteTemplate(w, "layout", View{
 			AppInfo: s.AppInfo(),
-			Alert: alert,
+			Alert:   alert,
 			EditObject: EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
@@ -239,7 +239,7 @@ func (s *Server) handleSplit() http.HandlerFunc {
 
 		err = s.Views.Split.ExecuteTemplate(w, "layout", Split{
 			AppInfo: s.AppInfo(),
-			Alert: alert,
+			Alert:   alert,
 			EditObject: EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
@@ -302,7 +302,7 @@ func (s *Server) handleEdit() http.HandlerFunc {
 
 		err = s.Views.Edit.ExecuteTemplate(w, "layout", Edit{
 			AppInfo: s.AppInfo(),
-			Alert: alert,
+			Alert:   alert,
 			EditObject: EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
@@ -346,10 +346,10 @@ func (s *Server) handleDelete() http.HandlerFunc {
 		}
 
 		err = s.Views.Delete.ExecuteTemplate(w, "layout", Delete{
-			AppInfo: s.AppInfo(),
-			Alert: alert,
+			AppInfo:  s.AppInfo(),
+			Alert:    alert,
 			Original: original,
-			Form: form,
+			Form:     form,
 		})
 		if err != nil {
 			fmt.Print(err.Error())
@@ -391,9 +391,8 @@ func (s *Server) makeId() string {
 
 func (s *Server) AppInfo() AppInfo {
 	return AppInfo{
-		DevMode:       s.DevMode,
-		DbOpen:        s.Db.IsOpened(),
-		StoredVersion: s.Version.GetStoredVersion(),
-		AppVersion:    s.Version.GetAppVersion(),
+		DevMode: s.DevMode,
+		DbOpen:  s.Db.IsOpened(),
+		Version: s.Version.GetVersion(),
 	}
 }
