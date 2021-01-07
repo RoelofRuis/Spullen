@@ -1,5 +1,3 @@
 - Zie de logica/gebruik van 'Notion'
 - Categorieen en tags vullen
-- Afsplitsen met variabel aantal
 - Objecten niet weggooien, metadata toevoegen, wanneer veranderd
-- Metadata van plaats?
