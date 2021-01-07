@@ -37,6 +37,7 @@ func (s *Server) Templates() {
 func (s *Server) Routes() {
 	s.Router.HandleFunc("/", s.handleOpen())
 	s.Router.HandleFunc("/new", s.handleNew())
+
 	s.Router.HandleFunc("/view", s.withDatabase(s.handleView()))
 	s.Router.HandleFunc("/edit", s.withDatabase(s.handleEdit()))
 	s.Router.HandleFunc("/split", s.withDatabase(s.handleSplit()))
@@ -56,7 +57,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *Server) withDatabase(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !s.Db.IsOpened() {
-			http.NotFound(w, r)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
 		h(w, r)
