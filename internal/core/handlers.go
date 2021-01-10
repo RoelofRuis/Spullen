@@ -22,8 +22,6 @@ func (s *Server) handleLoadDatabase(view *template.Template, isExistingDatabase 
 		if r.Method == http.MethodPost {
 			form.FillFromRequest(r)
 
-			fmt.Printf("%+v", form)
-
 			if form.Validate() {
 				if s.Db.IsOpened() {
 					err := s.Db.Close()
