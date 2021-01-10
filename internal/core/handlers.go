@@ -123,6 +123,40 @@ func (s *Server) handleClose() http.HandlerFunc {
 	}
 }
 
+func (s *Server) handleEdit(object *spullen.Object) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		form := FormFromObject(object)
+
+		var alert = ""
+		if r.Method == http.MethodPost {
+			form.FillFromRequest(r)
+
+			if form.Validate() {
+				obj, err := form.GetObject()
+				if err != nil {
+					alert = fmt.Sprintf("Error when getting object\n%s", err.Error())
+				} else {
+					s.Objects.Put(obj)
+
+					http.Redirect(w, r, "/view", http.StatusSeeOther)
+					return
+				}
+			}
+		}
+
+		Render(w, s.Views.Edit, &Edit{
+			AppInfo: s.AppInfo(),
+			Alert:   alert,
+			EditObject: EditObject{
+				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
+				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
+				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
+				Form:                 form,
+			},
+		})
+	}
+}
+
 func (s *Server) handleSplit(object *spullen.Object) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if object.Quantity < 2 {
@@ -174,40 +208,6 @@ func (s *Server) handleSplit(object *spullen.Object) http.HandlerFunc {
 				Form:                 form,
 			},
 			Original: original,
-		})
-	}
-}
-
-func (s *Server) handleEdit(object *spullen.Object) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		form := FormFromObject(object)
-
-		var alert = ""
-		if r.Method == http.MethodPost {
-			form.FillFromRequest(r)
-
-			if form.Validate() {
-				obj, err := form.GetObject()
-				if err != nil {
-					alert = fmt.Sprintf("Error when getting object\n%s", err.Error())
-				} else {
-					s.Objects.Put(obj)
-
-					http.Redirect(w, r, "/view", http.StatusSeeOther)
-					return
-				}
-			}
-		}
-
-		Render(w, s.Views.Edit, &Edit{
-			AppInfo: s.AppInfo(),
-			Alert:   alert,
-			EditObject: EditObject{
-				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
-				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
-				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
-				Form:                 form,
-			},
 		})
 	}
 }
