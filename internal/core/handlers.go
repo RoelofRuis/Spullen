@@ -3,9 +3,10 @@ package core
 import (
 	"fmt"
 	"github.com/roelofruis/spullen"
+	"github.com/roelofruis/spullen/internal/core/database"
+	"github.com/roelofruis/spullen/internal/core/deletion"
 	"github.com/roelofruis/spullen/internal/core/object"
 	"html/template"
-	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -14,12 +15,14 @@ import (
 
 func (s *Server) handleLoadDatabase(view *template.Template, isExistingDatabase bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		form := NewDatabaseForm(s.Finder)
+		form := database.NewDatabaseForm(s.Finder)
 		form.IsExistingDatabase = isExistingDatabase
 
 		var alert = ""
 		if r.Method == http.MethodPost {
 			form.FillFromRequest(r)
+
+			fmt.Printf("%+v", form)
 
 			if form.Validate() {
 				if s.Db.IsOpened() {
@@ -44,8 +47,7 @@ func (s *Server) handleLoadDatabase(view *template.Template, isExistingDatabase 
 			}
 		}
 
-		Render(w, view, &Database{
-			AppInfo: s.AppInfo(),
+		s.Render(w, view, &Database{
 			Alert:   alert,
 			Form:    form,
 		})
@@ -74,8 +76,7 @@ func (s *Server) handleView() http.HandlerFunc {
 			}
 		}
 
-		Render(w, s.Views.View, &View{
-			AppInfo: s.AppInfo(),
+		s.Render(w, s.Views.View, &View{
 			EditObject: EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
@@ -112,8 +113,7 @@ func (s *Server) handleEdit(o spullen.Object) http.HandlerFunc {
 			}
 		}
 
-		Render(w, s.Views.Edit, &Edit{
-			AppInfo: s.AppInfo(),
+		s.Render(w, s.Views.Edit, &Edit{
 			Alert:   alert,
 			EditObject: EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
@@ -166,8 +166,7 @@ func (s *Server) handleSplit(o spullen.Object) http.HandlerFunc {
 
 		original := object.FormFromObject(&o)
 
-		Render(w, s.Views.Split, &Split{
-			AppInfo: s.AppInfo(),
+		s.Render(w, s.Views.Split, &Split{
 			Alert:   alert,
 			EditObject: EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
@@ -196,8 +195,7 @@ func (s *Server) handleDelete(o spullen.Object) http.HandlerFunc {
 			}
 		}
 
-		Render(w, s.Views.Delete, &Delete{
-			AppInfo:  s.AppInfo(),
+		s.Render(w, s.Views.Delete, &deletion.Delete{
 			Alert:    alert,
 			Original: original,
 			Form:     form,
@@ -244,12 +242,5 @@ func (s *Server) handleClose() http.HandlerFunc {
 		}
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
-	}
-}
-
-func Render(w io.Writer, t *template.Template, data interface{}) {
-	err := t.ExecuteTemplate(w, "layout", data)
-	if err != nil {
-		log.Fatal(err.Error())
 	}
 }

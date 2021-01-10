@@ -13,9 +13,9 @@
         {{ if .DevMode }}
             <b class="text-danger">DEV MODE{{ if .DbOpen }} [DB OPEN]{{ end }}</b>
         {{ end }}
-        {{ template "navbar" . }}
+        {{ template "navbar" .Data }}
     </nav>
-    {{ template "content" . }}
+    {{ template "content" .Data }}
 </div>
 <script>
 function spinner() {

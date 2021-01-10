@@ -5,6 +5,7 @@ import (
 	"github.com/roelofruis/spullen"
 	"github.com/roelofruis/spullen/internal/util"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 )
@@ -118,10 +119,23 @@ func (s *Server) MakeId() spullen.ObjectId {
 	}
 }
 
-func (s *Server) AppInfo() AppInfo {
-	return AppInfo{
+type view struct {
+	DevMode bool
+	DbOpen  bool
+	Version Version
+
+	Data interface{}
+}
+
+// TODO: do not pass template but name!
+func (s *Server) Render(w io.Writer, t *template.Template, data interface{}) {
+	err := t.ExecuteTemplate(w, "layout", &view{
 		DevMode: s.DevMode,
 		DbOpen:  s.Db.IsOpened(),
 		Version: s.Version,
+		Data:   data,
+	})
+	if err != nil {
+		log.Fatal(err.Error())
 	}
 }

@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-type ObjectForm struct {
+type Form struct {
 	Id        spullen.ObjectId
 	TimeAdded string
 
@@ -27,11 +27,11 @@ type ObjectForm struct {
 	object *spullen.Object
 }
 
-func EmptyForm() *ObjectForm {
-	return &ObjectForm{Quantity: "1"}
+func EmptyForm() *Form {
+	return &Form{Quantity: "1"}
 }
 
-func (f *ObjectForm) FillFromRequest(r *http.Request) {
+func (f *Form) FillFromRequest(r *http.Request) {
 	f.Name = r.PostFormValue("name")
 	f.Quantity = r.PostFormValue("quantity")
 	f.Categories = r.PostFormValue("categories")
@@ -41,7 +41,7 @@ func (f *ObjectForm) FillFromRequest(r *http.Request) {
 	f.Notes = r.PostFormValue("notes")
 }
 
-func FormFromObject(o *spullen.Object) *ObjectForm {
+func FormFromObject(o *spullen.Object) *Form {
 	var propertyStrings []string = nil
 	for _, p := range o.Properties {
 		propertyStrings = append(propertyStrings, p.Key+"="+p.Value)
@@ -51,7 +51,7 @@ func FormFromObject(o *spullen.Object) *ObjectForm {
 	if o.Hidden {
 		hidden = "true"
 	}
-	return &ObjectForm{
+	return &Form{
 		Id:         o.Id,
 		TimeAdded:  strconv.FormatInt(o.Added.Unix(), 10),
 		Name:       o.Name,
@@ -64,7 +64,7 @@ func FormFromObject(o *spullen.Object) *ObjectForm {
 	}
 }
 
-func (f *ObjectForm) GetObject() (*spullen.Object, error) {
+func (f *Form) GetObject() (*spullen.Object, error) {
 	if f.object == nil {
 		return nil, errors.New("form has not been validated")
 	}
@@ -72,7 +72,7 @@ func (f *ObjectForm) GetObject() (*spullen.Object, error) {
 	return f.object, nil
 }
 
-func (f *ObjectForm) Validate() bool {
+func (f *Form) Validate() bool {
 	f.Errors = make(map[string]string)
 
 	if len(f.Id) != 16 {

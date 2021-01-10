@@ -1,4 +1,4 @@
-package core
+package database
 
 import (
 	"fmt"
@@ -8,16 +8,16 @@ import (
 	"strconv"
 )
 
-func NewDatabaseForm(finder *util.Finder) *DatabaseForm {
+func NewDatabaseForm(finder *util.Finder) *Form {
 	databases, err := finder.FindDatabases()
 	if err != nil {
 		log.Print(fmt.Sprintf("Error finding storage: %s", err.Error()))
 		databases = []string{}
 	}
-	return &DatabaseForm{AvailableDatabases: databases}
+	return &Form{AvailableDatabases: databases}
 }
 
-type DatabaseForm struct {
+type Form struct {
 	IsExistingDatabase bool
 
 	Database        string
@@ -31,13 +31,13 @@ type DatabaseForm struct {
 	ParsedShowHiddenItems bool
 }
 
-func (f *DatabaseForm) FillFromRequest(r *http.Request) {
-	f.Database = r.PostFormValue("storage")
+func (f *Form) FillFromRequest(r *http.Request) {
+	f.Database = r.PostFormValue("database")
 	f.Password = r.PostFormValue("password")
 	f.ShowHiddenItems = r.PostFormValue("show-hidden-items")
 }
 
-func (f *DatabaseForm) Validate() bool {
+func (f *Form) Validate() bool {
 	f.Errors = make(map[string]string)
 
 	var found = false
@@ -50,14 +50,14 @@ func (f *DatabaseForm) Validate() bool {
 
 	if f.IsExistingDatabase {
 		if !found {
-			f.Errors["Database"] = "Geef een bestaande storage op"
+			f.Errors["Database"] = "Geef een bestaande database op"
 		}
 	} else {
 		if f.Database == "" {
 			f.Errors["Database"] = "Geef een databasenaam op"
 		}
 		if found {
-			f.Errors["Database"] = "Er bestaat al een storage met deze naam"
+			f.Errors["Database"] = "Er bestaat al een database met deze naam"
 		}
 	}
 

@@ -10,7 +10,7 @@ import (
 type MarshallerImpl struct{}
 
 func (o *MarshallerImpl) Unmarshall(record []string) (*spullen.Object, error) {
-	form := &ObjectForm{
+	form := &Form{
 		Id:         spullen.ObjectId(record[0]),
 		TimeAdded:  record[1],
 		Name:       record[2],
