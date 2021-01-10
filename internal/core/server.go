@@ -82,7 +82,7 @@ func (s *Server) withDatabase(h http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func (s *Server) withValidObject(f func(object *spullen.Object) http.HandlerFunc) http.HandlerFunc {
+func (s *Server) withValidObject(f func(object spullen.Object) http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
@@ -103,7 +103,7 @@ func (s *Server) withValidObject(f func(object *spullen.Object) http.HandlerFunc
 			return
 		}
 
-		f(object)(w, r)
+		f(*object)(w, r)
 	}
 }
 

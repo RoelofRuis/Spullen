@@ -123,9 +123,9 @@ func (s *Server) handleClose() http.HandlerFunc {
 	}
 }
 
-func (s *Server) handleEdit(object *spullen.Object) http.HandlerFunc {
+func (s *Server) handleEdit(object spullen.Object) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		form := FormFromObject(object)
+		form := FormFromObject(&object)
 
 		var alert = ""
 		if r.Method == http.MethodPost {
@@ -157,14 +157,14 @@ func (s *Server) handleEdit(object *spullen.Object) http.HandlerFunc {
 	}
 }
 
-func (s *Server) handleSplit(object *spullen.Object) http.HandlerFunc {
+func (s *Server) handleSplit(object spullen.Object) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if object.Quantity < 2 {
 			http.Error(w, "object cannot be split", http.StatusConflict)
 			return
 		}
 
-		form := FormFromObject(object)
+		form := FormFromObject(&object)
 		form.Quantity = "1"
 
 		var alert = ""
@@ -181,7 +181,7 @@ func (s *Server) handleSplit(object *spullen.Object) http.HandlerFunc {
 					object.Quantity -= splitObject.Quantity
 
 					s.Objects.Put(splitObject)
-					s.Objects.Put(object)
+					s.Objects.Put(&object)
 
 					http.Redirect(w, r, "/view", http.StatusSeeOther)
 					return
@@ -196,7 +196,7 @@ func (s *Server) handleSplit(object *spullen.Object) http.HandlerFunc {
 			object.Quantity -= int(qty)
 		}
 
-		original := FormFromObject(object)
+		original := FormFromObject(&object)
 
 		Render(w, s.Views.Split, &Split{
 			AppInfo: s.AppInfo(),
@@ -212,9 +212,9 @@ func (s *Server) handleSplit(object *spullen.Object) http.HandlerFunc {
 	}
 }
 
-func (s *Server) handleDelete(object *spullen.Object) http.HandlerFunc {
+func (s *Server) handleDelete(object spullen.Object) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		original := FormFromObject(object)
+		original := FormFromObject(&object)
 
 		var alert = ""
 		form := &DeleteForm{Id: object.Id}
@@ -237,7 +237,7 @@ func (s *Server) handleDelete(object *spullen.Object) http.HandlerFunc {
 	}
 }
 
-func (s *Server) handleDestroy(object *spullen.Object) http.HandlerFunc {
+func (s *Server) handleDestroy(object spullen.Object) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		s.Objects.Remove(object.Id)
 
