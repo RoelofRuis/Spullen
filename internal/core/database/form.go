@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"github.com/roelofruis/spullen"
 	"github.com/roelofruis/spullen/internal/util"
 	"log"
 	"net/http"
@@ -11,7 +12,7 @@ import (
 func NewDatabaseForm(finder *util.Finder) *Form {
 	databases, err := finder.FindDatabases()
 	if err != nil {
-		log.Print(fmt.Sprintf("Error finding storage: %s", err.Error()))
+		log.Print(fmt.Sprintf("Error finding database: %s", err.Error()))
 		databases = []string{}
 	}
 	return &Form{AvailableDatabases: databases}
@@ -23,18 +24,24 @@ type Form struct {
 	Database        string
 	Password        string
 	ShowHiddenItems string
+	ShowDeletedItems string
 
 	AvailableDatabases []string
 
 	Errors map[string]string
 
-	ParsedShowHiddenItems bool
+	dataFlags *spullen.DataFlags
 }
 
 func (f *Form) FillFromRequest(r *http.Request) {
 	f.Database = r.PostFormValue("database")
 	f.Password = r.PostFormValue("password")
 	f.ShowHiddenItems = r.PostFormValue("show-hidden-items")
+	f.ShowDeletedItems = r.PostFormValue("show-deleted-items")
+}
+
+func (f *Form) GetDataFlags() *spullen.DataFlags {
+	return f.dataFlags
 }
 
 func (f *Form) Validate() bool {
@@ -68,9 +75,20 @@ func (f *Form) Validate() bool {
 	showHiddenItems, err := strconv.ParseBool(f.ShowHiddenItems)
 	if err != nil {
 		f.Errors["ShowHiddenItems"] = "Verborgen items tonen moet een geldige booleaanse waarde zijn"
-	} else {
-		f.ParsedShowHiddenItems = showHiddenItems
 	}
 
-	return len(f.Errors) == 0
+	showDeletedItems, err := strconv.ParseBool(f.ShowDeletedItems)
+	if err != nil {
+		f.Errors["ShowDeletedItems"] = "Verwijderde items tonen moet een geldige booleaanse waarde zijn"
+	}
+
+	isValid := len(f.Errors) == 0
+	if isValid {
+		f.dataFlags = &spullen.DataFlags{
+			ShowHiddenItems: showHiddenItems,
+			ShowDeletedItems: showDeletedItems,
+		}
+	}
+
+	return isValid
 }

@@ -41,7 +41,6 @@ func main() {
 
 	server := core.NewServer()
 	server.DevMode = devMode
-	server.PrivateMode = false
 	server.Finder = &util.Finder{Root: dbRoot}
 	server.Db = db
 	server.Objects = objectRepo

@@ -2,6 +2,11 @@ package spullen
 
 import "time"
 
+type DataFlags struct {
+	ShowHiddenItems bool
+	ShowDeletedItems bool
+}
+
 type Database interface {
 	IsOpened() bool
 	Name() string

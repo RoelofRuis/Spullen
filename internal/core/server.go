@@ -22,7 +22,7 @@ type Server struct {
 	templates *Templates
 
 	DevMode     bool
-	PrivateMode bool
+	DataFlags *spullen.DataFlags
 
 	Finder  *util.Finder
 	Db      spullen.Database
@@ -108,7 +108,7 @@ func (s *Server) withValidObject(f func(o spullen.Object) http.HandlerFunc) http
 			return
 		}
 
-		if !s.PrivateMode && object.Hidden {
+		if !s.DataFlags.ShowHiddenItems && object.Hidden {
 			http.Error(w, "object can not be edited", http.StatusForbidden)
 			return
 		}

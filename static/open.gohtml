@@ -31,6 +31,11 @@
                 <input type="hidden" name="show-hidden-items" value="false">
                 <label class="form-check-label" for="show-hidden-items">Verborgen items tonen</label>
             </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" name="show-deleted-items" class="form-control-sm form-check-input" id="show-deleted-items" value="true" {{ if eq .Form.ShowDeletedItems "true" }}checked{{ end }}>
+                <input type="hidden" name="show-deleted-items" value="false">
+                <label class="form-check-label" for="show-deleted-items">Verwijderde items tonen</label>
+            </div>
             <button type="submit" class="btn btn-outline-success btn-spinner">
                 <span class="spinner-border spinner-border-sm" role="status" style="display:none" aria-hidden="true"></span>
                 Openen

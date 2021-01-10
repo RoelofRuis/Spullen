@@ -33,7 +33,7 @@ func (s *Server) handleLoadDatabase(viewName string, isExistingDatabase bool) ht
 
 				err := s.Db.Open(form.Database, []byte(form.Password), form.IsExistingDatabase)
 				if err == nil {
-					s.PrivateMode = form.ParsedShowHiddenItems
+					s.DataFlags = form.GetDataFlags()
 
 					http.Redirect(w, r, "/view", http.StatusSeeOther)
 					return
@@ -75,16 +75,16 @@ func (s *Server) handleView() http.HandlerFunc {
 
 		s.Render(w, "view", &object.View{
 			EditObject: object.EditObject{
-				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
-				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
-				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
+				ExistingTags:         s.Objects.GetDistinctTags(s.DataFlags.ShowHiddenItems),
+				ExistingCategories:   s.Objects.GetDistinctCategories(s.DataFlags.ShowHiddenItems),
+				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.DataFlags.ShowHiddenItems),
 				Form:                 form,
 			},
 			DatabaseIsDirty: s.Db.IsDirty(),
 			TotalCount:      s.Objects.Count(),
 			DbName:          s.Db.Name(),
 			Objects:         s.Objects.GetAll(),
-			PrivateMode:     s.PrivateMode,
+			PrivateMode:     s.DataFlags.ShowHiddenItems,
 		})
 	}
 }
@@ -113,9 +113,9 @@ func (s *Server) handleEdit(o spullen.Object) http.HandlerFunc {
 		s.Render(w, "edit", &object.Edit{
 			Alert: alert,
 			EditObject: object.EditObject{
-				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
-				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
-				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
+				ExistingTags:         s.Objects.GetDistinctTags(s.DataFlags.ShowHiddenItems),
+				ExistingCategories:   s.Objects.GetDistinctCategories(s.DataFlags.ShowHiddenItems),
+				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.DataFlags.ShowHiddenItems),
 				Form:                 form,
 			},
 		})
@@ -166,9 +166,9 @@ func (s *Server) handleSplit(o spullen.Object) http.HandlerFunc {
 		s.Render(w, "split", &object.Split{
 			Alert: alert,
 			EditObject: object.EditObject{
-				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
-				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
-				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
+				ExistingTags:         s.Objects.GetDistinctTags(s.DataFlags.ShowHiddenItems),
+				ExistingCategories:   s.Objects.GetDistinctCategories(s.DataFlags.ShowHiddenItems),
+				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.DataFlags.ShowHiddenItems),
 				Form:                 form,
 			},
 			Original: original,
