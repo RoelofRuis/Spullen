@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/roelofruis/spullen/internal/core"
 	"github.com/roelofruis/spullen/internal/core/object"
-	"github.com/roelofruis/spullen/internal/database"
+	"github.com/roelofruis/spullen/internal/storage"
 	"github.com/roelofruis/spullen/internal/util"
 	"log"
 	"math/rand"
@@ -27,11 +27,11 @@ func main() {
 
 	objectRepo := object.NewStorableObjectRepository(&object.MarshallerImpl{})
 
-	var db *database.FileDatabase
+	var db *storage.FileDatabase
 	if devMode {
-		db = database.NewDatabase(false, false)
+		db = storage.NewDatabase(false, false)
 	} else {
-		db = database.NewDatabase(true, true)
+		db = storage.NewDatabase(true, true)
 	}
 
 	_ = db.Register("object-repository", objectRepo)

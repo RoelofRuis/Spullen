@@ -11,7 +11,7 @@ import (
 func NewDatabaseForm(finder *util.Finder) *DatabaseForm {
 	databases, err := finder.FindDatabases()
 	if err != nil {
-		log.Print(fmt.Sprintf("Error finding database: %s", err.Error()))
+		log.Print(fmt.Sprintf("Error finding storage: %s", err.Error()))
 		databases = []string{}
 	}
 	return &DatabaseForm{AvailableDatabases: databases}
@@ -32,7 +32,7 @@ type DatabaseForm struct {
 }
 
 func (f *DatabaseForm) FillFromRequest(r *http.Request) {
-	f.Database = r.PostFormValue("database")
+	f.Database = r.PostFormValue("storage")
 	f.Password = r.PostFormValue("password")
 	f.ShowHiddenItems = r.PostFormValue("show-hidden-items")
 }
@@ -50,14 +50,14 @@ func (f *DatabaseForm) Validate() bool {
 
 	if f.IsExistingDatabase {
 		if !found {
-			f.Errors["Database"] = "Geef een bestaande database op"
+			f.Errors["Database"] = "Geef een bestaande storage op"
 		}
 	} else {
 		if f.Database == "" {
 			f.Errors["Database"] = "Geef een databasenaam op"
 		}
 		if found {
-			f.Errors["Database"] = "Er bestaat al een database met deze naam"
+			f.Errors["Database"] = "Er bestaat al een storage met deze naam"
 		}
 	}
 

@@ -25,7 +25,7 @@ func (s *Server) handleLoadDatabase(view *template.Template, isExistingDatabase 
 				if s.Db.IsOpened() {
 					err := s.Db.Close()
 					if err != nil {
-						log.Print(fmt.Sprintf("unable to close database: %s", err.Error()))
+						log.Print(fmt.Sprintf("unable to close storage: %s", err.Error()))
 						http.Error(w, "error", http.StatusInternalServerError)
 						return
 					}
@@ -39,7 +39,7 @@ func (s *Server) handleLoadDatabase(view *template.Template, isExistingDatabase 
 					return
 				}
 
-				log.Printf("Error when trying to open database: %s", err.Error())
+				log.Printf("Error when trying to open storage: %s", err.Error())
 				alert = "De database kon niet worden geopend. Het wachtwoord is fout of de database is corrupt."
 			}
 		}
@@ -231,14 +231,14 @@ func (s *Server) handleClose() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := s.Db.Persist()
 		if err != nil {
-			log.Print(fmt.Sprintf("unable to persist database: %s", err.Error()))
+			log.Print(fmt.Sprintf("unable to persist storage: %s", err.Error()))
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
 
 		err = s.Db.Close()
 		if err != nil {
-			log.Print(fmt.Sprintf("unable to close database: %s", err.Error()))
+			log.Print(fmt.Sprintf("unable to close storage: %s", err.Error()))
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}

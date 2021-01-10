@@ -1,4 +1,4 @@
-package database
+package storage
 
 import (
 	"errors"
@@ -11,16 +11,16 @@ import (
 //
 // Implementations should then be registered with a class that implements StorableRegistry
 type Storable interface {
-	// Called with the raw data when the storable is instantiated by the database.
+	// Called with the raw data when the storable is instantiated by the storage.
 	Instantiate([]byte) error
 
-	// Called by the database to request the raw data representation for storage.
+	// Called by the storage to request the raw data representation for storage.
 	ToRaw() ([]byte, error)
 
-	// Called by the database to check whether the storable contains dirty data, to allow for storage optimizations.
+	// Called by the storage to check whether the storable contains dirty data, to allow for storage optimizations.
 	IsDirty() bool
 
-	// Called by the database right after data was successfully persisted.
+	// Called by the storage right after data was successfully persisted.
 	AfterPersist()
 }
 
@@ -78,7 +78,7 @@ func (db *FileDatabase) Name() string {
 
 func (db *FileDatabase) Open(name string, pass []byte, openExisting bool) error {
 	if db.isOpened {
-		return errors.New("database is already opened")
+		return errors.New("storage is already opened")
 	}
 
 	storage := &storageImpl{
@@ -135,7 +135,7 @@ func (db *FileDatabase) Register(id string, p Storable) error {
 
 func (db *FileDatabase) Persist() error {
 	if !db.IsOpened() {
-		return errors.New("database should be opened before it can be persisted")
+		return errors.New("storage should be opened before it can be persisted")
 	}
 
 	if !db.IsDirty() {
@@ -166,7 +166,7 @@ func (db *FileDatabase) Persist() error {
 
 func (db *FileDatabase) Close() error {
 	if !db.IsOpened() {
-		return errors.New("database should be opened before it can be closed")
+		return errors.New("storage should be opened before it can be closed")
 	}
 
 	db.lock.Lock()
