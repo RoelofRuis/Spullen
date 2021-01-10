@@ -25,10 +25,10 @@ type View struct {
 
 	DatabaseIsDirty bool
 
-	TotalCount  int
-	DbName      string
-	Objects     []ObjectView
-	ShowingHiddenItems bool
+	TotalCount          int
+	DbName              string
+	Objects             []ObjectView
+	ShowingHiddenItems  bool
 	ShowingDeletedItems bool
 }
 

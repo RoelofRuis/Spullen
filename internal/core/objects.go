@@ -36,15 +36,15 @@ func (v *ObjectViewer) GetAll(flags *spullen.DataFlags) []object.ObjectView {
 		}
 
 		objects = append(objects, object.ObjectView{
-			Id: string(o.Id),
-			Name: o.Name,
-			AddedAt: o.Added.Format("02-01-2006"),
-			Quantity: o.Quantity,
+			Id:         string(o.Id),
+			Name:       o.Name,
+			AddedAt:    o.Added.Format("02-01-2006"),
+			Quantity:   o.Quantity,
 			Categories: o.Categories,
-			Tags: o.Tags,
+			Tags:       o.Tags,
 			Properties: properties,
-			Hidden: o.Hidden,
-			Deleted: isDeleted,
+			Hidden:     o.Hidden,
+			Deleted:    isDeleted,
 		})
 	}
 	return objects

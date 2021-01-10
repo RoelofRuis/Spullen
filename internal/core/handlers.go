@@ -80,11 +80,11 @@ func (s *Server) handleView() http.HandlerFunc {
 				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.DataFlags.ShowHiddenItems),
 				Form:                 form,
 			},
-			DatabaseIsDirty: s.Db.IsDirty(),
-			TotalCount:      s.Objects.Count(),
-			DbName:          s.Db.Name(),
-			Objects:         s.ObjectViewer.GetAll(s.DataFlags),
-			ShowingHiddenItems: s.DataFlags.ShowHiddenItems,
+			DatabaseIsDirty:     s.Db.IsDirty(),
+			TotalCount:          s.Objects.Count(),
+			DbName:              s.Db.Name(),
+			Objects:             s.ObjectViewer.GetAll(s.DataFlags),
+			ShowingHiddenItems:  s.DataFlags.ShowHiddenItems,
 			ShowingDeletedItems: s.DataFlags.ShowDeletedItems,
 		})
 	}
