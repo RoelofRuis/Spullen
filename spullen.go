@@ -25,12 +25,6 @@ type ObjectRepository interface {
 	Has(id ObjectId) bool
 }
 
-type ObjectDeletionRepository interface {
-	Get(id ObjectId) *ObjectDeletion
-	Put(*ObjectDeletion)
-	Has(id ObjectId) bool
-}
-
 type Object struct {
 	Id         ObjectId
 	Added      time.Time
@@ -48,7 +42,13 @@ type Property struct {
 	Value string
 }
 
-type ObjectDeletion struct {
+type DeletionRepository interface {
+	Get(id ObjectId) *Deletion
+	Put(*Deletion)
+	Has(id ObjectId) bool
+}
+
+type Deletion struct {
 	Id        ObjectId
 	Reason    string
 	DeletedAt time.Time

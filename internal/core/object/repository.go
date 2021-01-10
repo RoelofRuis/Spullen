@@ -23,7 +23,7 @@ type Marshaller interface {
 	Marshall(obj *spullen.Object) []string
 }
 
-func NewStorableObjectRepository(marshaller Marshaller) *StorableObjectRepository {
+func NewRepository(marshaller Marshaller) *StorableObjectRepository {
 	return &StorableObjectRepository{
 		lock: sync.RWMutex{},
 

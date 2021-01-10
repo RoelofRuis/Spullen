@@ -26,6 +26,7 @@ type Server struct {
 	Finder  *util.Finder
 	Db      spullen.Database
 	Objects spullen.ObjectRepository
+	Deletions spullen.DeletionRepository
 
 	Version Version
 }

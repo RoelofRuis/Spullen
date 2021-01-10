@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/roelofruis/spullen/internal/core"
+	"github.com/roelofruis/spullen/internal/core/deletion"
 	"github.com/roelofruis/spullen/internal/core/object"
 	"github.com/roelofruis/spullen/internal/storage"
 	"github.com/roelofruis/spullen/internal/util"
@@ -25,7 +26,8 @@ func main() {
 		port = "8080"
 	}
 
-	objectRepo := object.NewStorableObjectRepository(&object.MarshallerImpl{})
+	objectRepo := object.NewRepository(&object.MarshallerImpl{})
+	deletionRepo := deletion.NewRepository()
 
 	var db *storage.FileDatabase
 	if devMode {
@@ -35,6 +37,7 @@ func main() {
 	}
 
 	_ = db.Register("object-repository", objectRepo)
+	_ = db.Register("deletion-repository", deletionRepo)
 
 	server := core.NewServer()
 	server.DevMode = devMode
@@ -42,6 +45,7 @@ func main() {
 	server.Finder = &util.Finder{Root: dbRoot}
 	server.Db = db
 	server.Objects = objectRepo
+	server.Deletions = deletionRepo
 	server.Version = VERSION
 
 	server.Templates()
