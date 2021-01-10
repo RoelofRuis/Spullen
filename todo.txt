@@ -1,3 +1,2 @@
 - Zie de logica/gebruik van 'Notion'
 - Categorieen en tags vullen
-- Objecten niet weggooien, metadata toevoegen, wanneer veranderd
