@@ -63,9 +63,9 @@
                         {{ end }}
                     </td>
                     <td>
-                        <a class="text-secondary" title="edit" href="/edit?id={{ .Id }}"><i class="fa fa-pencil"></i></a>
+                        <a class="text-secondary" title="edit" href="/edit/{{ .Id }}"><i class="fa fa-pencil"></i></a>
                         {{ if gt .Quantity 1 }}
-                            <a class="text-secondary" title="split" href="/split?id={{ .Id }}"><i class="fa fa-cubes"></i></a>
+                            <a class="text-secondary" title="split" href="/split/{{ .Id }}"><i class="fa fa-cubes"></i></a>
                         {{ end }}
                     </td>
                 </tr>

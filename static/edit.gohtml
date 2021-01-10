@@ -7,11 +7,11 @@
         {{ with .Alert }}
             <div class="alert alert-danger">{{ . }}</div>
         {{ end }}
-        <form action="/edit?id={{ .Form.Id }}" method="post">
+        <form action="/edit/{{ .Form.Id }}" method="post">
             {{ template "object-edit" . }}
             <button type="submit" class="btn btn-outline-success">Opslaan</button>
             <a href="/view" class="btn btn-outline-primary">Terug</a>
-            <a href="/delete?id={{ .Form.Id }}" class="btn btn-outline-danger pull-right" role="button">Verwijderen</a>
+            <a href="/delete/{{ .Form.Id }}" class="btn btn-outline-danger pull-right" role="button">Verwijderen</a>
         </form>
     </div>
     <div class="col"></div>

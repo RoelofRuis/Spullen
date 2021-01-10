@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type Server struct {
@@ -58,10 +59,10 @@ func (s *Server) Routes() {
 	s.Router.HandleFunc("/close", s.withDatabase(s.handleClose()))
 
 	s.Router.HandleFunc("/view", s.withDatabase(s.handleView()))
-	s.Router.HandleFunc("/edit", s.withDatabase(s.withValidObject(s.handleEdit)))
-	s.Router.HandleFunc("/split", s.withDatabase(s.withValidObject(s.handleSplit)))
-	s.Router.HandleFunc("/delete", s.withDatabase(s.withValidObject(s.handleDelete)))
-	s.Router.HandleFunc("/destroy", s.withDatabase(s.withValidObject(s.handleDestroy)))
+	s.Router.HandleFunc("/edit/", s.withDatabase(s.withValidObject(s.handleEdit)))
+	s.Router.HandleFunc("/split/", s.withDatabase(s.withValidObject(s.handleSplit)))
+	s.Router.HandleFunc("/delete/", s.withDatabase(s.withValidObject(s.handleDelete)))
+	s.Router.HandleFunc("/destroy/", s.withDatabase(s.withValidObject(s.handleDestroy)))
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -84,6 +85,16 @@ func (s *Server) withDatabase(h http.HandlerFunc) http.HandlerFunc {
 
 func (s *Server) withValidObject(f func(object spullen.Object) http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		urlParts := strings.Split(r.URL.Path, "/")
+
+		if len(urlParts) < 2 {
+			log.Print(fmt.Sprintf("unable to detect id"))
+			http.Error(w, "invalid url", http.StatusBadRequest)
+			return
+		}
+
+		id := spullen.ObjectId(urlParts[2])
+
 		err := r.ParseForm()
 		if err != nil {
 			log.Print(fmt.Sprintf("error when parsing form: %s", err.Error()))
@@ -91,7 +102,6 @@ func (s *Server) withValidObject(f func(object spullen.Object) http.HandlerFunc)
 			return
 		}
 
-		id := spullen.ObjectId(r.Form.Get("id"))
 		object := s.Objects.Get(id)
 		if object == nil {
 			http.Error(w, "object does not exist", http.StatusNotFound)

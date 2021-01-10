@@ -7,7 +7,7 @@
         {{ with .Alert }}
             <div class="alert alert-danger">{{ . }}</div>
         {{ end }}
-        <form action="/split?id={{ .Original.Id }}" method="post">
+        <form action="/split/{{ .Original.Id }}" method="post">
             {{ template "object-edit" . }}
             <button type="submit" class="btn btn-outline-success">Afsplitsen</button>
             <a href="/view" class="btn btn-outline-primary">Terug</a>
