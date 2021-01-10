@@ -25,6 +25,12 @@ type ObjectRepository interface {
 	Has(id ObjectId) bool
 }
 
+type ObjectDeletionRepository interface {
+	Get(id ObjectId) *ObjectDeletion
+	Put(*ObjectDeletion)
+	Has(id ObjectId) bool
+}
+
 type Object struct {
 	Id         ObjectId
 	Added      time.Time
