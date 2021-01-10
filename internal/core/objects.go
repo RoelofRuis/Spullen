@@ -18,5 +18,34 @@ type ObjectViewer struct {
 }
 
 func (v *ObjectViewer) GetAll(flags *spullen.DataFlags) []object.ObjectView {
-	// TODO: implement
+	var objects []object.ObjectView
+	for _, o := range v.objects.GetAll() {
+		if !flags.ShowHiddenItems && o.Hidden {
+			continue
+		}
+
+		isDeleted := v.deletions.Has(o.Id)
+
+		if !flags.ShowDeletedItems && isDeleted {
+			continue
+		}
+
+		var properties []string
+		for _, p := range o.Properties {
+			properties = append(properties, p.String())
+		}
+
+		objects = append(objects, object.ObjectView{
+			Id: string(o.Id),
+			Name: o.Name,
+			AddedAt: o.Added.Format("02-01-2006"),
+			Quantity: o.Quantity,
+			Categories: o.Categories,
+			Tags: o.Tags,
+			Properties: properties,
+			Hidden: o.Hidden,
+			Deleted: isDeleted,
+		})
+	}
+	return objects
 }

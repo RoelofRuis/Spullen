@@ -20,7 +20,6 @@
 {{ end }}
 
 {{ define "content" }}
-{{ $private_mode := .PrivateMode }}
 <div class="row mt-2">
     <div class="col">
         <h4>Toevoegen</h4>
@@ -35,8 +34,11 @@
                 <tr>
                     <th colspan="3">
                         Database: <b>{{ .DbName }}</b>
-                        {{ if $private_mode }}
+                        {{ if .ShowingHiddenItems }}
                         <span class="fa fa-exclamation-circle text-primary" title="verborgen items zijn zichtbaar"></span>
+                        {{ end }}
+                        {{ if .ShowingDeletedItems }}
+                            <span class="fa fa-trash-o text-primary" title="verwijderde items zijn zichtbaar"></span>
                         {{ end }}
                         <span id="table-filter" class="fa fa-filter text-info" title="filter toegepast" style="display: none;"></span>
                         <span class="pull-right">Totaal aantal: <b>{{ .TotalCount }}</b></span>
@@ -45,10 +47,15 @@
             </thead>
             <tbody id="table-results">
             {{ range .Objects }}
-                {{ if or $private_mode (not .Hidden) }}
-                <tr title="{{ .Name }} ({{ .Added.Format "02-01-2006" }})">
+                <tr title="{{ .Name }} ({{ .AddedAt }})">
                     <td>
-                        {{ if .Hidden }}<i title="verborgen item" class="fa fa-exclamation-circle text-primary"></i> {{ end }}<span class="name">{{ .Name }}</span>
+                        {{ if .Hidden }}
+                            <i title="verborgen item" class="fa fa-exclamation-circle text-primary"></i>
+                        {{ end }}
+                        {{ if .Deleted }}
+                            <i title="verwijderd item" class="fa fa-trash-o text-primary"></i>
+                        {{ end }}
+                        <span class="name">{{ .Name }}</span>
                         {{ if gt .Quantity 1 }}<span class="text-muted">×{{ .Quantity }}</span>{{ end }}
                     </td>
                     <td>
@@ -59,17 +66,18 @@
                             <span class="badge badge-pill badge-info">{{ . }}</span>
                         {{ end }}
                         {{ range .Properties }}
-                            <span class="badge badge-pill badge-secondary">{{ .Key }}={{ .Value }}</span>
+                            <span class="badge badge-pill badge-secondary">{{ . }}</span>
                         {{ end }}
                     </td>
                     <td>
-                        <a class="text-secondary" title="edit" href="/edit/{{ .Id }}"><i class="fa fa-pencil"></i></a>
+                        {{ if not .Deleted }}
+                            <a class="text-secondary" title="edit" href="/edit/{{ .Id }}"><i class="fa fa-pencil"></i></a>
+                        {{ end }}
                         {{ if gt .Quantity 1 }}
                             <a class="text-secondary" title="split" href="/split/{{ .Id }}"><i class="fa fa-cubes"></i></a>
                         {{ end }}
                     </td>
                 </tr>
-                {{ end }}
             {{ end }}
             </tbody>
         </table>

@@ -3,6 +3,7 @@ package object
 type ObjectView struct {
 	Id         string
 	Name       string
+	AddedAt    string
 	Quantity   int
 	Categories []string
 	Tags       []string
@@ -27,7 +28,8 @@ type View struct {
 	TotalCount  int
 	DbName      string
 	Objects     []ObjectView
-	PrivateMode bool
+	ShowingHiddenItems bool
+	ShowingDeletedItems bool
 }
 
 type Split struct {

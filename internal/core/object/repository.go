@@ -243,7 +243,7 @@ func (s *StorableObjectRepository) ToRaw() ([]byte, error) {
 	for _, obj := range s.GetAll() {
 		var properties []string
 		for _, p := range obj.Properties {
-			properties = append(properties, fmt.Sprintf("%s=%s", p.Key, p.Value))
+			properties = append(properties, p.String())
 		}
 
 		record := []string{

@@ -84,7 +84,8 @@ func (s *Server) handleView() http.HandlerFunc {
 			TotalCount:      s.Objects.Count(),
 			DbName:          s.Db.Name(),
 			Objects:         s.ObjectViewer.GetAll(s.DataFlags),
-			PrivateMode:     s.DataFlags.ShowHiddenItems,
+			ShowingHiddenItems: s.DataFlags.ShowHiddenItems,
+			ShowingDeletedItems: s.DataFlags.ShowDeletedItems,
 		})
 	}
 }

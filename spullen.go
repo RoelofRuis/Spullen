@@ -1,6 +1,9 @@
 package spullen
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type DataFlags struct {
 	ShowHiddenItems  bool
@@ -45,6 +48,10 @@ type Object struct {
 type Property struct {
 	Key   string
 	Value string
+}
+
+func (p *Property) String() string {
+	return fmt.Sprintf("%s=%s", p.Key, p.Value)
 }
 
 type DeletionRepository interface {
