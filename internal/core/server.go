@@ -133,7 +133,7 @@ func (s *Server) Render(w io.Writer, t *template.Template, data interface{}) {
 		DevMode: s.DevMode,
 		DbOpen:  s.Db.IsOpened(),
 		Version: s.Version,
-		Data:   data,
+		Data:    data,
 	})
 	if err != nil {
 		log.Fatal(err.Error())

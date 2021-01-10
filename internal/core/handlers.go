@@ -46,8 +46,8 @@ func (s *Server) handleLoadDatabase(view *template.Template, isExistingDatabase 
 		}
 
 		s.Render(w, view, &Database{
-			Alert:   alert,
-			Form:    form,
+			Alert: alert,
+			Form:  form,
 		})
 	}
 }
@@ -112,7 +112,7 @@ func (s *Server) handleEdit(o spullen.Object) http.HandlerFunc {
 		}
 
 		s.Render(w, s.Views.Edit, &Edit{
-			Alert:   alert,
+			Alert: alert,
 			EditObject: EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
@@ -165,7 +165,7 @@ func (s *Server) handleSplit(o spullen.Object) http.HandlerFunc {
 		original := object.FormFromObject(&o)
 
 		s.Render(w, s.Views.Split, &Split{
-			Alert:   alert,
+			Alert: alert,
 			EditObject: EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
