@@ -36,19 +36,13 @@ func main() {
 
 	_ = db.Register("object-repository", objectRepo)
 
-	server := &core.Server{
-		Router: http.ServeMux{},
-		Views:  &core.Views{},
-
-		DevMode:     devMode,
-		PrivateMode: true,
-
-		Finder:  &util.Finder{Root: dbRoot},
-		Db:      db,
-		Objects: objectRepo,
-
-		Version: VERSION,
-	}
+	server := core.NewServer()
+	server.DevMode = devMode
+	server.PrivateMode = false
+	server.Finder = &util.Finder{Root: dbRoot}
+	server.Db = db
+	server.Objects = objectRepo
+	server.Version = VERSION
 
 	server.Templates()
 	server.Routes()

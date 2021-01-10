@@ -6,14 +6,13 @@ import (
 	"github.com/roelofruis/spullen/internal/core/database"
 	"github.com/roelofruis/spullen/internal/core/deletion"
 	"github.com/roelofruis/spullen/internal/core/object"
-	"html/template"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
 )
 
-func (s *Server) handleLoadDatabase(view *template.Template, isExistingDatabase bool) http.HandlerFunc {
+func (s *Server) handleLoadDatabase(viewName string, isExistingDatabase bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		form := database.NewDatabaseForm(s.Finder)
 		form.IsExistingDatabase = isExistingDatabase
@@ -45,7 +44,7 @@ func (s *Server) handleLoadDatabase(view *template.Template, isExistingDatabase 
 			}
 		}
 
-		s.Render(w, view, &database.Database{
+		s.Render(w, viewName, &database.Database{
 			Alert: alert,
 			Form:  form,
 		})
@@ -74,7 +73,7 @@ func (s *Server) handleView() http.HandlerFunc {
 			}
 		}
 
-		s.Render(w, s.Views.View, &object.View{
+		s.Render(w, "view", &object.View{
 			EditObject: object.EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
@@ -111,7 +110,7 @@ func (s *Server) handleEdit(o spullen.Object) http.HandlerFunc {
 			}
 		}
 
-		s.Render(w, s.Views.Edit, &object.Edit{
+		s.Render(w, "edit", &object.Edit{
 			Alert: alert,
 			EditObject: object.EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
@@ -164,7 +163,7 @@ func (s *Server) handleSplit(o spullen.Object) http.HandlerFunc {
 
 		original := object.FormFromObject(&o)
 
-		s.Render(w, s.Views.Split, &object.Split{
+		s.Render(w, "split", &object.Split{
 			Alert: alert,
 			EditObject: object.EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
@@ -193,7 +192,7 @@ func (s *Server) handleDelete(o spullen.Object) http.HandlerFunc {
 			}
 		}
 
-		s.Render(w, s.Views.Delete, &deletion.Delete{
+		s.Render(w, "delete", &deletion.Delete{
 			Alert:    alert,
 			Original: original,
 			Form:     form,
