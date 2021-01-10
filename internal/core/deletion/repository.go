@@ -22,6 +22,7 @@ func NewRepository() *StorableDeletionRepository {
 	return &StorableDeletionRepository{
 		lock: sync.RWMutex{},
 
+		deletions: map[spullen.ObjectId]*spullen.Deletion{},
 		dirty:   false,
 	}
 }

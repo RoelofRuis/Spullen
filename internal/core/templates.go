@@ -5,6 +5,12 @@ import (
 	"html/template"
 )
 
+func NewTemplates() *Templates {
+	return &Templates {
+		templates: make(map[string]*template.Template),
+	}
+}
+
 type Templates struct {
 	templates map[string]*template.Template
 }

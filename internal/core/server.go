@@ -12,7 +12,7 @@ import (
 func NewServer() *Server {
 	return &Server{
 		router:    http.ServeMux{},
-		templates: &Templates{},
+		templates: NewTemplates(),
 	}
 }
 
