@@ -1,8 +1,17 @@
 package object
 
-import "github.com/roelofruis/spullen"
+type ObjectView struct {
+	Id         string
+	Name       string
+	Quantity   int
+	Categories []string
+	Tags       []string
+	Properties []string
+	Hidden     bool
+	Deleted    bool
+}
 
-type EditObject struct {
+type EditableObjectForm struct {
 	ExistingTags         []string
 	ExistingCategories   []string
 	ExistingPropertyKeys []string
@@ -11,18 +20,18 @@ type EditObject struct {
 }
 
 type View struct {
-	EditObject
+	EditableObjectForm
 
 	DatabaseIsDirty bool
 
 	TotalCount  int
 	DbName      string
-	Objects     []*spullen.Object
+	Objects     []ObjectView
 	PrivateMode bool
 }
 
 type Split struct {
-	EditObject
+	EditableObjectForm
 
 	Alert string
 
@@ -30,7 +39,7 @@ type Split struct {
 }
 
 type Edit struct {
-	EditObject
+	EditableObjectForm
 
 	Alert string
 }

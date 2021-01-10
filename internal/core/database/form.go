@@ -21,9 +21,9 @@ func NewDatabaseForm(finder *util.Finder) *Form {
 type Form struct {
 	IsExistingDatabase bool
 
-	Database        string
-	Password        string
-	ShowHiddenItems string
+	Database         string
+	Password         string
+	ShowHiddenItems  string
 	ShowDeletedItems string
 
 	AvailableDatabases []string
@@ -85,7 +85,7 @@ func (f *Form) Validate() bool {
 	isValid := len(f.Errors) == 0
 	if isValid {
 		f.dataFlags = &spullen.DataFlags{
-			ShowHiddenItems: showHiddenItems,
+			ShowHiddenItems:  showHiddenItems,
 			ShowDeletedItems: showDeletedItems,
 		}
 	}

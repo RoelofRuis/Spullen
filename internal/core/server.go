@@ -21,13 +21,14 @@ type Server struct {
 	router    http.ServeMux
 	templates *Templates
 
-	DevMode     bool
+	DevMode   bool
 	DataFlags *spullen.DataFlags
 
-	Finder  *util.Finder
-	Db      spullen.Database
-	Objects spullen.ObjectRepository
-	Deletions spullen.DeletionRepository
+	Finder       *util.Finder
+	Db           spullen.Database
+	Objects      spullen.ObjectRepository
+	Deletions    spullen.DeletionRepository
+	ObjectViewer *ObjectViewer
 
 	Version Version
 }

@@ -3,7 +3,7 @@ package spullen
 import "time"
 
 type DataFlags struct {
-	ShowHiddenItems bool
+	ShowHiddenItems  bool
 	ShowDeletedItems bool
 }
 

@@ -74,7 +74,7 @@ func (s *Server) handleView() http.HandlerFunc {
 		}
 
 		s.Render(w, "view", &object.View{
-			EditObject: object.EditObject{
+			EditableObjectForm: object.EditableObjectForm{
 				ExistingTags:         s.Objects.GetDistinctTags(s.DataFlags.ShowHiddenItems),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.DataFlags.ShowHiddenItems),
 				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.DataFlags.ShowHiddenItems),
@@ -83,7 +83,7 @@ func (s *Server) handleView() http.HandlerFunc {
 			DatabaseIsDirty: s.Db.IsDirty(),
 			TotalCount:      s.Objects.Count(),
 			DbName:          s.Db.Name(),
-			Objects:         s.Objects.GetAll(),
+			Objects:         s.ObjectViewer.GetAll(s.DataFlags),
 			PrivateMode:     s.DataFlags.ShowHiddenItems,
 		})
 	}
@@ -112,7 +112,7 @@ func (s *Server) handleEdit(o spullen.Object) http.HandlerFunc {
 
 		s.Render(w, "edit", &object.Edit{
 			Alert: alert,
-			EditObject: object.EditObject{
+			EditableObjectForm: object.EditableObjectForm{
 				ExistingTags:         s.Objects.GetDistinctTags(s.DataFlags.ShowHiddenItems),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.DataFlags.ShowHiddenItems),
 				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.DataFlags.ShowHiddenItems),
@@ -165,7 +165,7 @@ func (s *Server) handleSplit(o spullen.Object) http.HandlerFunc {
 
 		s.Render(w, "split", &object.Split{
 			Alert: alert,
-			EditObject: object.EditObject{
+			EditableObjectForm: object.EditableObjectForm{
 				ExistingTags:         s.Objects.GetDistinctTags(s.DataFlags.ShowHiddenItems),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.DataFlags.ShowHiddenItems),
 				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.DataFlags.ShowHiddenItems),

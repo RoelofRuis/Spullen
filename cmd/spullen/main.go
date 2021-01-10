@@ -26,7 +26,7 @@ func main() {
 		port = "8080"
 	}
 
-	objectRepo   := object.NewRepository()
+	objectRepo := object.NewRepository()
 	deletionRepo := deletion.NewRepository()
 
 	var db *storage.FileDatabase
@@ -46,6 +46,7 @@ func main() {
 	server.Objects = objectRepo
 	server.Deletions = deletionRepo
 	server.Version = VERSION
+	server.ObjectViewer = core.NewObjectViewer(objectRepo, deletionRepo)
 
 	server.Templates()
 	server.Routes()

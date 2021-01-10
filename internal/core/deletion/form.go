@@ -40,9 +40,9 @@ func (f *Form) Validate() bool {
 	isValid := len(f.Errors) == 0
 	if isValid {
 		f.deletion = &spullen.Deletion{
-			Id: f.Id,
+			Id:        f.Id,
 			DeletedAt: time.Unix(t, 0),
-			Reason: f.Reason,
+			Reason:    f.Reason,
 		}
 	}
 

@@ -15,8 +15,8 @@ import (
 type StorableObjectRepository struct {
 	lock sync.RWMutex
 
-	objects    map[spullen.ObjectId]*spullen.Object
-	dirty      bool
+	objects map[spullen.ObjectId]*spullen.Object
+	dirty   bool
 }
 
 type Marshaller interface {

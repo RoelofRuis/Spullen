@@ -14,8 +14,8 @@ import (
 type StorableDeletionRepository struct {
 	lock sync.RWMutex
 
-	deletions  map[spullen.ObjectId]*spullen.Deletion
-	dirty      bool
+	deletions map[spullen.ObjectId]*spullen.Deletion
+	dirty     bool
 }
 
 func NewRepository() *StorableDeletionRepository {
@@ -23,7 +23,7 @@ func NewRepository() *StorableDeletionRepository {
 		lock: sync.RWMutex{},
 
 		deletions: map[spullen.ObjectId]*spullen.Deletion{},
-		dirty:   false,
+		dirty:     false,
 	}
 }
 
@@ -82,9 +82,9 @@ func (s *StorableDeletionRepository) Instantiate(data []byte) error {
 		}
 
 		form := &Form{
-			Id: spullen.ObjectId(record[0]),
+			Id:        spullen.ObjectId(record[0]),
 			RemovedAt: record[1],
-			Reason: record[2],
+			Reason:    record[2],
 		}
 
 		if !form.Validate() {
@@ -114,7 +114,7 @@ func (s *StorableDeletionRepository) ToRaw() ([]byte, error) {
 	w.Comma = ';'
 
 	for _, d := range s.deletions {
-		record := []string {
+		record := []string{
 			string(d.Id),
 			strconv.FormatInt(d.DeletedAt.Unix(), 10),
 			d.Reason,

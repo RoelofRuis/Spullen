@@ -6,7 +6,7 @@ import (
 )
 
 func NewTemplates() *Templates {
-	return &Templates {
+	return &Templates{
 		templates: make(map[string]*template.Template),
 	}
 }
