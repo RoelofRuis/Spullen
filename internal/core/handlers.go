@@ -45,7 +45,7 @@ func (s *Server) handleLoadDatabase(view *template.Template, isExistingDatabase 
 			}
 		}
 
-		s.Render(w, view, &Database{
+		s.Render(w, view, &database.Database{
 			Alert: alert,
 			Form:  form,
 		})
@@ -74,8 +74,8 @@ func (s *Server) handleView() http.HandlerFunc {
 			}
 		}
 
-		s.Render(w, s.Views.View, &View{
-			EditObject: EditObject{
+		s.Render(w, s.Views.View, &object.View{
+			EditObject: object.EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
 				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
@@ -111,9 +111,9 @@ func (s *Server) handleEdit(o spullen.Object) http.HandlerFunc {
 			}
 		}
 
-		s.Render(w, s.Views.Edit, &Edit{
+		s.Render(w, s.Views.Edit, &object.Edit{
 			Alert: alert,
-			EditObject: EditObject{
+			EditObject: object.EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
 				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
@@ -164,9 +164,9 @@ func (s *Server) handleSplit(o spullen.Object) http.HandlerFunc {
 
 		original := object.FormFromObject(&o)
 
-		s.Render(w, s.Views.Split, &Split{
+		s.Render(w, s.Views.Split, &object.Split{
 			Alert: alert,
-			EditObject: EditObject{
+			EditObject: object.EditObject{
 				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
 				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
 				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
@@ -182,7 +182,7 @@ func (s *Server) handleDelete(o spullen.Object) http.HandlerFunc {
 		original := object.FormFromObject(&o)
 
 		var alert = ""
-		form := &DeleteForm{Id: o.Id}
+		form := &deletion.Form{Id: o.Id}
 		if r.Method == http.MethodPost {
 			form.RemovedAt = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
 			form.Reason = r.PostFormValue("reason")

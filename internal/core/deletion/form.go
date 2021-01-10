@@ -1,10 +1,10 @@
-package core
+package deletion
 
 import (
 	"github.com/roelofruis/spullen"
 )
 
-type DeleteForm struct {
+type Form struct {
 	Id        spullen.ObjectId
 	Reason    string
 	RemovedAt string
@@ -12,7 +12,7 @@ type DeleteForm struct {
 	Errors map[string]string
 }
 
-func (f *DeleteForm) Validate() bool {
+func (f *Form) Validate() bool {
 	f.Errors = make(map[string]string)
 
 	if len(f.Id) != 16 {
