@@ -187,8 +187,15 @@ func (s *Server) handleDelete(o spullen.Object) http.HandlerFunc {
 			form.Reason = r.PostFormValue("reason")
 
 			if form.Validate() {
-				// TODO: implement actual logic
-				alert = "TODO: this is not implemented yet, object should now be deleted!"
+				del, err := form.GetDeletion()
+				if err != nil {
+					alert = fmt.Sprintf("Error when getting deletion\n%s", err.Error())
+				} else {
+					s.Deletions.Put(del)
+
+					http.Redirect(w, r, "/view", http.StatusSeeOther)
+					return
+				}
 			}
 		}
 
