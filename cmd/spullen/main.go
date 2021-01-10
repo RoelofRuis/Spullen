@@ -26,7 +26,7 @@ func main() {
 		port = "8080"
 	}
 
-	objectRepo := object.NewRepository(&object.MarshallerImpl{})
+	objectRepo   := object.NewRepository()
 	deletionRepo := deletion.NewRepository()
 
 	var db *storage.FileDatabase
