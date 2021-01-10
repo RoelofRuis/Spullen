@@ -1,6 +1,9 @@
 package core
 
-import "github.com/roelofruis/spullen"
+import (
+	"github.com/roelofruis/spullen"
+	"github.com/roelofruis/spullen/internal/core/object"
+)
 
 type AppInfo struct {
 	DevMode bool
@@ -21,7 +24,7 @@ type EditObject struct {
 	ExistingCategories   []string
 	ExistingPropertyKeys []string
 
-	Form *ObjectForm
+	Form *object.ObjectForm
 }
 
 type View struct {
@@ -42,7 +45,7 @@ type Split struct {
 
 	Alert string
 
-	Original *ObjectForm
+	Original *object.ObjectForm
 }
 
 type Edit struct {
@@ -57,6 +60,6 @@ type Delete struct {
 
 	Alert string
 
-	Original *ObjectForm
+	Original *object.ObjectForm
 	Form     *DeleteForm
 }

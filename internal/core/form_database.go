@@ -2,12 +2,13 @@ package core
 
 import (
 	"fmt"
+	"github.com/roelofruis/spullen/internal/util"
 	"log"
 	"net/http"
 	"strconv"
 )
 
-func NewDatabaseForm(finder *Finder) *DatabaseForm {
+func NewDatabaseForm(finder *util.Finder) *DatabaseForm {
 	databases, err := finder.FindDatabases()
 	if err != nil {
 		log.Print(fmt.Sprintf("Error finding database: %s", err.Error()))

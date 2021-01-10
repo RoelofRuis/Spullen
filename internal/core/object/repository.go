@@ -1,4 +1,4 @@
-package repository
+package object
 
 import (
 	"bytes"
@@ -13,17 +13,17 @@ import (
 type StorableObjectRepository struct {
 	lock sync.RWMutex
 
-	marshaller ObjectMarshaller
+	marshaller Marshaller
 	objects    map[spullen.ObjectId]*spullen.Object
 	dirty      bool
 }
 
-type ObjectMarshaller interface {
+type Marshaller interface {
 	Unmarshall(record []string) (*spullen.Object, error)
 	Marshall(obj *spullen.Object) []string
 }
 
-func NewStorableObjectRepository(marshaller ObjectMarshaller) *StorableObjectRepository {
+func NewStorableObjectRepository(marshaller Marshaller) *StorableObjectRepository {
 	return &StorableObjectRepository{
 		lock: sync.RWMutex{},
 

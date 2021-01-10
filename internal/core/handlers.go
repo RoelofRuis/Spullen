@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"github.com/roelofruis/spullen"
+	"github.com/roelofruis/spullen/internal/core/object"
 	"html/template"
 	"io"
 	"log"
@@ -53,7 +54,7 @@ func (s *Server) handleLoadDatabase(view *template.Template, isExistingDatabase 
 
 func (s *Server) handleView() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		form := EmptyForm()
+		form := object.EmptyForm()
 
 		if r.Method == http.MethodPost {
 			form.Id = s.MakeId()
@@ -69,7 +70,7 @@ func (s *Server) handleView() http.HandlerFunc {
 				}
 
 				s.Objects.Put(obj)
-				form = EmptyForm()
+				form = object.EmptyForm()
 			}
 		}
 
@@ -87,6 +88,129 @@ func (s *Server) handleView() http.HandlerFunc {
 			Objects:         s.Objects.GetAll(),
 			PrivateMode:     s.PrivateMode,
 		})
+	}
+}
+
+func (s *Server) handleEdit(o spullen.Object) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		form := object.FormFromObject(&o)
+
+		var alert = ""
+		if r.Method == http.MethodPost {
+			form.FillFromRequest(r)
+
+			if form.Validate() {
+				obj, err := form.GetObject()
+				if err != nil {
+					alert = fmt.Sprintf("Error when getting object\n%s", err.Error())
+				} else {
+					s.Objects.Put(obj)
+
+					http.Redirect(w, r, "/view", http.StatusSeeOther)
+					return
+				}
+			}
+		}
+
+		Render(w, s.Views.Edit, &Edit{
+			AppInfo: s.AppInfo(),
+			Alert:   alert,
+			EditObject: EditObject{
+				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
+				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
+				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
+				Form:                 form,
+			},
+		})
+	}
+}
+
+func (s *Server) handleSplit(o spullen.Object) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if o.Quantity < 2 {
+			http.Error(w, "object cannot be split", http.StatusConflict)
+			return
+		}
+
+		form := object.FormFromObject(&o)
+		form.Quantity = "1"
+
+		var alert = ""
+		if r.Method == http.MethodPost {
+			form.Id = s.MakeId()
+			form.TimeAdded = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
+			form.FillFromRequest(r)
+
+			if form.Validate() {
+				splitObject, err := form.GetObject()
+				if err != nil {
+					alert = fmt.Sprintf("Error when getting object \n%s", err.Error())
+				} else {
+					o.Quantity -= splitObject.Quantity
+
+					s.Objects.Put(splitObject)
+					s.Objects.Put(&o)
+
+					http.Redirect(w, r, "/view", http.StatusSeeOther)
+					return
+				}
+			}
+		}
+
+		qty, err := strconv.ParseInt(form.Quantity, 10, 64)
+		if err != nil {
+			o.Quantity -= 1
+		} else {
+			o.Quantity -= int(qty)
+		}
+
+		original := object.FormFromObject(&o)
+
+		Render(w, s.Views.Split, &Split{
+			AppInfo: s.AppInfo(),
+			Alert:   alert,
+			EditObject: EditObject{
+				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
+				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
+				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
+				Form:                 form,
+			},
+			Original: original,
+		})
+	}
+}
+
+func (s *Server) handleDelete(o spullen.Object) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		original := object.FormFromObject(&o)
+
+		var alert = ""
+		form := &DeleteForm{Id: o.Id}
+		if r.Method == http.MethodPost {
+			form.RemovedAt = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
+			form.Reason = r.PostFormValue("reason")
+
+			if form.Validate() {
+				// TODO: implement actual logic
+				alert = "TODO: this is not implemented yet, object should now be deleted!"
+			}
+		}
+
+		Render(w, s.Views.Delete, &Delete{
+			AppInfo:  s.AppInfo(),
+			Alert:    alert,
+			Original: original,
+			Form:     form,
+		})
+	}
+}
+
+func (s *Server) handleDestroy(object spullen.Object) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		s.Objects.Remove(object.Id)
+
+		http.Redirect(w, r, "/view", http.StatusSeeOther)
+		return
 	}
 }
 
@@ -120,129 +244,6 @@ func (s *Server) handleClose() http.HandlerFunc {
 		}
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
-	}
-}
-
-func (s *Server) handleEdit(object spullen.Object) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		form := FormFromObject(&object)
-
-		var alert = ""
-		if r.Method == http.MethodPost {
-			form.FillFromRequest(r)
-
-			if form.Validate() {
-				obj, err := form.GetObject()
-				if err != nil {
-					alert = fmt.Sprintf("Error when getting object\n%s", err.Error())
-				} else {
-					s.Objects.Put(obj)
-
-					http.Redirect(w, r, "/view", http.StatusSeeOther)
-					return
-				}
-			}
-		}
-
-		Render(w, s.Views.Edit, &Edit{
-			AppInfo: s.AppInfo(),
-			Alert:   alert,
-			EditObject: EditObject{
-				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
-				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
-				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
-				Form:                 form,
-			},
-		})
-	}
-}
-
-func (s *Server) handleSplit(object spullen.Object) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if object.Quantity < 2 {
-			http.Error(w, "object cannot be split", http.StatusConflict)
-			return
-		}
-
-		form := FormFromObject(&object)
-		form.Quantity = "1"
-
-		var alert = ""
-		if r.Method == http.MethodPost {
-			form.Id = s.MakeId()
-			form.TimeAdded = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
-			form.FillFromRequest(r)
-
-			if form.Validate() {
-				splitObject, err := form.GetObject()
-				if err != nil {
-					alert = fmt.Sprintf("Error when getting object \n%s", err.Error())
-				} else {
-					object.Quantity -= splitObject.Quantity
-
-					s.Objects.Put(splitObject)
-					s.Objects.Put(&object)
-
-					http.Redirect(w, r, "/view", http.StatusSeeOther)
-					return
-				}
-			}
-		}
-
-		qty, err := strconv.ParseInt(form.Quantity, 10, 64)
-		if err != nil {
-			object.Quantity -= 1
-		} else {
-			object.Quantity -= int(qty)
-		}
-
-		original := FormFromObject(&object)
-
-		Render(w, s.Views.Split, &Split{
-			AppInfo: s.AppInfo(),
-			Alert:   alert,
-			EditObject: EditObject{
-				ExistingTags:         s.Objects.GetDistinctTags(s.PrivateMode),
-				ExistingCategories:   s.Objects.GetDistinctCategories(s.PrivateMode),
-				ExistingPropertyKeys: s.Objects.GetDistinctPropertyKeys(s.PrivateMode),
-				Form:                 form,
-			},
-			Original: original,
-		})
-	}
-}
-
-func (s *Server) handleDelete(object spullen.Object) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		original := FormFromObject(&object)
-
-		var alert = ""
-		form := &DeleteForm{Id: object.Id}
-		if r.Method == http.MethodPost {
-			form.RemovedAt = strconv.FormatInt(time.Now().Truncate(time.Second).Unix(), 10)
-			form.Reason = r.PostFormValue("reason")
-
-			if form.Validate() {
-				// TODO: implement actual logic
-				alert = "TODO: this is not implemented yet, object should now be deleted!"
-			}
-		}
-
-		Render(w, s.Views.Delete, &Delete{
-			AppInfo:  s.AppInfo(),
-			Alert:    alert,
-			Original: original,
-			Form:     form,
-		})
-	}
-}
-
-func (s *Server) handleDestroy(object spullen.Object) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		s.Objects.Remove(object.Id)
-
-		http.Redirect(w, r, "/view", http.StatusSeeOther)
-		return
 	}
 }
 

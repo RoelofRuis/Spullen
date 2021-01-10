@@ -1,4 +1,4 @@
-package core
+package object
 
 import (
 	"fmt"
@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-type ObjectMarshallerImpl struct{}
+type MarshallerImpl struct{}
 
-func (o *ObjectMarshallerImpl) Unmarshall(record []string) (*spullen.Object, error) {
+func (o *MarshallerImpl) Unmarshall(record []string) (*spullen.Object, error) {
 	form := &ObjectForm{
 		Id:         spullen.ObjectId(record[0]),
 		TimeAdded:  record[1],
@@ -34,7 +34,7 @@ func (o *ObjectMarshallerImpl) Unmarshall(record []string) (*spullen.Object, err
 	return object, nil
 }
 
-func (o *ObjectMarshallerImpl) Marshall(obj *spullen.Object) []string {
+func (o *MarshallerImpl) Marshall(obj *spullen.Object) []string {
 	var properties []string
 	for _, p := range obj.Properties {
 		properties = append(properties, fmt.Sprintf("%s=%s", p.Key, p.Value))

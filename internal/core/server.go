@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"github.com/roelofruis/spullen"
+	"github.com/roelofruis/spullen/internal/util"
 	"html/template"
 	"log"
 	"net/http"
@@ -15,7 +16,7 @@ type Server struct {
 	DevMode     bool
 	PrivateMode bool
 
-	Finder  *Finder
+	Finder  *util.Finder
 	Db      spullen.Database
 	Objects spullen.ObjectRepository
 
@@ -82,7 +83,7 @@ func (s *Server) withDatabase(h http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func (s *Server) withValidObject(f func(object spullen.Object) http.HandlerFunc) http.HandlerFunc {
+func (s *Server) withValidObject(f func(o spullen.Object) http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
@@ -110,7 +111,7 @@ func (s *Server) withValidObject(f func(object spullen.Object) http.HandlerFunc)
 func (s *Server) MakeId() spullen.ObjectId {
 	var id spullen.ObjectId
 	for {
-		id = spullen.ObjectId(randSeq(16))
+		id = spullen.ObjectId(util.RandSeq(16))
 		if !s.Objects.Has(id) {
 			return id
 		}

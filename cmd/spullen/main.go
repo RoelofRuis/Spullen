@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/roelofruis/spullen/internal/core"
+	"github.com/roelofruis/spullen/internal/core/object"
 	"github.com/roelofruis/spullen/internal/database"
-	"github.com/roelofruis/spullen/internal/repository"
+	"github.com/roelofruis/spullen/internal/util"
 	"log"
 	"math/rand"
 	"net/http"
@@ -24,7 +25,7 @@ func main() {
 		port = "8080"
 	}
 
-	objectRepo := repository.NewStorableObjectRepository(&core.ObjectMarshallerImpl{})
+	objectRepo := object.NewStorableObjectRepository(&object.MarshallerImpl{})
 
 	var db *database.FileDatabase
 	if devMode {
@@ -42,7 +43,7 @@ func main() {
 		DevMode:     devMode,
 		PrivateMode: true,
 
-		Finder:  &core.Finder{Root: dbRoot},
+		Finder:  &util.Finder{Root: dbRoot},
 		Db:      db,
 		Objects: objectRepo,
 
