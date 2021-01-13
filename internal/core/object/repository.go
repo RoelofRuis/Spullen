@@ -202,6 +202,11 @@ func (s *StorableObjectRepository) Instantiate(data []byte) error {
 			return err
 		}
 
+		marked := "false"
+		if len(record) > 9 {
+			marked = record[9]
+		}
+
 		form := &Form{
 			Id:         spullen.ObjectId(record[0]),
 			TimeAdded:  record[1],
@@ -212,10 +217,11 @@ func (s *StorableObjectRepository) Instantiate(data []byte) error {
 			Properties: record[6],
 			Hidden:     record[7],
 			Notes:      record[8],
+			Marked:     marked,
 		}
 
 		if !form.Validate() {
-			return fmt.Errorf("invalid object [%s]", record[0])
+			return fmt.Errorf("invalid object [%s]\n%v", record[0], form.Errors)
 		}
 
 		obj, err := form.GetObject()
@@ -256,6 +262,7 @@ func (s *StorableObjectRepository) ToRaw() ([]byte, error) {
 			strings.Join(properties, ","),
 			strconv.FormatBool(obj.Hidden),
 			obj.Notes,
+			strconv.FormatBool(obj.Marked),
 		}
 
 		err := w.Write(record)

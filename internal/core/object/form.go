@@ -21,6 +21,7 @@ type Form struct {
 	Properties string
 	Hidden     string
 	Notes      string
+	Marked     string
 
 	Errors map[string]string
 
@@ -39,6 +40,7 @@ func (f *Form) FillFromRequest(r *http.Request) {
 	f.Properties = r.PostFormValue("properties")
 	f.Hidden = r.PostFormValue("hidden")
 	f.Notes = r.PostFormValue("notes")
+	f.Marked = "false"
 }
 
 func FormFromObject(o *spullen.Object) *Form {
@@ -51,6 +53,11 @@ func FormFromObject(o *spullen.Object) *Form {
 	if o.Hidden {
 		hidden = "true"
 	}
+
+	var marked = ""
+	if o.Marked {
+		marked = "true"
+	}
 	return &Form{
 		Id:         o.Id,
 		TimeAdded:  strconv.FormatInt(o.Added.Unix(), 10),
@@ -61,6 +68,7 @@ func FormFromObject(o *spullen.Object) *Form {
 		Properties: strings.Join(propertyStrings, ","),
 		Hidden:     hidden,
 		Notes:      o.Notes,
+		Marked:     marked,
 	}
 }
 
@@ -150,6 +158,11 @@ func (f *Form) Validate() bool {
 		f.Errors["Hidden"] = "Verborgen moet een geldige booleaanse waarde zijn"
 	}
 
+	marked, err := strconv.ParseBool(f.Marked)
+	if err != nil {
+		f.Errors["Marked"] = "Gemarkeerd moet een geldige booleaanse waarde zijn"
+	}
+
 	isValid := len(f.Errors) == 0
 	if isValid {
 		f.object = &spullen.Object{
@@ -162,6 +175,7 @@ func (f *Form) Validate() bool {
 			Properties: properties,
 			Hidden:     hidden,
 			Notes:      f.Notes,
+			Marked:     marked,
 		}
 	}
 

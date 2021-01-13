@@ -43,6 +43,7 @@ type Object struct {
 	Properties []*Property
 	Hidden     bool
 	Notes      string
+	Marked     bool
 }
 
 type Property struct {
