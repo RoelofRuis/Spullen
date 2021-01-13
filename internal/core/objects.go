@@ -45,6 +45,7 @@ func (v *ObjectViewer) GetAll(flags *spullen.DataFlags) []object.ObjectView {
 			Properties: properties,
 			Hidden:     o.Hidden,
 			Deleted:    isDeleted,
+			Marked:     o.Marked,
 		})
 	}
 	return objects

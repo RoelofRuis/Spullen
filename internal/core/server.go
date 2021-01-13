@@ -64,6 +64,8 @@ func (s *Server) Routes() {
 	s.router.HandleFunc("/split/", s.withDatabase(s.withValidObject(s.handleSplit)))
 	s.router.HandleFunc("/delete/", s.withDatabase(s.withValidObject(s.handleDelete)))
 	s.router.HandleFunc("/destroy/", s.withDatabase(s.withValidObject(s.handleDestroy)))
+	s.router.HandleFunc("/mark/", s.withDatabase(s.withValidObject(s.handleMark)))
+	s.router.HandleFunc("/unmark/", s.withDatabase(s.withValidObject(s.handleUnmark)))
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {

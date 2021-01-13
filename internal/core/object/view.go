@@ -10,6 +10,7 @@ type ObjectView struct {
 	Properties []string
 	Hidden     bool
 	Deleted    bool
+	Marked     bool
 }
 
 type EditableObjectForm struct {

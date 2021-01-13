@@ -32,7 +32,7 @@
         <table class="table table-sm table-hover">
             <thead>
                 <tr>
-                    <th colspan="3">
+                    <th colspan="4">
                         Database: <b>{{ .DbName }}</b>
                         {{ if .ShowingHiddenItems }}
                         <span class="fa fa-exclamation-circle text-primary" title="verborgen items zijn zichtbaar"></span>
@@ -48,6 +48,13 @@
             <tbody id="table-results">
             {{ range .Objects }}
                 <tr title="{{ .Name }} ({{ .AddedAt }})">
+                    <td>
+                        {{ if .Marked }}
+                            <a class="text-secondary" title="demarkeren" href="/unmark/{{ .Id }}"><i class="fa fa-star"></i></a>
+                        {{ else }}
+                            <a class="text-secondary" title="markeren" href="/mark/{{ .Id }}"><i class="fa fa-star-o"></i></a>
+                        {{ end }}
+                    </td>
                     <td>
                         {{ if .Hidden }}
                             <i title="verborgen item" class="fa fa-exclamation-circle text-primary"></i>

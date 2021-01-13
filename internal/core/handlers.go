@@ -90,6 +90,24 @@ func (s *Server) handleView() http.HandlerFunc {
 	}
 }
 
+func (s *Server) handleMark(o spullen.Object) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		o.Marked = true
+		s.Objects.Put(&o)
+
+		http.Redirect(w, r, "/view", http.StatusSeeOther)
+	}
+}
+
+func (s *Server) handleUnmark(o spullen.Object) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		o.Marked = false
+		s.Objects.Put(&o)
+
+		http.Redirect(w, r, "/view", http.StatusSeeOther)
+	}
+}
+
 func (s *Server) handleEdit(o spullen.Object) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		form := object.FormFromObject(&o)
