@@ -40,14 +40,14 @@ type objectName struct {
 
 type objectNames []objectName
 
-func (o objectNames) Len() int           { return len(o) }
+func (o objectNames) Len() int { return len(o) }
 func (o objectNames) Less(i, j int) bool {
 	if o[i].name == o[j].name {
 		return o[i].id < o[j].id
 	}
 	return o[i].name < o[j].name
 }
-func (o objectNames) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
+func (o objectNames) Swap(i, j int) { o[i], o[j] = o[j], o[i] }
 
 func (s *StorableObjectRepository) Count() int {
 	s.lock.RLock()
