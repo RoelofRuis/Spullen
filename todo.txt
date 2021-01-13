@@ -1,2 +1,5 @@
 - Zie de logica/gebruik van 'Notion'
 - Categorieen en tags vullen
+
+BUGS:
+- markering blijft niet werken als het item daarna wordt geedit
