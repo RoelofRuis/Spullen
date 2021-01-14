@@ -29,7 +29,7 @@ type Form struct {
 }
 
 func EmptyForm() *Form {
-	return &Form{Quantity: "1"}
+	return &Form{Quantity: "1", Marked: "false"}
 }
 
 func (f *Form) FillFromRequest(r *http.Request) {
