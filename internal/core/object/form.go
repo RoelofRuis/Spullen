@@ -40,7 +40,7 @@ func (f *Form) FillFromRequest(r *http.Request) {
 	f.Properties = r.PostFormValue("properties")
 	f.Hidden = r.PostFormValue("hidden")
 	f.Notes = r.PostFormValue("notes")
-	f.Marked = "false"
+	f.Marked = r.PostFormValue("marked")
 }
 
 func FormFromObject(o *spullen.Object) *Form {
@@ -54,7 +54,7 @@ func FormFromObject(o *spullen.Object) *Form {
 		hidden = "true"
 	}
 
-	var marked = ""
+	var marked = "false"
 	if o.Marked {
 		marked = "true"
 	}
