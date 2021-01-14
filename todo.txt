@@ -2,4 +2,4 @@
 - Categorieen en tags vullen
 
 BUGS:
-- markering blijft niet werken als het item daarna wordt geedit
+- Verwijderde items niet meetellen in count
