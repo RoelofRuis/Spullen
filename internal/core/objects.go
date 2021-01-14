@@ -17,6 +17,10 @@ type ObjectViewer struct {
 	deletions spullen.DeletionRepository
 }
 
+func (v *ObjectViewer) CountNonDeleted() int {
+	return v.objects.Count() - v.deletions.Count()
+}
+
 func (v *ObjectViewer) GetAll(flags *spullen.DataFlags) []object.ObjectView {
 	var objects []object.ObjectView
 	for _, o := range v.objects.GetAll() {

@@ -56,6 +56,7 @@ func (p *Property) String() string {
 }
 
 type DeletionRepository interface {
+	Count() int
 	Get(id ObjectId) *Deletion
 	Put(*Deletion)
 	Has(id ObjectId) bool

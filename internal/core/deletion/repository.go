@@ -38,6 +38,13 @@ func (s *StorableDeletionRepository) Get(id spullen.ObjectId) *spullen.Deletion 
 	return nil
 }
 
+func (s *StorableDeletionRepository) Count() int {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
+	return len(s.deletions)
+}
+
 func (s *StorableDeletionRepository) Put(d *spullen.Deletion) {
 	s.lock.Lock()
 	defer s.lock.Unlock()

@@ -81,7 +81,7 @@ func (s *Server) handleView() http.HandlerFunc {
 				Form:                 form,
 			},
 			DatabaseIsDirty:     s.Db.IsDirty(),
-			TotalCount:          s.Objects.Count(),
+			TotalCount:          s.ObjectViewer.CountNonDeleted(),
 			DbName:              s.Db.Name(),
 			Objects:             s.ObjectViewer.GetAll(s.DataFlags),
 			ShowingHiddenItems:  s.DataFlags.ShowHiddenItems,

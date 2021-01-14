@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-var VERSION = core.Version{Major: 0, Minor: 9, Patch: 1}
+var VERSION = core.Version{Major: 0, Minor: 9, Patch: 2}
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
