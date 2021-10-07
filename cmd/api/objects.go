@@ -1,13 +1,21 @@
 package main
 
 import (
+	"errors"
 	"net/http"
+
+	"github.com/roelofruis/spullen/internal_/data"
 )
 
 func (app *application) handleListObjects(w http.ResponseWriter, r *http.Request) {
 	objects, err := app.models.Objects.GetAll()
 	if err != nil {
-		app.serverErrorResponse(w, r, err)
+		switch {
+		case errors.Is(err, data.ErrNoDataSource):
+			app.unauthorizedResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
 		return
 	}
 

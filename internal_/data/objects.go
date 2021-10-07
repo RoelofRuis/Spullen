@@ -1,6 +1,7 @@
 package data
 
 import (
+	"context"
 	"time"
 )
 
@@ -16,5 +17,41 @@ type ObjectModel struct {
 }
 
 func (r ObjectModel) GetAll() ([]*Object, error) {
-	return nil, nil
+	query := `
+	SELECT id, added, name, quantity
+	FROM objects`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	rows, err := r.DB.QueryContext(ctx, query, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	objects := []*Object{}
+
+	for rows.Next() {
+		var object Object
+
+		err := rows.Scan(
+			&object.ID,
+			&object.Added,
+			&object.Name,
+			&object.Quantity,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		objects = append(objects, &object)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return objects, nil
 }

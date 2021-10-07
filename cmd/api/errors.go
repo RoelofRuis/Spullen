@@ -31,3 +31,8 @@ func (app *application) methodNotAllowedResponse(w http.ResponseWriter, r *http.
 	message := fmt.Sprintf("method %s is not supported for this resource", r.Method)
 	app.errorResponse(w, r, http.StatusMethodNotAllowed, message)
 }
+
+func (app *application) unauthorizedResponse(w http.ResponseWriter, r *http.Request) {
+	message := "client is not authorized to access the requested resource"
+	app.errorResponse(w, r, http.StatusUnauthorized, message)
+}
