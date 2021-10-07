@@ -1,7 +1,6 @@
 package data
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -12,10 +11,10 @@ type Object struct {
 	Quantity int
 }
 
-type ObjectRepository struct {
-	DB *sql.DB
+type ObjectModel struct {
+	DB DBProxy
 }
 
-func (r ObjectRepository) GetAll() []*Object {
-	return nil
+func (r ObjectModel) GetAll() ([]*Object, error) {
+	return nil, nil
 }
