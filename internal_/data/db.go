@@ -14,6 +14,14 @@ type DBProxy struct {
 	DB *sql.DB
 }
 
+func (db DBProxy) Open(dns string) error {
+	return nil // TODO: implement
+}
+
+func (db DBProxy) Close() error {
+	return nil // TODO: implement
+}
+
 func (db DBProxy) QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
 	if db.DB == nil {
 		return nil, ErrNoDataSource
