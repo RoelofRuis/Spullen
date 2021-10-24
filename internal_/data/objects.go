@@ -13,7 +13,7 @@ type Object struct {
 }
 
 type ObjectModel struct {
-	DB DBProxy
+	DB *DBProxy
 }
 
 func (r ObjectModel) GetAll() ([]*Object, error) {
@@ -31,7 +31,7 @@ func (r ObjectModel) GetAll() ([]*Object, error) {
 
 	defer rows.Close()
 
-	objects := []*Object{}
+	objects := make([]*Object, 0)
 
 	for rows.Next() {
 		var object Object

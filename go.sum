@@ -1,3 +1,5 @@
+github.com/CovenantSQL/go-sqlite3-encrypt v1.9.0 h1:GPtIZW4KZhul21SrmmpgUCx+wEPhnFlzOceTtzMypzs=
+github.com/CovenantSQL/go-sqlite3-encrypt v1.9.0/go.mod h1:EH9sjhhyDGHNIj/Wx59f7CURbVp1C1x/eRVi07WPsvg=
 github.com/julienschmidt/httprouter v1.3.0 h1:U0609e9tgbseu3rBINet9P48AI/D3oJs4dN7jwJOQ1U=
 github.com/julienschmidt/httprouter v1.3.0/go.mod h1:JR6WtHb+2LUe8TCKY3cZOxFyyO8IZAc4RVcycCCAKdM=
 github.com/justinas/alice v1.2.0 h1:+MHSA/vccVCF4Uq37S42jwlkvI2Xzl7zTPCN5BnZNVo=
