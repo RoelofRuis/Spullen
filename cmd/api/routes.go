@@ -15,6 +15,7 @@ func (app *application) routes() http.Handler {
 	router.MethodNotAllowed = http.HandlerFunc(app.methodNotAllowedResponse)
 
 	router.HandlerFunc(http.MethodPost, "/v1/db/new", app.handleNewDatabase)
+	router.HandlerFunc(http.MethodPost, "/v1/db/open", app.handleOpenDatabase)
 
 	router.HandlerFunc(http.MethodGet, "/v1/objects", app.handleListObjects)
 

@@ -15,6 +15,7 @@ func (app *application) serve() error {
 		WriteTimeout: 3 * time.Second,
 	}
 
+	app.logger.Printf("Starting API at localhost:8080")
 	err := srv.ListenAndServe()
 	if !errors.Is(err, http.ErrServerClosed) {
 		return err

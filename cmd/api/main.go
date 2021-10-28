@@ -15,10 +15,8 @@ type application struct {
 func main() {
 	app := application{
 		logger: log.New(os.Stdout, "", log.Ltime),
-		models: data.NewModels(&data.DBProxy{}),
+		models: data.NewModels(data.NewDBProxy()),
 	}
-
-	app.logger.Printf("Starting API")
 
 	err := app.serve()
 	if err != nil {
