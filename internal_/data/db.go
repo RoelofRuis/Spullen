@@ -77,24 +77,26 @@ func (db *DBProxy) Open(descr DBDescription) error {
 		return err
 	}
 
-	_, err = conn.Exec(`CREATE TABLE test(x integer PRIMARY KEY)`)
-	if err != nil {
-		return err
-	}
-
+	db.lock.Lock()
 	db.db = conn
+	db.lock.Unlock()
 	return nil
 }
 
 func (db *DBProxy) Close() (err error) {
 	if db.db != nil {
+		db.lock.Lock()
 		err = db.db.Close()
 		db.db = nil
+		db.lock.Unlock()
 	}
 	return
 }
 
 func (db *DBProxy) QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
+	db.lock.RLock()
+	defer db.lock.RUnlock()
+
 	if db.db == nil {
 		return nil, ErrNoDataSource
 	}

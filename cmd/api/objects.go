@@ -19,5 +19,8 @@ func (app *application) handleListObjects(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	app.writeJSON(w, http.StatusOK, envelope{"objects": objects}, nil)
+	err = app.writeJSON(w, http.StatusOK, envelope{"objects": objects}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
 }
