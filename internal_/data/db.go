@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/roelofruis/spullen/internal_/migration"
 	"github.com/roelofruis/spullen/internal_/validator"
 	"regexp"
 	"sync"
@@ -58,6 +59,15 @@ func (db *DBProxy) Open(descr DBDescription) error {
 		),
 	)
 	if err != nil {
+		return err
+	}
+
+	migrator, err := migration.Init(conn)
+	if err != nil {
+		return err
+	}
+
+	if err := migrator.Up(); err != nil {
 		return err
 	}
 
