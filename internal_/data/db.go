@@ -2,16 +2,15 @@ package data
 
 import (
 	"context"
-	"crypto/sha256"
+	"crypto/md5"
 	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/roelofruis/spullen/internal_/validator"
-	"os"
 	"regexp"
 	"sync"
 
-	_ "github.com/CovenantSQL/go-sqlite3-encrypt"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var (
@@ -19,29 +18,19 @@ var (
 )
 
 var (
-	ModeCreate      = "create"
-	ModeOpen        = "open"
 	ErrNoDataSource = errors.New("no data source opened")
 )
 
 type DBDescription struct {
-	Name     string
-	Key      string
-	Mode     string
+	User     string
+	Pass     string
 	FilePath string
 }
 
 func ValidateDescription(v *validator.Validator, descr *DBDescription) {
-	v.Check(descr.Name != "", "name", "must not be empty")
-	v.Check(validator.Matches(descr.Name, FileRX), "name", "can only contain alphanumeric characters and underscore")
-	v.Check(descr.Key != "", "key", "must not be empty")
-	v.Check(validator.In(descr.Mode, ModeCreate, ModeOpen), "mode", "must be one of 'create' or 'open'")
-
-	if descr.Mode == ModeOpen {
-		if _, err := os.Stat(descr.FilePath); errors.Is(err, os.ErrNotExist) {
-			v.AddError("name", "does not exist")
-		}
-	}
+	v.Check(descr.User != "", "user", "must not be empty")
+	v.Check(validator.Matches(descr.User, FileRX), "user", "can only contain alphanumeric characters and underscore")
+	v.Check(descr.Pass != "", "pass", "must not be empty")
 }
 
 type DBProxy struct {
@@ -57,22 +46,17 @@ func NewDBProxy() *DBProxy {
 }
 
 func (db *DBProxy) Open(descr DBDescription) error {
+	passHash := md5.Sum([]byte(descr.Pass))
+
 	conn, err := sql.Open(
 		"sqlite3",
 		fmt.Sprintf(
 			"file:%s?_auth&_auth_user=%s&_auth_pass=%s",
 			descr.FilePath,
-			"admin",
-			"admin",
+			descr.User,
+			passHash,
 		),
 	)
-	if err != nil {
-		return err
-	}
-
-	keyHash := fmt.Sprintf("%x", sha256.Sum256([]byte(descr.Key)))
-
-	_, err = conn.Exec(fmt.Sprintf("PRAGMA key='%s'", keyHash))
 	if err != nil {
 		return err
 	}
@@ -101,5 +85,5 @@ func (db *DBProxy) QueryContext(ctx context.Context, query string, args ...inter
 		return nil, ErrNoDataSource
 	}
 
-	return db.db.QueryContext(ctx, query, args)
+	return db.db.QueryContext(ctx, query, args...)
 }

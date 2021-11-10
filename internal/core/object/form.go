@@ -88,7 +88,7 @@ func (f *Form) Validate() bool {
 	}
 
 	if len(f.Name) == 0 {
-		f.Errors["Name"] = "Voer een naam in"
+		f.Errors["User"] = "Voer een naam in"
 	}
 
 	t, err := strconv.ParseInt(f.TimeAdded, 10, 64)

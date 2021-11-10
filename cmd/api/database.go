@@ -12,7 +12,7 @@ import (
 func (app *application) handleOpenDatabase(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Name string `json:"name"`
-		Key  string `json:"key"`
+		Pass string `json:"password"`
 	}
 
 	err := app.readJSON(w, r, &input)
@@ -28,9 +28,8 @@ func (app *application) handleOpenDatabase(w http.ResponseWriter, r *http.Reques
 	}
 
 	descr := data.DBDescription{
-		Name:     input.Name,
-		Key:      input.Key,
-		Mode:     data.ModeOpen,
+		User:     input.Name,
+		Pass:     input.Pass,
 		FilePath: path.Join(wd, fmt.Sprintf("%s.sqlite", input.Name)),
 	}
 
@@ -47,49 +46,6 @@ func (app *application) handleOpenDatabase(w http.ResponseWriter, r *http.Reques
 	}
 
 	err = app.writeJSON(w, http.StatusOK, envelope{"database": input.Name}, nil)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-	}
-}
-
-func (app *application) handleNewDatabase(w http.ResponseWriter, r *http.Request) {
-	var input struct {
-		Name string `json:"name"`
-		Key  string `json:"key"`
-	}
-
-	err := app.readJSON(w, r, &input)
-	if err != nil {
-		app.badRequestResponse(w, r, err)
-		return
-	}
-
-	wd, err := os.Getwd()
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
-	}
-
-	descr := data.DBDescription{
-		Name:     input.Name,
-		Key:      input.Key,
-		Mode:     data.ModeCreate,
-		FilePath: path.Join(wd, fmt.Sprintf("%s.sqlite", input.Name)),
-	}
-
-	v := validator.New()
-	if data.ValidateDescription(v, &descr); !v.Valid() {
-		app.failedValidationResponse(w, r, v.Errors)
-		return
-	}
-
-	err = app.models.DB.Open(descr)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
-	}
-
-	err = app.writeJSON(w, http.StatusCreated, envelope{"database": input.Name}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

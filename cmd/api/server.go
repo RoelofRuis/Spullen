@@ -7,15 +7,17 @@ import (
 )
 
 func (app *application) serve() error {
+	address := "localhost:8080"
+
 	srv := &http.Server{
-		Addr:         "localhost:8080",
+		Addr:         address,
 		Handler:      app.routes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  3 * time.Second,
 		WriteTimeout: 3 * time.Second,
 	}
 
-	app.logger.Printf("Starting API at localhost:8080")
+	app.logger.PrintInfo("Starting API", map[string]string{"address": address})
 	err := srv.ListenAndServe()
 	if !errors.Is(err, http.ErrServerClosed) {
 		return err
