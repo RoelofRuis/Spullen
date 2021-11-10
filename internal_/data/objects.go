@@ -16,6 +16,31 @@ type ObjectModel struct {
 	DB *DBProxy
 }
 
+func (r ObjectModel) Insert(obj *Object) error {
+	query := `
+	INSERT INTO objects(added, name, quantity)
+	VALUES (?, ?, ?)
+	`
+
+	args := []interface{}{obj.Added, obj.Name, obj.Quantity}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	res, err := r.DB.ExecContext(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		return err
+	}
+	obj.ID = id
+
+	return nil
+}
+
 func (r ObjectModel) GetAll() ([]*Object, error) {
 	query := `
 	SELECT id, added, name, quantity

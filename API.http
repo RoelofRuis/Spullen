@@ -1,8 +1,3 @@
-GET localhost:8080/v1/objects
-
-
-###
-
 POST localhost:8080/v1/db/open
 Content-Type: application/json
 
@@ -10,3 +5,18 @@ Content-Type: application/json
   "name": "piet",
   "password": "piet1"
 }
+
+###
+
+POST localhost:8080/v1/objects
+Content-Type: application/json
+
+{
+  "name": "stoel",
+  "quantity": 1
+}
+
+
+###
+
+GET localhost:8080/v1/objects

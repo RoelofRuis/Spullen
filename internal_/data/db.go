@@ -92,6 +92,17 @@ func (db *DBProxy) Close() (err error) {
 	return
 }
 
+func (db *DBProxy) ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
+	db.lock.RLock()
+	defer db.lock.RUnlock()
+
+	if db.db == nil {
+		return nil, ErrNoDataSource
+	}
+
+	return db.db.ExecContext(ctx, query, args...)
+}
+
 func (db *DBProxy) QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
 	db.lock.RLock()
 	defer db.lock.RUnlock()
