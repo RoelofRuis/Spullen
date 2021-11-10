@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/roelofruis/spullen/internal_/data"
+	"github.com/roelofruis/spullen/internal/data"
 )
 
 func (app *application) handleListObjects(w http.ResponseWriter, r *http.Request) {

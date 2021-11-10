@@ -1,5 +1,0 @@
-- Zie de logica/gebruik van 'Notion'
-- Categorieen en tags vullen
-
-BUGS:
-- Verwijderde items niet meetellen in count

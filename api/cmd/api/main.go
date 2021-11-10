@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/roelofruis/spullen/internal_/jsonlog"
+	"github.com/roelofruis/spullen/internal/jsonlog"
 	"os"
 
-	"github.com/roelofruis/spullen/internal_/data"
+	"github.com/roelofruis/spullen/internal/data"
 )
 
 type application struct {

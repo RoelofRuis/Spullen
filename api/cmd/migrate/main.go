@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/roelofruis/spullen/internal_/migration"
+	"github.com/roelofruis/spullen/internal/migration"
 	"log"
 )
 

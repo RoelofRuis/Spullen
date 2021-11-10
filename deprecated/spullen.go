@@ -1,4 +1,4 @@
-package spullen
+package deprecated
 
 import (
 	"fmt"

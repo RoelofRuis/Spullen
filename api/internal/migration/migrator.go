@@ -128,7 +128,7 @@ func Create(name string) error {
 		return errors.New("unable to execute template: " + err.Error())
 	}
 
-	f, err := os.Create(fmt.Sprintf("./internal_/migration/%s_%s.go", version, name))
+	f, err := os.Create(fmt.Sprintf("./internal/migration/%s_%s.go", version, name))
 	if err != nil {
 		return errors.New("unable to create migration file: " + err.Error())
 	}

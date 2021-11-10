@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/roelofruis/spullen/internal_/data"
-	"github.com/roelofruis/spullen/internal_/validator"
+	"github.com/roelofruis/spullen/internal/data"
+	"github.com/roelofruis/spullen/internal/validator"
 	"net/http"
 	"os"
 	"path"
