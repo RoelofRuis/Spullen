@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/roelofruis/spullen/internal_/data"
 	"github.com/roelofruis/spullen/internal_/validator"
@@ -41,7 +42,12 @@ func (app *application) handleOpenDatabase(w http.ResponseWriter, r *http.Reques
 
 	err = app.models.DB.Open(descr)
 	if err != nil {
-		app.serverErrorResponse(w, r, err)
+		switch {
+		case errors.Is(err, data.ErrInvalidAuth):
+			app.unauthorizedResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
 		return
 	}
 

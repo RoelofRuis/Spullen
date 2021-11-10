@@ -85,7 +85,6 @@ func Init(db *sql.DB) (*Migrator, error) {
 	migrator.db = db
 
 	if _, err := db.Exec("CREATE TABLE IF NOT EXISTS `schema_migrations` (version varchar(255));"); err != nil {
-		fmt.Println("unable to create `schema_migrations` table", err)
 		return nil, err
 	}
 

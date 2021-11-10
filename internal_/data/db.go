@@ -9,6 +9,7 @@ import (
 	"github.com/roelofruis/spullen/internal_/migration"
 	"github.com/roelofruis/spullen/internal_/validator"
 	"regexp"
+	"strings"
 	"sync"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -19,6 +20,7 @@ var (
 )
 
 var (
+	ErrInvalidAuth = errors.New("invalid authorization")
 	ErrNoDataSource = errors.New("no data source opened")
 )
 
@@ -52,7 +54,7 @@ func (db *DBProxy) Open(descr DBDescription) error {
 	conn, err := sql.Open(
 		"sqlite3",
 		fmt.Sprintf(
-			"file:%s?_auth&_auth_user=%s&_auth_pass=%s",
+			"file:%s?_auth&_auth_user=%s&_auth_pass=%s&_auth_crypt=sha256",
 			descr.FilePath,
 			descr.User,
 			passHash,
@@ -64,6 +66,9 @@ func (db *DBProxy) Open(descr DBDescription) error {
 
 	migrator, err := migration.Init(conn)
 	if err != nil {
+		if strings.Contains(err.Error(), "SQLITE_AUTH: Unauthorized") {
+			return ErrInvalidAuth
+		}
 		return err
 	}
 
