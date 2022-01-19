@@ -51,7 +51,14 @@ func (app *application) handleOpenDatabase(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = app.writeJSON(w, http.StatusOK, envelope{"database": input.Name}, nil)
+	if err := app.models.Token.Refresh(); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	token := app.models.Token.Get().Plaintext
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"database": input.Name, "authentication_token": token}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

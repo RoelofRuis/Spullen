@@ -51,3 +51,15 @@ func (app *application) badRequestResponse(w http.ResponseWriter, r *http.Reques
 func (app *application) failedValidationResponse(w http.ResponseWriter, r *http.Request, errors map[string]string) {
 	app.errorResponse(w, r, http.StatusUnprocessableEntity, errors)
 }
+
+func (app *application) invalidAuthenticationTokenResponse(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("WWW-Authenticate", "Bearer")
+
+	message := "invalid or missing authentication token"
+	app.errorResponse(w, r, http.StatusUnauthorized, message)
+}
+
+func (app *application) authenticationRequiredResponse(w http.ResponseWriter, r *http.Request) {
+	message := "you must be authenticated to access this resource"
+	app.errorResponse(w, r, http.StatusUnauthorized, message)
+}
