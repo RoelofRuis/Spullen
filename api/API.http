@@ -10,7 +10,7 @@ Content-Type: application/json
 
 POST localhost:8080/v1/objects
 Content-Type: application/json
-Authorization: Bearer QVJLW2S54T33ZEIHSSOVYOH3TY
+Authorization: Bearer RJUFIK2N4F4EQHCS4TJ4KDWZEA
 
 {
   "name": "tafel",
@@ -21,4 +21,4 @@ Authorization: Bearer QVJLW2S54T33ZEIHSSOVYOH3TY
 ###
 
 GET localhost:8080/v1/objects
-Authorization: Bearer QVJLW2S54T33ZEIHSSOVYOH3TY
+Authorization: Bearer RJUFIK2N4F4EQHCS4TJ4KDWZEA

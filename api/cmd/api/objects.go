@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"github.com/roelofruis/spullen/internal/model"
 	"github.com/roelofruis/spullen/internal/request"
 	"github.com/roelofruis/spullen/internal/validator"
 	"net/http"
@@ -22,6 +23,8 @@ func (app *application) handleListObjects(w http.ResponseWriter, r *http.Request
 	input.Name = request.ReadString(qs, "name", "")
 	input.Filters.Page = request.ReadInt(qs, "page", 1, v)
 	input.Filters.PageSize = request.ReadInt(qs, "page_size", 20, v)
+	input.Filters.Sort = request.ReadString(qs, "sort", "id")
+	input.Filters.SortSafeList = []string{"id"}
 
 	if request.ValidateFilters(v, input.Filters); !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
@@ -57,7 +60,7 @@ func (app *application) handleAddObject(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	object := &data.Object{
+	object := &model.Object{
 		Added:    time.Now(),
 		Name:     input.Name,
 		Quantity: input.Quantity,

@@ -8,6 +8,7 @@ type Object struct {
 	Name     string    `json:"name"`
 	Quantity int       `json:"quantity"`
 	Deletion *Deletion `json:"deletion"`
+	Tag      []*Tag    `json:"tags"`
 }
 
 func (o *Object) Delete(at time.Time, description string) {
