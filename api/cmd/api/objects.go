@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"github.com/roelofruis/spullen/internal/request"
 	"github.com/roelofruis/spullen/internal/validator"
 	"net/http"
 	"time"
@@ -10,9 +11,24 @@ import (
 )
 
 func (app *application) handleListObjects(w http.ResponseWriter, r *http.Request) {
-	query := contextGetQuery(r)
+	var input struct {
+		request.Filters
+		Name string
+	}
 
-	objects, err := app.models.Objects.GetAll(query.Values.Get("name"))
+	v := validator.New()
+	qs := r.URL.Query()
+
+	input.Name = request.ReadString(qs, "name", "")
+	input.Filters.Page = request.ReadInt(qs, "page", 1, v)
+	input.Filters.PageSize = request.ReadInt(qs, "page_size", 20, v)
+
+	if request.ValidateFilters(v, input.Filters); !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
+	}
+
+	objects, err := app.models.Objects.GetAll(input.Name)
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrNoDataSource):
