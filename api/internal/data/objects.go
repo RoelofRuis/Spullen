@@ -2,18 +2,12 @@ package data
 
 import (
 	"context"
+	"github.com/roelofruis/spullen/internal/model"
 	"github.com/roelofruis/spullen/internal/validator"
 	"time"
 )
 
-type Object struct {
-	ID       int64     `json:"id"`
-	Added    time.Time `json:"added"`
-	Name     string    `json:"name"`
-	Quantity int       `json:"quantity"`
-}
-
-func ValidateObject(v *validator.Validator, obj *Object) {
+func ValidateObject(v *validator.Validator, obj *model.Object) {
 	v.Check(obj.Name != "", "name", "must not be empty")
 	v.Check(obj.Quantity > 0, "quantity", "quantity must be a positive integer")
 }
@@ -22,7 +16,7 @@ type ObjectModel struct {
 	DB *DBProxy
 }
 
-func (r ObjectModel) Insert(obj *Object) error {
+func (r ObjectModel) Insert(obj *model.Object) error {
 	query := `
 	INSERT INTO objects(added, name, quantity)
 	VALUES (?, ?, ?)
@@ -47,7 +41,7 @@ func (r ObjectModel) Insert(obj *Object) error {
 	return nil
 }
 
-func (r ObjectModel) GetAll(name string) ([]*Object, error) {
+func (r ObjectModel) GetAll(name string) ([]*model.Object, error) {
 	query := `
 	SELECT id, added, name, quantity
 	FROM objects`
@@ -68,10 +62,10 @@ func (r ObjectModel) GetAll(name string) ([]*Object, error) {
 
 	defer rows.Close()
 
-	objects := make([]*Object, 0)
+	objects := make([]*model.Object, 0)
 
 	for rows.Next() {
-		var object Object
+		var object model.Object
 
 		err := rows.Scan(
 			&object.ID,
