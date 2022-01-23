@@ -6,10 +6,10 @@ import (
 )
 
 type Object struct {
-	ID       int64
-	Added    time.Time
-	Name     string
-	Quantity int
+	ID       int64     `json:"id"`
+	Added    time.Time `json:"added"`
+	Name     string    `json:"name"`
+	Quantity int       `json:"quantity"`
 }
 
 type ObjectModel struct {
@@ -41,15 +41,21 @@ func (r ObjectModel) Insert(obj *Object) error {
 	return nil
 }
 
-func (r ObjectModel) GetAll() ([]*Object, error) {
+func (r ObjectModel) GetAll(name string) ([]*Object, error) {
 	query := `
 	SELECT id, added, name, quantity
 	FROM objects`
+	var params []interface{}
+
+	if name != "" {
+		query = query + "\nWHERE name LIKE ?"
+		params = append(params, name)
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	rows, err := r.DB.QueryContext(ctx, query)
+	rows, err := r.DB.QueryContext(ctx, query, params...)
 	if err != nil {
 		return nil, err
 	}

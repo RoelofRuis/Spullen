@@ -10,15 +10,15 @@ Content-Type: application/json
 
 POST localhost:8080/v1/objects
 Content-Type: application/json
-Authorization: Bearer <token>
+Authorization: Bearer 6SEANS4JYBTK5Q5UQCOPRNMLXE
 
 {
-  "name": "stoel",
+  "name": "bankie",
   "quantity": 1
 }
 
 
 ###
 
-GET localhost:8080/v1/objects
-Authorization: Bearer <token>
+GET localhost:8080/v1/objects?name=ba%25
+Authorization: Bearer 3JONBDRABN737GHR2UQWM7QYWE

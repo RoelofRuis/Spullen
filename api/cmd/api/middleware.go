@@ -5,8 +5,25 @@ import (
 	"github.com/roelofruis/spullen/internal/data"
 	"github.com/roelofruis/spullen/internal/validator"
 	"net/http"
+	"net/url"
 	"strings"
 )
+
+func (app *application) withQueryParams(next http.Handler) http.Handler {
+	return http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
+
+		values, err := url.ParseQuery(r.URL.RawQuery)
+		if err != nil {
+			app.badRequestResponse(w, r, err)
+			return
+		}
+
+		r = contextSetQuery(r, values)
+
+
+		next.ServeHTTP(w, r)
+	})
+}
 
 func (app *application) authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
@@ -15,7 +32,7 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 		authorizationHeader := r.Header.Get("Authorization")
 
 		if authorizationHeader == "" {
-			r = app.contextSetIsAuthenticated(r, false)
+			r = contextSetIsAuthenticated(r, false)
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -41,14 +58,14 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-		r = app.contextSetIsAuthenticated(r, true)
+		r = contextSetIsAuthenticated(r, true)
 		next.ServeHTTP(w, r)
 	})
 }
 
 func (app *application) requireAuthentication(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !app.contextGetIsAuthenticated(r) {
+		if !contextGetIsAuthenticated(r) {
 			app.authenticationRequiredResponse(w, r)
 			return
 		}

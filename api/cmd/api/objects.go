@@ -9,7 +9,9 @@ import (
 )
 
 func (app *application) handleListObjects(w http.ResponseWriter, r *http.Request) {
-	objects, err := app.models.Objects.GetAll()
+	query := contextGetQuery(r)
+
+	objects, err := app.models.Objects.GetAll(query.Values.Get("name"))
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrNoDataSource):

@@ -8,7 +8,7 @@ import (
 )
 
 func (app *application) routes() http.Handler {
-	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, app.authenticate)
+	standardMiddleware := alice.New(app.recoverPanic, app.logRequest, app.authenticate, app.withQueryParams)
 
 	router := httprouter.New()
 	router.NotFound = http.HandlerFunc(app.notFoundResponse)
