@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"github.com/roelofruis/spullen/internal/validator"
 	"time"
 )
 
@@ -10,6 +11,11 @@ type Object struct {
 	Added    time.Time `json:"added"`
 	Name     string    `json:"name"`
 	Quantity int       `json:"quantity"`
+}
+
+func ValidateObject(v *validator.Validator, obj *Object) {
+	v.Check(obj.Name != "", "name", "must not be empty")
+	v.Check(obj.Quantity > 0, "quantity", "quantity must be a positive integer")
 }
 
 type ObjectModel struct {

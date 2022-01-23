@@ -10,10 +10,10 @@ Content-Type: application/json
 
 POST localhost:8080/v1/objects
 Content-Type: application/json
-Authorization: Bearer DLZXNYO5D3P3BXQQPP76IDNPXI
+Authorization: Bearer QVJLW2S54T33ZEIHSSOVYOH3TY
 
 {
-  "name": "stoel",
+  "name": "tafel",
   "quantity": 1
 }
 
@@ -21,4 +21,4 @@ Authorization: Bearer DLZXNYO5D3P3BXQQPP76IDNPXI
 ###
 
 GET localhost:8080/v1/objects
-Authorization: Bearer DLZXNYO5D3P3BXQQPP76IDNPXI
+Authorization: Bearer QVJLW2S54T33ZEIHSSOVYOH3TY

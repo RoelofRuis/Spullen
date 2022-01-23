@@ -10,6 +10,8 @@ import (
 	"path"
 )
 
+
+
 func (app *application) handleOpenDatabase(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Name string `json:"name"`

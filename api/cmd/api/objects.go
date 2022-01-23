@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"github.com/roelofruis/spullen/internal/validator"
 	"net/http"
 	"time"
 
@@ -46,7 +47,11 @@ func (app *application) handleAddObject(w http.ResponseWriter, r *http.Request) 
 		Quantity: input.Quantity,
 	}
 
-	// TODO: validate
+	v := validator.New()
+	if data.ValidateObject(v, object); !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
+		return
+	}
 
 	if err := app.models.Objects.Insert(object); err != nil {
 		switch {
