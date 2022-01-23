@@ -2,23 +2,23 @@ POST localhost:8080/v1/db/open
 Content-Type: application/json
 
 {
-  "name": "piet",
-  "password": "piet1"
+  "name": "test",
+  "password": "test123"
 }
 
 ###
 
 POST localhost:8080/v1/objects
 Content-Type: application/json
-Authorization: Bearer 6SEANS4JYBTK5Q5UQCOPRNMLXE
+Authorization: Bearer DLZXNYO5D3P3BXQQPP76IDNPXI
 
 {
-  "name": "bankie",
+  "name": "stoel",
   "quantity": 1
 }
 
 
 ###
 
-GET localhost:8080/v1/objects?name=ba%25
-Authorization: Bearer 3JONBDRABN737GHR2UQWM7QYWE
+GET localhost:8080/v1/objects
+Authorization: Bearer DLZXNYO5D3P3BXQQPP76IDNPXI
