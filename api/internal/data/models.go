@@ -4,6 +4,7 @@ type Models struct {
 	DB      *DBProxy
 	Token   *TokenModel
 	Objects *ObjectModel
+	Tags    *TagModel
 }
 
 func NewModels(db *DBProxy) Models {
@@ -11,5 +12,6 @@ func NewModels(db *DBProxy) Models {
 		DB:      db,
 		Token:   &TokenModel{},
 		Objects: &ObjectModel{DB: db},
+		Tags:    &TagModel{DB: db},
 	}
 }

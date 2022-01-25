@@ -48,7 +48,7 @@ func (app *application) handleListObjects(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func (app *application) handleAddObject(w http.ResponseWriter, r *http.Request) {
+func (app *application) handleCreateObject(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Name     string `json:"name"`
 		Quantity int    `json:"quantity"`
