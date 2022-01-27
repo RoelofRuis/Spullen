@@ -21,9 +21,11 @@ func mig_20211110154005_structure_up(tx *sql.Tx) error {
     }
 
     _, err = tx.Exec(`
-    CREATE TABLE deletions (
+    CREATE TABLE quantity_changes (
+        id INTEGER PRIMARY KEY,
         object_id INTEGER NOT NULL,
-        deleted_at DATETIME NOT NULL,
+        at DATETIME NOT NULL,
+        quantity INTEGER NOT NULL,
         description TEXT,
         FOREIGN KEY (object_id) REFERENCES objects(id)
     );`)

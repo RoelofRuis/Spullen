@@ -58,10 +58,7 @@ func (app *application) handleCreateObject(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	object := &model.Object{
-		Name:        input.Name,
-		Description: input.Description,
-	}
+	object := model.NewObject(input.Name, input.Description)
 
 	v := validator.New()
 	if model.ValidateObject(v, object); !v.Valid() {

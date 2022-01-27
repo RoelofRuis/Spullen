@@ -6,13 +6,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/roelofruis/spullen/internal/migration"
 	"github.com/roelofruis/spullen/internal/validator"
 	"regexp"
 	"strings"
 	"sync"
-
-	_ "github.com/mattn/go-sqlite3"
+	"time"
 )
 
 var (
@@ -90,6 +90,13 @@ func (p *Proxy) Close() (err error) {
 		p.lock.Unlock()
 	}
 	return
+}
+
+func (p *Proxy) Exec(i *InsertStatement) (sql.Result, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	return p.ExecContext(ctx, i.query(), i.args()...)
 }
 
 func (p *Proxy) ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
