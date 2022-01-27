@@ -7,7 +7,6 @@ import (
 	"github.com/roelofruis/spullen/internal/request"
 	"github.com/roelofruis/spullen/internal/validator"
 	"net/http"
-	"time"
 )
 
 func (app *application) handleListObjects(w http.ResponseWriter, r *http.Request) {
@@ -49,8 +48,8 @@ func (app *application) handleListObjects(w http.ResponseWriter, r *http.Request
 
 func (app *application) handleCreateObject(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		Name     string `json:"name"`
-		Quantity int    `json:"quantity"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
 	}
 
 	err := app.readJSON(w, r, &input)
@@ -60,9 +59,8 @@ func (app *application) handleCreateObject(w http.ResponseWriter, r *http.Reques
 	}
 
 	object := &model.Object{
-		Added:    time.Now(),
-		Name:     input.Name,
-		Quantity: input.Quantity,
+		Name:        input.Name,
+		Description: input.Description,
 	}
 
 	v := validator.New()

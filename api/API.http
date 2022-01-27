@@ -10,23 +10,23 @@ Content-Type: application/json
 
 POST localhost:8080/v1/objects
 Content-Type: application/json
-Authorization: Bearer RURF7PZI7HPLR7LAZDTHPSNYM4
+Authorization: Bearer DUD2MGM45D6XWDYXA4TOM7LHMY
 
 {
   "name": "stoel",
-  "quantity": 2
+  "description": "kan je lekker op zitten"
 }
 
 ###
 
 GET localhost:8080/v1/objects
-Authorization: Bearer RURF7PZI7HPLR7LAZDTHPSNYM4
+Authorization: Bearer DUD2MGM45D6XWDYXA4TOM7LHMY
 
 ###
 
 POST localhost:8080/v1/tags
 Content-Type: application/json
-Authorization: Bearer RURF7PZI7HPLR7LAZDTHPSNYM4
+Authorization: Bearer DUD2MGM45D6XWDYXA4TOM7LHMY
 
 {
   "name": "meubel",
@@ -36,4 +36,4 @@ Authorization: Bearer RURF7PZI7HPLR7LAZDTHPSNYM4
 ###
 
 GET localhost:8080/v1/tags
-Authorization: Bearer RURF7PZI7HPLR7LAZDTHPSNYM4
+Authorization: Bearer DUD2MGM45D6XWDYXA4TOM7LHMY

@@ -13,11 +13,11 @@ type ObjectRepository struct {
 func (r ObjectRepository) Insert(obj *Object) error {
 	if obj.ID == ObjectID(0) {
 		query := `
-		INSERT INTO objects(added, name, quantity)
-		VALUES (?, ?, ?)
+		INSERT INTO objects(name, description)
+		VALUES (?, ?)
 		`
 
-		args := []interface{}{obj.Added, obj.Name, obj.Quantity}
+		args := []interface{}{obj.Name, obj.Description}
 
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 		defer cancel()
@@ -37,11 +37,11 @@ func (r ObjectRepository) Insert(obj *Object) error {
 	}
 
 	query := `
-	UPDATE objects SET added = ?, name = ?, quantity = ?
+	UPDATE objects SET name = ?, description = ?
 	WHERE id = ?
 	`
 
-	args := []interface{}{obj.Added, obj.Name, obj.Quantity, obj.ID}
+	args := []interface{}{obj.Name, obj.Description, obj.ID}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -56,7 +56,7 @@ func (r ObjectRepository) Insert(obj *Object) error {
 
 func (r ObjectRepository) GetAll(name string) ([]*Object, error) {
 	query := `
-	SELECT id, added, name, quantity
+	SELECT id, name, description
 	FROM objects`
 	var params []interface{}
 
@@ -82,9 +82,8 @@ func (r ObjectRepository) GetAll(name string) ([]*Object, error) {
 
 		err := rows.Scan(
 			&object.ID,
-			&object.Added,
 			&object.Name,
-			&object.Quantity,
+			&object.Description,
 		)
 		if err != nil {
 			return nil, err
