@@ -10,15 +10,30 @@ Content-Type: application/json
 
 POST localhost:8080/v1/objects
 Content-Type: application/json
-Authorization: Bearer RJUFIK2N4F4EQHCS4TJ4KDWZEA
+Authorization: Bearer RURF7PZI7HPLR7LAZDTHPSNYM4
 
 {
-  "name": "tafel",
-  "quantity": 1
+  "name": "stoel",
+  "quantity": 2
 }
-
 
 ###
 
 GET localhost:8080/v1/objects
-Authorization: Bearer RJUFIK2N4F4EQHCS4TJ4KDWZEA
+Authorization: Bearer RURF7PZI7HPLR7LAZDTHPSNYM4
+
+###
+
+POST localhost:8080/v1/tags
+Content-Type: application/json
+Authorization: Bearer RURF7PZI7HPLR7LAZDTHPSNYM4
+
+{
+  "name": "meubel",
+  "description": "alle meubels vallen hier onder"
+}
+
+###
+
+GET localhost:8080/v1/tags
+Authorization: Bearer RURF7PZI7HPLR7LAZDTHPSNYM4

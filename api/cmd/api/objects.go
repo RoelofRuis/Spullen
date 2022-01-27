@@ -2,13 +2,12 @@ package main
 
 import (
 	"errors"
+	"github.com/roelofruis/spullen/internal/db"
 	"github.com/roelofruis/spullen/internal/model"
 	"github.com/roelofruis/spullen/internal/request"
 	"github.com/roelofruis/spullen/internal/validator"
 	"net/http"
 	"time"
-
-	"github.com/roelofruis/spullen/internal/data"
 )
 
 func (app *application) handleListObjects(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +33,7 @@ func (app *application) handleListObjects(w http.ResponseWriter, r *http.Request
 	objects, err := app.models.Objects.GetAll(input.Name)
 	if err != nil {
 		switch {
-		case errors.Is(err, data.ErrNoDataSource):
+		case errors.Is(err, db.ErrNoDataSource):
 			app.unauthorizedResponse(w, r)
 		default:
 			app.serverErrorResponse(w, r, err)
@@ -67,14 +66,14 @@ func (app *application) handleCreateObject(w http.ResponseWriter, r *http.Reques
 	}
 
 	v := validator.New()
-	if data.ValidateObject(v, object); !v.Valid() {
+	if model.ValidateObject(v, object); !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
 
 	if err := app.models.Objects.Insert(object); err != nil {
 		switch {
-		case errors.Is(err, data.ErrNoDataSource):
+		case errors.Is(err, db.ErrNoDataSource):
 			app.unauthorizedResponse(w, r)
 		default:
 			app.serverErrorResponse(w, r, err)

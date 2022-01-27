@@ -1,4 +1,4 @@
-package data
+package model
 
 import (
 	"crypto/rand"
@@ -6,20 +6,16 @@ import (
 	"github.com/roelofruis/spullen/internal/validator"
 )
 
-type Token struct {
-	Plaintext string
-}
-
 func ValidateTokenPlaintext(v *validator.Validator, tokenPlaintext string) {
 	v.Check(tokenPlaintext != "", "token", "must be provided")
 	v.Check(len(tokenPlaintext) == 26, "token", "must be 26 bytes long")
 }
 
-type TokenModel struct {
-	token *Token
+type Token struct {
+	plaintext string
 }
 
-func (r *TokenModel) Refresh() error {
+func (r *Token) Refresh() error {
 	randomBytes := make([]byte, 16)
 
 	_, err := rand.Read(randomBytes)
@@ -27,13 +23,11 @@ func (r *TokenModel) Refresh() error {
 		return err
 	}
 
-	r.token = &Token{
-		Plaintext: base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(randomBytes),
-	}
+	r.plaintext = base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(randomBytes)
 
 	return nil
 }
 
-func (r *TokenModel) Get() *Token {
-	return r.token
+func (r *Token) Get() string {
+	return r.plaintext
 }

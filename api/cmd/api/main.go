@@ -1,15 +1,15 @@
 package main
 
 import (
+	"github.com/roelofruis/spullen/internal/db"
 	"github.com/roelofruis/spullen/internal/jsonlog"
+	"github.com/roelofruis/spullen/internal/model"
 	"os"
-
-	"github.com/roelofruis/spullen/internal/data"
 )
 
 type application struct {
 	logger *jsonlog.Logger
-	models data.Models
+	models model.Model
 }
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 
 	app := application{
 		logger: logger,
-		models: data.NewModels(data.NewDBProxy()),
+		models: model.NewModel(db.NewProxy()),
 	}
 
 	err := app.serve()

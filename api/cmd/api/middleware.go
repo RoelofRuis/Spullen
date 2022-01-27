@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/roelofruis/spullen/internal/data"
+	"github.com/roelofruis/spullen/internal/model"
 	"github.com/roelofruis/spullen/internal/request"
 	"github.com/roelofruis/spullen/internal/validator"
 	"net/http"
@@ -10,7 +10,7 @@ import (
 )
 
 func (app *application) authenticate(next http.Handler) http.Handler {
-	return http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Vary", "Authorization")
 
 		authorizationHeader := r.Header.Get("Authorization")
@@ -31,13 +31,13 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 
 		v := validator.New()
 
-		if data.ValidateTokenPlaintext(v, token); !v.Valid() {
+		if model.ValidateTokenPlaintext(v, token); !v.Valid() {
 			app.invalidAuthenticationTokenResponse(w, r)
 			return
 		}
 
 		activeToken := app.models.Token.Get()
-		if activeToken == nil || activeToken.Plaintext != token {
+		if activeToken != token {
 			app.invalidAuthenticationTokenResponse(w, r)
 			return
 		}

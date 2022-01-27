@@ -2,7 +2,7 @@ package main
 
 import (
 	"errors"
-	"github.com/roelofruis/spullen/internal/data"
+	"github.com/roelofruis/spullen/internal/db"
 	"github.com/roelofruis/spullen/internal/model"
 	"github.com/roelofruis/spullen/internal/validator"
 	"net/http"
@@ -12,7 +12,7 @@ func (app *application) handleListTags(w http.ResponseWriter, r *http.Request) {
 	tags, err := app.models.Tags.GetAll()
 	if err != nil {
 		switch {
-		case errors.Is(err, data.ErrNoDataSource):
+		case errors.Is(err, db.ErrNoDataSource):
 			app.unauthorizedResponse(w, r)
 		default:
 			app.serverErrorResponse(w, r, err)
@@ -45,14 +45,14 @@ func (app *application) handleCreateTag(w http.ResponseWriter, r *http.Request) 
 	}
 
 	v := validator.New()
-	if data.ValidateTag(v, tag); !v.Valid() {
+	if model.ValidateTag(v, tag); !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
 
 	if err := app.models.Tags.Insert(tag); err != nil {
 		switch {
-		case errors.Is(err, data.ErrNoDataSource):
+		case errors.Is(err, db.ErrNoDataSource):
 			app.unauthorizedResponse(w, r)
 		default:
 			app.serverErrorResponse(w, r, err)

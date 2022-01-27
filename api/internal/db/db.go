@@ -1,4 +1,4 @@
-package data
+package db
 
 import (
 	"context"
@@ -36,19 +36,19 @@ func ValidateDescription(v *validator.Validator, descr *DBDescription) {
 	v.Check(descr.Pass != "", "pass", "must not be empty")
 }
 
-type DBProxy struct {
+type Proxy struct {
 	db   *sql.DB
 	lock sync.RWMutex
 }
 
-func NewDBProxy() *DBProxy {
-	return &DBProxy{
+func NewProxy() *Proxy {
+	return &Proxy{
 		db:   nil,
 		lock: sync.RWMutex{},
 	}
 }
 
-func (db *DBProxy) Open(descr DBDescription) error {
+func (p *Proxy) Open(descr DBDescription) error {
 	passHash := md5.Sum([]byte(descr.Pass))
 
 	conn, err := sql.Open(
@@ -76,40 +76,40 @@ func (db *DBProxy) Open(descr DBDescription) error {
 		return err
 	}
 
-	db.lock.Lock()
-	db.db = conn
-	db.lock.Unlock()
+	p.lock.Lock()
+	p.db = conn
+	p.lock.Unlock()
 	return nil
 }
 
-func (db *DBProxy) Close() (err error) {
-	if db.db != nil {
-		db.lock.Lock()
-		err = db.db.Close()
-		db.db = nil
-		db.lock.Unlock()
+func (p *Proxy) Close() (err error) {
+	if p.db != nil {
+		p.lock.Lock()
+		err = p.db.Close()
+		p.db = nil
+		p.lock.Unlock()
 	}
 	return
 }
 
-func (db *DBProxy) ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
-	db.lock.RLock()
-	defer db.lock.RUnlock()
+func (p *Proxy) ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
+	p.lock.RLock()
+	defer p.lock.RUnlock()
 
-	if db.db == nil {
+	if p.db == nil {
 		return nil, ErrNoDataSource
 	}
 
-	return db.db.ExecContext(ctx, query, args...)
+	return p.db.ExecContext(ctx, query, args...)
 }
 
-func (db *DBProxy) QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
-	db.lock.RLock()
-	defer db.lock.RUnlock()
+func (p *Proxy) QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
+	p.lock.RLock()
+	defer p.lock.RUnlock()
 
-	if db.db == nil {
+	if p.db == nil {
 		return nil, ErrNoDataSource
 	}
 
-	return db.db.QueryContext(ctx, query, args...)
+	return p.db.QueryContext(ctx, query, args...)
 }
