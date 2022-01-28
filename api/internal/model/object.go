@@ -5,11 +5,6 @@ import (
 	"time"
 )
 
-func ValidateObject(v *validator.Validator, obj *Object) {
-	v.Check(obj.Name != "", "name", "must not be empty")
-
-}
-
 type ObjectID int64
 
 func NewObject(name string, description string) *Object {
@@ -28,6 +23,19 @@ type Object struct {
 	Description     string            `json:"description"`
 	QuantityChanges []*QuantityChange `json:"quantity_changes"`
 	Tags            []TagID           `json:"tags"`
+}
+
+func (o *Object) Validate(v *validator.Validator) {
+	v.Check(o.Name != "", "name", "must not be empty")
+	v.Check(o.QuantitySum() >= 0, "quantity_sum", "cannot be negative")
+}
+
+func (o *Object) QuantitySum() int {
+	sum := 0
+	for _, c := range o.QuantityChanges {
+		sum += c.Quantity
+	}
+	return sum
 }
 
 func (o *Object) ChangeQuantity(amount int, description string) {

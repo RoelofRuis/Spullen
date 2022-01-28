@@ -35,7 +35,7 @@ func (r ObjectRepository) Insert(obj *Object) error {
 
 	for _, qChange := range obj.QuantityChanges {
 		if qChange.ID == QuantityChangeID(0) {
-			query := db.Insert("quantity_change", map[string]interface{}{
+			query := db.Insert("quantity_changes", map[string]interface{}{
 				"object_id":   obj.ID,
 				"at":          qChange.At,
 				"quantity":    qChange.Quantity,

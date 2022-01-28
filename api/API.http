@@ -10,17 +10,17 @@ Content-Type: application/json
 
 POST localhost:8080/v1/objects
 Content-Type: application/json
-Authorization: Bearer UXDVA555IQPSKHBPJLUQM6IBTU
+Authorization: Bearer BDCURJAVHDNXQHZZ3WGCRDB634
 
 {
-  "name": "stoel",
-  "description": "kan je lekker op zitten"
+  "name": "paperclips",
+  "description": ""
 }
 
 ###
 
 GET localhost:8080/v1/objects
-Authorization: Bearer UXDVA555IQPSKHBPJLUQM6IBTU
+Authorization: Bearer BDCURJAVHDNXQHZZ3WGCRDB634
 
 ###
 

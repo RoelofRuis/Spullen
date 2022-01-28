@@ -7,14 +7,24 @@ import (
 
 type InsertStatement struct {
 	table    string
-	values   map[string]interface{}
+	columns  []string
+	values   []interface{}
 	idColumn string
 	idValue  interface{}
 }
 
-func Insert(table string, values map[string]interface{}) *InsertStatement {
+func Insert(table string, args map[string]interface{}) *InsertStatement {
+	var columns []string
+	var values []interface{}
+
+	for col, val := range args {
+		columns = append(columns, col)
+		values = append(values, val)
+	}
+
 	return &InsertStatement{
 		table:  table,
+		columns: columns,
 		values: values,
 	}
 }
@@ -28,22 +38,20 @@ func (i *InsertStatement) Update(idColumn string, idValue interface{}) *InsertSt
 
 func (i *InsertStatement) query() string {
 	if i.idColumn == "" {
-		var columns []string
 		var params []string
 
-		for column := range i.values {
-			columns = append(columns, column)
+		for x := 0; x < len(i.columns); x++ {
 			params = append(params, "?")
 		}
 		return fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)",
 			i.table,
-			strings.Join(columns, ","),
+			strings.Join(i.columns, ","),
 			strings.Join(params, ","),
 		)
 	}
 
 	var params []string
-	for column := range i.values {
+	for _, column := range i.columns {
 		params = append(params, fmt.Sprintf("%s = ?", column))
 	}
 	return fmt.Sprintf("UPDATE %s SET %s WHERE %s = ?",
@@ -54,11 +62,7 @@ func (i *InsertStatement) query() string {
 }
 
 func (i *InsertStatement) args() []interface{} {
-	var values []interface{}
-
-	for _, value := range i.values {
-		values = append(values, value)
-	}
+	var values = i.values
 
 	if i.idColumn != "" {
 		values = append(values, i.idValue)

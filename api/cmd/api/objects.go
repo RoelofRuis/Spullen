@@ -50,6 +50,7 @@ func (app *application) handleCreateObject(w http.ResponseWriter, r *http.Reques
 	var input struct {
 		Name        string `json:"name"`
 		Description string `json:"description"`
+		Quantity    int    `json:"quantity"`
 	}
 
 	err := app.readJSON(w, r, &input)
@@ -60,8 +61,12 @@ func (app *application) handleCreateObject(w http.ResponseWriter, r *http.Reques
 
 	object := model.NewObject(input.Name, input.Description)
 
+	if input.Quantity > 0 {
+		object.ChangeQuantity(input.Quantity, "")
+	}
+
 	v := validator.New()
-	if model.ValidateObject(v, object); !v.Valid() {
+	if object.Validate(v); !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
