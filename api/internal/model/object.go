@@ -27,15 +27,7 @@ type Object struct {
 
 func (o *Object) Validate(v *validator.Validator) {
 	v.Check(o.Name != "", "name", "must not be empty")
-	v.Check(o.QuantitySum() >= 0, "quantity_sum", "cannot be negative")
-}
-
-func (o *Object) QuantitySum() int {
-	sum := 0
-	for _, c := range o.QuantityChanges {
-		sum += c.Quantity
-	}
-	return sum
+	v.Check(o.GetTotalQuantity() >= 0, "total_quantity", "cannot be negative")
 }
 
 func (o *Object) ChangeQuantity(amount int, description string) {
@@ -44,6 +36,33 @@ func (o *Object) ChangeQuantity(amount int, description string) {
 		Quantity:    amount,
 		Description: description,
 	})
+}
+
+func (o *Object) AttachTag(t *Tag) {
+	for _, id := range o.Tags {
+		if id == t.ID {
+			return
+		}
+	}
+	o.Tags = append(o.Tags, t.ID)
+}
+
+func (o *Object) RemoveTag(t *Tag) {
+	for i, id := range o.Tags {
+		if id == t.ID {
+			o.Tags[i] = o.Tags[len(o.Tags)-1]
+			o.Tags = o.Tags[:len(o.Tags)-1]
+			return
+		}
+	}
+}
+
+func (o *Object) GetTotalQuantity() int {
+	sum := 0
+	for _, c := range o.QuantityChanges {
+		sum += c.Quantity
+	}
+	return sum
 }
 
 type QuantityChangeID int64

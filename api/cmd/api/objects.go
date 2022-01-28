@@ -85,3 +85,22 @@ func (app *application) handleCreateObject(w http.ResponseWriter, r *http.Reques
 		app.serverErrorResponse(w, r, err)
 	}
 }
+
+func (app *application) handleTagObject(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		ObjectId int `json:"object_id"`
+		TagId    int `json:"tag_id"`
+	}
+
+	err := app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	// TODO: implement
+	// - lookup object
+	// - lookup tag
+	// - attach tag to object
+	// - store object
+}
