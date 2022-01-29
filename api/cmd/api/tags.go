@@ -9,7 +9,7 @@ import (
 )
 
 func (app *application) handleListTags(w http.ResponseWriter, r *http.Request) {
-	tags, err := app.models.Tags.GetAll()
+	tags, err := app.models.Tags.GetAll(0)
 	if err != nil {
 		switch {
 		case errors.Is(err, db.ErrNoDataSource):

@@ -33,6 +33,8 @@ func (r ObjectRepository) Insert(obj *Object) error {
 		obj.ID = ObjectID(id)
 	}
 
+	// TODO: insert tags
+
 	for _, qChange := range obj.QuantityChanges {
 		if qChange.ID == QuantityChangeID(0) {
 			query := db.Insert("quantity_changes", map[string]interface{}{
@@ -58,7 +60,21 @@ func (r ObjectRepository) Insert(obj *Object) error {
 	return nil
 }
 
-func (r ObjectRepository) GetAll(name string) ([]*Object, error) {
+func (r ObjectRepository) GetOne(id ObjectID) (*Object, error) {
+	objects, err := r.GetAll("", id)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(objects) == 0 {
+		return nil, db.ErrNoSuchRecord
+	}
+
+	return objects[0], nil
+}
+
+// TODO: configurable query
+func (r ObjectRepository) GetAll(name string, id ObjectID) ([]*Object, error) {
 	query := `
 	SELECT id, name, description, COALESCE(tag_list, ""), COALESCE(quantity_change_list, "")
 	FROM objects
@@ -73,6 +89,12 @@ func (r ObjectRepository) GetAll(name string) ([]*Object, error) {
 		GROUP BY object_id
 	) quantity_changes ON quantity_changes.object_id = objects.id`
 	var params []interface{}
+
+	// TODO: improve with query builder
+	if id != 0 {
+		query = query + "\nWHERE id = ?"
+		params = append(params, id)
+	}
 
 	if name != "" {
 		query = query + "\nWHERE name LIKE ?"

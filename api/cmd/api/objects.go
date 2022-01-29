@@ -29,7 +29,7 @@ func (app *application) handleListObjects(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	objects, err := app.models.Objects.GetAll(input.Name)
+	objects, err := app.models.Objects.GetAll(input.Name, 0)
 	if err != nil {
 		switch {
 		case errors.Is(err, db.ErrNoDataSource):
@@ -87,20 +87,51 @@ func (app *application) handleCreateObject(w http.ResponseWriter, r *http.Reques
 }
 
 func (app *application) handleTagObject(w http.ResponseWriter, r *http.Request) {
-	var input struct {
-		ObjectId int `json:"object_id"`
-		TagId    int `json:"tag_id"`
-	}
-
-	err := app.readJSON(w, r, &input)
+	objectId, err := request.ReadIDParam(r)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return
 	}
 
-	// TODO: implement
-	// - lookup object
-	// - lookup tag
-	// - attach tag to object
-	// - store object
+	var input struct {
+		TagId    int `json:"tag_id"`
+	}
+
+	err = app.readJSON(w, r, &input)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	object, err := app.models.Objects.GetOne(model.ObjectID(objectId))
+	if err != nil {
+		switch {
+		case errors.Is(err, db.ErrNoSuchRecord):
+			app.notFoundResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	tag, err := app.models.Tags.GetOne(model.TagID(input.TagId))
+	if err != nil {
+		switch {
+		case errors.Is(err, db.ErrNoSuchRecord):
+			app.notFoundResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	object.AttachTag(tag)
+	if err := app.models.Objects.Insert(object); err != nil {
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
+	if err := app.writeJSON(w, http.StatusOK, envelope{"object": object}, nil); err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
 }

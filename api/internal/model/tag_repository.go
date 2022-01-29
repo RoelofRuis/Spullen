@@ -54,11 +54,31 @@ func (r TagRepository) Insert(tag *Tag) error {
 	return nil
 }
 
-func (r TagRepository) GetAll() ([]*Tag, error) {
+func (r TagRepository) GetOne(id TagID) (*Tag, error) {
+	tags, err := r.GetAll(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(tags) == 0 {
+		return nil, db.ErrNoSuchRecord
+	}
+
+	return tags[0], nil
+}
+
+// TODO: configurable query
+func (r TagRepository) GetAll(id TagID) ([]*Tag, error) {
 	query := `
 	SELECT id, name, description, is_system_tag
 	FROM tags`
 	var params []interface{}
+
+	// TODO: improve with query builder
+	if id != 0 {
+		query = query + "\nWHERE id = ?"
+		params = append(params, id)
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

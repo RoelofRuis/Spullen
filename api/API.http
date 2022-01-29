@@ -19,14 +19,24 @@ Authorization: Bearer BDCURJAVHDNXQHZZ3WGCRDB634
 
 ###
 
+POST localhost:8080/v1/object/1/tag
+Content-Type: application/json
+Authorization: Bearer F7EAQTMIG6H2LEPHFXC4N62JSE
+
+{
+  "tag_id": 1
+}
+
+###
+
 GET localhost:8080/v1/objects
-Authorization: Bearer BDCURJAVHDNXQHZZ3WGCRDB634
+Authorization: Bearer F7EAQTMIG6H2LEPHFXC4N62JSE
 
 ###
 
 POST localhost:8080/v1/tags
 Content-Type: application/json
-Authorization: Bearer AL4RXK7TNUMDX3ZOP766T4URRQ
+Authorization: Bearer F7EAQTMIG6H2LEPHFXC4N62JSE
 
 {
   "name": "meubel",
@@ -36,4 +46,4 @@ Authorization: Bearer AL4RXK7TNUMDX3ZOP766T4URRQ
 ###
 
 GET localhost:8080/v1/tags
-Authorization: Bearer AL4RXK7TNUMDX3ZOP766T4URRQ
+Authorization: Bearer F7EAQTMIG6H2LEPHFXC4N62JSE
