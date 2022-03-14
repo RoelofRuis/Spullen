@@ -23,16 +23,16 @@ func Insert(table string, args map[string]interface{}) *InsertStatement {
 	}
 
 	return &InsertStatement{
-		table:  table,
+		table:   table,
 		columns: columns,
-		values: values,
+		values:  values,
 	}
 }
 
 func (i *InsertStatement) Update(idColumn string, idValue interface{}) *InsertStatement {
 	return &InsertStatement{
 		idColumn: idColumn,
-		idValue: idValue,
+		idValue:  idValue,
 	}
 }
 

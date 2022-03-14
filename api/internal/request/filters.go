@@ -25,4 +25,3 @@ func (f Filters) Limit() int {
 func (f Filters) Offset() int {
 	return (f.Page - 1) * f.PageSize
 }
-

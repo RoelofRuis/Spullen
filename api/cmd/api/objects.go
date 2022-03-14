@@ -94,7 +94,7 @@ func (app *application) handleTagObject(w http.ResponseWriter, r *http.Request) 
 	}
 
 	var input struct {
-		TagId    int `json:"tag_id"`
+		TagId int `json:"tag_id"`
 	}
 
 	err = app.readJSON(w, r, &input)

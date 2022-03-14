@@ -10,7 +10,7 @@ Content-Type: application/json
 
 POST localhost:8080/v1/objects
 Content-Type: application/json
-Authorization: Bearer BDCURJAVHDNXQHZZ3WGCRDB634
+Authorization: Bearer 4HD6CMIKHOKNYNCSQFVVPZRRYE
 
 {
   "name": "paperclips",
@@ -21,7 +21,7 @@ Authorization: Bearer BDCURJAVHDNXQHZZ3WGCRDB634
 
 POST localhost:8080/v1/object/1/tag
 Content-Type: application/json
-Authorization: Bearer F7EAQTMIG6H2LEPHFXC4N62JSE
+Authorization: Bearer 4HD6CMIKHOKNYNCSQFVVPZRRYE
 
 {
   "tag_id": 1
@@ -30,13 +30,13 @@ Authorization: Bearer F7EAQTMIG6H2LEPHFXC4N62JSE
 ###
 
 GET localhost:8080/v1/objects
-Authorization: Bearer F7EAQTMIG6H2LEPHFXC4N62JSE
+Authorization: Bearer 4HD6CMIKHOKNYNCSQFVVPZRRYE
 
 ###
 
 POST localhost:8080/v1/tags
 Content-Type: application/json
-Authorization: Bearer F7EAQTMIG6H2LEPHFXC4N62JSE
+Authorization: Bearer 4HD6CMIKHOKNYNCSQFVVPZRRYE
 
 {
   "name": "meubel",
@@ -46,4 +46,4 @@ Authorization: Bearer F7EAQTMIG6H2LEPHFXC4N62JSE
 ###
 
 GET localhost:8080/v1/tags
-Authorization: Bearer F7EAQTMIG6H2LEPHFXC4N62JSE
+Authorization: Bearer 4HD6CMIKHOKNYNCSQFVVPZRRYE

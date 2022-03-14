@@ -20,7 +20,7 @@ var (
 )
 
 var (
-	ErrInvalidAuth = errors.New("invalid authorization")
+	ErrInvalidAuth  = errors.New("invalid authorization")
 	ErrNoDataSource = errors.New("no data source opened")
 	ErrNoSuchRecord = errors.New("no such record")
 )
